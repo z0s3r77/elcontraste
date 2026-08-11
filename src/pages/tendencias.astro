@@ -4,6 +4,7 @@ import Base from "../layouts/Base.astro";
 
 <Base title="newsdigest — tendencias">
   <h1>Tendencias por tema</h1>
+  <div id="gap"></div>
   <div id="acelerando"></div>
   <div id="chart" class="panel" style="overflow-x:auto"></div>
   <div id="tabla" class="status">Cargando…</div>
@@ -20,10 +21,31 @@ import Base from "../layouts/Base.astro";
   const COLORS = ["#0b5fff", "#b42318", "#067647", "#b54708", "#7839ee", "#dd2590", "#175cd3", "#c11574"];
 
   async function main() {
-    const [trends, accel] = await Promise.all([
+    const [trends, accel, gap] = await Promise.all([
       fetch(`${API}/api/trends?days=180`).then((r) => r.json()),
       fetch(`${API}/api/trends/accelerating`).then((r) => r.json()),
+      fetch(`${API}/api/coverage-gap?days=7`).then((r) => r.json()),
     ]);
+
+    // Cobertura diferencial: lo que un bloque cuenta y el otro calla.
+    if (gap.length) {
+      document.getElementById("gap")!.innerHTML = `
+        <div class="panel">
+          <h3>⚖️ Solo lo cuenta un bloque (últimos 7 días)</h3>
+          ${gap
+            .map(
+              (c: any) => `
+            <a class="card" href="/cluster?id=${c.id}">
+              <div class="headline">${esc(c.headline ?? "(sin síntesis)")}</div>
+              <div class="meta">
+                <span class="pill medio">bloque ${esc(c.covered_by)}</span>
+                ${c.media.map((m: string) => `<span class="pill">${esc(m)}</span>`).join("")}
+              </div>
+            </a>`
+            )
+            .join("")}
+        </div>`;
+    }
 
     // Temas en aceleración (media 7d > 2× media 90d)
     if (accel.length) {
