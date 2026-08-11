@@ -1,0 +1,33 @@
+CLAUDE.md
+  s_1d94626668ff21::t_24820de78193a0 78-89
+README.md
+  s_1d94626668ff21::t_e2139390c6a55e 80-84
+api/main.py
+  s_1d94626668ff21::t_f1cf035dd46812 247-292
+docs/fase-9.md
+  s_1d94626668ff21::t_a317d9ea4e4878 1-67
+docs/resumen.md
+  s_1d94626668ff21::t_bc137204105cff 1-124
+pipeline/run_daily.py
+  s_1d94626668ff21::t_5b8bfd857d5b9a 1-56
+scripts/pipeline_cron.sh
+  s_1d94626668ff21::t_048ab98db60d28 2-5,13-20
+web/src/pages/tendencias.astro
+  s_1d94626668ff21::t_799e30e460729f 7,24,27,30-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4eeeaab6581b08b235415e0ddaff81010a508123",
+  "prompts": {},
+  "sessions": {
+    "s_1d94626668ff21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dd4aed0-fa9f-451f-98e1-bb5145f002e2",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
