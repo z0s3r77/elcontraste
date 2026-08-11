@@ -1,0 +1,23 @@
+CLAUDE.md
+  s_1d94626668ff21::t_3af727d0f993e1 60-69
+docs/fase-6.md
+  s_1d94626668ff21::t_8f3f944e96205e 1-82
+pipeline/classify.py
+  s_1d94626668ff21::t_c802c38a1ce174 1-210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "717ae40f8b0ab03ff684b1d5db5896094aa50ef5",
+  "prompts": {},
+  "sessions": {
+    "s_1d94626668ff21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dd4aed0-fa9f-451f-98e1-bb5145f002e2",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
