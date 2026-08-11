@@ -1,0 +1,27 @@
+CLAUDE.md
+  s_1d94626668ff21::t_a644572090d198 50-59
+docker-compose.yml
+  s_1d94626668ff21::t_4aabe1771ded9d 16-18
+docs/fase-5.md
+  s_1d94626668ff21::t_04f6502d09555e 1-91
+pipeline/synthesize.py
+  s_1d94626668ff21::t_cefdcdbe7c5ce0 1-192
+pyproject.toml
+  s_1d94626668ff21::t_192f58f7ba219a 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "d3a2185982dab14c27635406a9b4e31469b50174",
+  "prompts": {},
+  "sessions": {
+    "s_1d94626668ff21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dd4aed0-fa9f-451f-98e1-bb5145f002e2",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
