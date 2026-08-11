@@ -1,113 +1,201 @@
 ---
 import Base from "../layouts/Base.astro";
+// Familia datos (04 · Stat-Led). La cobertura diferencial se ha movido a la
+// portada (superficie 03 del Ecosystem Index): aquí sobraba duplicada y allí
+// es lo que engancha. Esta página se queda con la serie temporal, que es lo
+// único que necesita histórico.
 ---
 
-<Base title="newsdigest — tendencias">
-  <h1>Tendencias por tema</h1>
-  <div id="gap"></div>
+<Base title="El Contraste — tendencias" seccion="tendencias">
+  <div id="cabecera"></div>
   <div id="acelerando"></div>
-  <div id="chart" class="panel" style="overflow-x:auto"></div>
-  <div id="tabla" class="status">Cargando…</div>
+  <div class="banda">
+    <span class="banda-num">01</span>
+    <h2>Historias por tema y día</h2>
+    <span class="cuenta">8 temas con más histórico</span>
+  </div>
+  <div id="grafica" class="grafica"></div>
+  <div id="tabla"><p class="estado">Cargando la serie…</p></div>
 </Base>
 
 <script>
   import uPlot from "uplot";
   import "uplot/dist/uPlot.min.css";
+  import { esc, traer, rotula } from "../lib/ui";
 
-  const API = location.port === "4321" ? "http://localhost:8000" : "";
-  const esc = (s: string) =>
-    s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
-
-  const COLORS = ["#0b5fff", "#b42318", "#067647", "#b54708", "#7839ee", "#dd2590", "#175cd3", "#c11574"];
+  // Los colores de serie salen de tokens, no de hex sueltos (design.md).
+  const token = (n: string) =>
+    getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
   async function main() {
-    const [trends, accel, gap] = await Promise.all([
-      fetch(`${API}/api/trends?days=180`).then((r) => r.json()),
-      fetch(`${API}/api/trends/accelerating`).then((r) => r.json()),
-      fetch(`${API}/api/coverage-gap?days=7`).then((r) => r.json()),
-    ]);
-
-    // Cobertura diferencial: lo que un bloque cuenta y el otro calla.
-    if (gap.length) {
-      document.getElementById("gap")!.innerHTML = `
-        <div class="panel">
-          <h3>⚖️ Solo lo cuenta un bloque (últimos 7 días)</h3>
-          ${gap
-            .map(
-              (c: any) => `
-            <a class="card" href="/cluster?id=${c.id}">
-              <div class="headline">${esc(c.headline ?? "(sin síntesis)")}</div>
-              <div class="meta">
-                <span class="pill medio">bloque ${esc(c.covered_by)}</span>
-                ${c.media.map((m: string) => `<span class="pill">${esc(m)}</span>`).join("")}
-              </div>
-            </a>`
-            )
-            .join("")}
-        </div>`;
-    }
-
-    // Temas en aceleración (media 7d > 2× media 90d)
-    if (accel.length) {
-      document.getElementById("acelerando")!.innerHTML = `
-        <div class="panel">
-          <h3>🚀 Subiendo</h3>
-          ${accel
-            .map((a: any) => `<span class="pill">${esc(a.topic)} (${a.avg_7d} vs ${a.avg_90d})</span>`)
-            .join(" ")}
-        </div>`;
-    }
-
     const tabla = document.getElementById("tabla")!;
-    if (!trends.length) {
-      tabla.textContent = "Aún no hay días suficientes. El cron los irá acumulando.";
+    let trends: any[], accel: any[];
+    try {
+      [trends, accel] = await Promise.all([
+        traer<any[]>("/api/trends?days=180"),
+        traer<any[]>("/api/trends/accelerating"),
+      ]);
+    } catch (err) {
+      tabla.innerHTML = `<p class="estado">No se pudieron cargar las tendencias: ${esc(err)}</p>`;
       return;
     }
 
-    // Gráfica uPlot: los 8 temas con más días de datos, clústeres/día.
-    const top = trends.slice(0, 8);
-    const days = [...new Set(top.flatMap((t: any) => t.points.map((p: any) => p.day)))].sort();
-    const x = days.map((d) => new Date(d + "T00:00:00Z").getTime() / 1000);
-    const series = top.map((t: any) => {
-      const by = Object.fromEntries(t.points.map((p: any) => [p.day, p.n_clusters]));
-      return days.map((d) => by[d] ?? 0);
-    });
+    const dias = new Set(trends.flatMap((t) => t.points.map((p: any) => p.day))).size;
+    document.getElementById("mast-edicion")!.textContent =
+      `Tendencias · ${dias} ${dias === 1 ? "día" : "días"} de histórico`;
 
-    new uPlot(
-      {
-        width: Math.max(700, days.length * 40),
-        height: 300,
-        title: "Clústeres por tema y día",
-        series: [
-          {},
-          ...top.map((t: any, i: number) => ({
-            label: t.topic, stroke: COLORS[i % COLORS.length], width: 2,
-          })),
-        ],
-        axes: [{}, { label: "clústeres" }],
-      },
-      [x, ...series] as any,
-      document.getElementById("chart")!
-    );
+    document.getElementById("cabecera")!.innerHTML = `
+      <section class="cifra-hero">
+        <p class="cifra dato">${dias}</p>
+        <p class="cifra-frase">
+          ${dias === 1 ? "día registrado" : "días registrados"} desde que el pipeline
+          empezó a contar temas. La serie gana sentido a partir de dos o tres semanas.
+        </p>
+      </section>`;
 
-    // Tabla completa
-    tabla.className = "panel";
-    tabla.innerHTML = `
-      <table>
-        <thead><tr><th>Tema</th><th>Sección</th><th>Días con datos</th><th>Clústeres totales</th></tr></thead>
-        <tbody>
-          ${trends
+    if (accel.length) {
+      document.getElementById("acelerando")!.innerHTML = `
+        <div class="banda">
+          <span class="banda-num">00</span><h2>Subiendo</h2>
+          <span class="cuenta">7 días &gt; 2× la media de 90</span>
+        </div>
+        <ul class="lista-acelera">
+          ${accel
             .map(
-              (t: any) => `
-            <tr>
-              <td>${esc(t.topic)}</td><td>${esc(t.section)}</td>
-              <td>${t.points.length}</td>
-              <td>${t.points.reduce((acc: number, p: any) => acc + p.n_clusters, 0)}</td>
-            </tr>`
+              (a: any) => `<li>
+                <a href="/seccion?s=${encodeURIComponent(a.section)}&tema=${encodeURIComponent(a.topic)}">${esc(
+                  a.topic,
+                )}</a>
+                <span class="dato muted">${a.avg_7d} vs ${a.avg_90d}</span>
+              </li>`,
             )
             .join("")}
-        </tbody>
-      </table>`;
+        </ul>`;
+    }
+
+    if (!trends.length) {
+      tabla.innerHTML = `<p class="aviso">Todavía no hay días suficientes.
+        El cron los va acumulando en cada pasada.</p>`;
+      return;
+    }
+
+    // ── Gráfica: los 8 temas con más días de datos.
+    const top = trends.slice(0, 8);
+    const dd = [...new Set(top.flatMap((t: any) => t.points.map((p: any) => p.day)))].sort();
+    const x = dd.map((d) => new Date(d + "T00:00:00Z").getTime() / 1000);
+    const series = top.map((t: any) => {
+      const by = Object.fromEntries(t.points.map((p: any) => [p.day, p.n_clusters]));
+      return dd.map((d) => by[d] ?? 0);
+    });
+    const colores = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => token(`--serie-${i}`));
+
+    const contenedor = document.getElementById("grafica")!;
+    const pintar = () =>
+      new uPlot(
+        {
+          width: Math.max(contenedor.clientWidth || 640, dd.length * 44),
+          height: 300,
+          series: [
+            {},
+            ...top.map((t: any, i: number) => ({
+              label: t.topic,
+              stroke: colores[i % colores.length],
+              width: 2,
+            })),
+          ],
+          axes: [
+            { stroke: token("--color-neutral"), grid: { stroke: token("--color-rule") } },
+            {
+              label: "historias",
+              stroke: token("--color-neutral"),
+              grid: { stroke: token("--color-rule") },
+            },
+          ],
+        },
+        [x, ...series] as any,
+        contenedor,
+      );
+    pintar();
+
+    // ── Tabla completa: el archivo, ordenado por volumen.
+    tabla.innerHTML = `
+      <div class="banda">
+        <span class="banda-num">02</span><h2>Todos los temas</h2>
+        <span class="cuenta">${trends.length} con datos</span>
+      </div>
+      <div class="tabla-envoltorio">
+        <table class="tabla-radar">
+          <thead>
+            <tr>
+              <th scope="col">Tema</th><th scope="col">Sección</th>
+              <th scope="col">Días</th><th scope="col">Historias</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${trends
+              .map(
+                (t: any) => `
+              <tr>
+                <th scope="row">
+                  <a href="/seccion?s=${encodeURIComponent(t.section)}&tema=${encodeURIComponent(
+                    t.topic,
+                  )}">${esc(t.topic)}</a>
+                </th>
+                <td>${esc(rotula(t.section))}</td>
+                <td class="dato">${t.points.length}</td>
+                <td class="dato">${t.points.reduce(
+                  (acc: number, p: any) => acc + p.n_clusters,
+                  0,
+                )}</td>
+              </tr>`,
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>`;
   }
   main();
 </script>
+
+<style is:global>
+  :root {
+    --serie-1: oklch(48% 0.140 245);
+    --serie-2: oklch(48% 0.150 25);
+    --serie-3: oklch(50% 0.120 150);
+    --serie-4: oklch(55% 0.130 70);
+    --serie-5: oklch(45% 0.140 310);
+    --serie-6: oklch(52% 0.110 195);
+    --serie-7: oklch(42% 0.120 340);
+    --serie-8: oklch(58% 0.090 100);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --serie-1: oklch(76% 0.130 245);
+      --serie-2: oklch(72% 0.140 25);
+      --serie-3: oklch(74% 0.120 150);
+      --serie-4: oklch(78% 0.120 70);
+      --serie-5: oklch(72% 0.130 310);
+      --serie-6: oklch(76% 0.100 195);
+      --serie-7: oklch(70% 0.120 340);
+      --serie-8: oklch(80% 0.090 100);
+    }
+  }
+
+  .grafica {
+    overflow-x: auto;
+    margin-bottom: var(--space-lg);
+  }
+  .grafica .u-legend { font-family: var(--font-outlier); font-size: var(--text-xs); }
+  .grafica .u-title { display: none; }
+
+  .lista-acelera {
+    list-style: none; margin: 0 0 var(--space-lg); padding: 0;
+    display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-md);
+  }
+  .lista-acelera li {
+    display: flex; gap: var(--space-3xs); align-items: baseline;
+    font-family: var(--font-outlier); font-size: var(--text-xs);
+  }
+  .lista-acelera a { color: var(--color-accent); text-decoration: none; }
+  .lista-acelera a:hover { text-decoration: underline; }
+</style>
