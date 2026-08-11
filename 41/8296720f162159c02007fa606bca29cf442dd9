@@ -1,0 +1,23 @@
+docs/fase-4.md
+  s_1d94626668ff21::t_cd813a5a8b2ffb 1-86
+pipeline/cluster.py
+  s_1d94626668ff21::t_4b3409380a432b 1-112
+CLAUDE.md
+  s_1d94626668ff21::t_35ebb6e3a74a96 45-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "418296720f162159c02007fa606bca29cf442dd9",
+  "prompts": {},
+  "sessions": {
+    "s_1d94626668ff21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dd4aed0-fa9f-451f-98e1-bb5145f002e2",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
