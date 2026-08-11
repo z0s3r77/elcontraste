@@ -1,0 +1,21 @@
+CLAUDE.md
+  s_1d94626668ff21::t_21710d157d70a2 50-61
+docs/fase-5.md
+  s_1d94626668ff21::t_f1240407bb13fa 73-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "52e64d0dd6e9f515658f1fb7ba122e46aa800155",
+  "prompts": {},
+  "sessions": {
+    "s_1d94626668ff21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dd4aed0-fa9f-451f-98e1-bb5145f002e2",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
