@@ -1,0 +1,41 @@
+.dockerignore
+  s_4c5e92b79763cd::t_0d8a977b216fde 1-21
+.gitignore
+  s_4c5e92b79763cd::t_9e8c73c7961e01 1-29
+CLAUDE.md
+  s_4c5e92b79763cd::t_5adf071f705d5d 1-69
+Dockerfile
+  s_4c5e92b79763cd::t_082a7533601acd 1-25
+PLAN.md
+  s_4c5e92b79763cd::t_2010c2b56a43d3 1-330
+README.md
+  s_4c5e92b79763cd::t_c5aecc0716b064 1-83
+api/main.py
+  s_4c5e92b79763cd::t_f297b39f91ac7c 1-61
+config/sources.yaml
+  s_4c5e92b79763cd::t_bd532857a74b51 1-58
+config/taxonomy.yaml
+  s_4c5e92b79763cd::t_2cd069807aaf8c 1-32
+db/schema.sql
+  s_4c5e92b79763cd::t_3f8b1d685766b0 1-97
+docker-compose.yml
+  s_4c5e92b79763cd::t_86957659483d5b 1-18
+pyproject.toml
+  s_4c5e92b79763cd::t_84c1e4e7f844c8 1-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "8b285a1a6204b1dd61eed4f7e65c0f7a80db9202",
+  "prompts": {},
+  "sessions": {
+    "s_4c5e92b79763cd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6b43444-377a-4c98-b4cf-31cbf4eac101",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
