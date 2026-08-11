@@ -1,0 +1,269 @@
+.agents/skills/hallmark/SKILL.md
+  s_8c8a274509502a::t_a46881df4e0243 1-558
+.agents/skills/hallmark/references/anti-patterns.md
+  s_8c8a274509502a::t_a50a826cbc21b9 1-418
+.agents/skills/hallmark/references/assets.md
+  s_8c8a274509502a::t_a3199a5fcba61e 1-406
+.agents/skills/hallmark/references/color.md
+  s_8c8a274509502a::t_f65edd5138a530 1-95
+.agents/skills/hallmark/references/component-cookbook.md
+  s_8c8a274509502a::t_c5b8185e93270b 1-265
+.agents/skills/hallmark/references/components/c1-outlined-chip.md
+  s_8c8a274509502a::t_bc11cb56eeff98 1-12
+.agents/skills/hallmark/references/components/c2-inline-form-as-cta.md
+  s_8c8a274509502a::t_2139b3ef4f10f0 1-16
+.agents/skills/hallmark/references/components/c3-typographic-link.md
+  s_8c8a274509502a::t_7afc1b1fc5169b 1-8
+.agents/skills/hallmark/references/components/c4-sticky-bottom-bar.md
+  s_8c8a274509502a::t_9148b25518455e 1-16
+.agents/skills/hallmark/references/components/f1-bento-grid.md
+  s_8c8a274509502a::t_39feda55ff0590 1-20
+.agents/skills/hallmark/references/components/f2-sticky-scroll-stack.md
+  s_8c8a274509502a::t_90e97941a850bc 1-20
+.agents/skills/hallmark/references/components/f3-tabular-spec-sheet.md
+  s_8c8a274509502a::t_e9c8e629a73bd6 1-11
+.agents/skills/hallmark/references/components/f4-step-sequence.md
+  s_8c8a274509502a::t_df09f2af7a997d 1-11
+.agents/skills/hallmark/references/components/f5-annotated-screenshot.md
+  s_8c8a274509502a::t_9d4d3b5e89e162 1-11
+.agents/skills/hallmark/references/components/f6-product-card-grid.md
+  s_8c8a274509502a::t_97814d381246bf 1-41
+.agents/skills/hallmark/references/components/ft1-mast-headed.md
+  s_8c8a274509502a::t_5fe93fe3236538 1-13
+.agents/skills/hallmark/references/components/ft2-inline-rule-single-line.md
+  s_8c8a274509502a::t_eade8dc27fed7b 1-10
+.agents/skills/hallmark/references/components/ft3-index-style-category-list.md
+  s_8c8a274509502a::t_b08d034310c887 1-12
+.agents/skills/hallmark/references/components/ft4-dense-typographic.md
+  s_8c8a274509502a::t_a508a676fd2d79 1-10
+.agents/skills/hallmark/references/components/ft5-statement.md
+  s_8c8a274509502a::t_9af5141a6cacfe 1-21
+.agents/skills/hallmark/references/components/ft6-letter-close.md
+  s_8c8a274509502a::t_299bee79cf1713 1-19
+.agents/skills/hallmark/references/components/ft7-newsletter-first.md
+  s_8c8a274509502a::t_d6c9fed4c7427f 1-27
+.agents/skills/hallmark/references/components/ft8-marquee-scroll.md
+  s_8c8a274509502a::t_e81b2b514faa69 1-25
+.agents/skills/hallmark/references/components/h1-marquee.md
+  s_8c8a274509502a::t_ced4726736fb5c 1-15
+.agents/skills/hallmark/references/components/h2-split-diptych.md
+  s_8c8a274509502a::t_019459e01fbe1c 1-15
+.agents/skills/hallmark/references/components/h3-quote-led.md
+  s_8c8a274509502a::t_9570c9e56c5c45 1-11
+.agents/skills/hallmark/references/components/h4-stat-led.md
+  s_8c8a274509502a::t_2c7402bc232bdb 1-14
+.agents/skills/hallmark/references/components/h5-letter-hero.md
+  s_8c8a274509502a::t_3ee1ec00e96981 1-11
+.agents/skills/hallmark/references/components/h6-photographic-fold.md
+  s_8c8a274509502a::t_edc42319d37441 1-16
+.agents/skills/hallmark/references/components/h7-demo-video-clipped-by-viewport-edge.md
+  s_8c8a274509502a::t_63bc5642cd962a 1-27
+.agents/skills/hallmark/references/components/h8-mockup-split-browser-framed.md
+  s_8c8a274509502a::t_734398636554e4 1-23
+.agents/skills/hallmark/references/components/h9-custom-illustration-centerpiece.md
+  s_8c8a274509502a::t_a5adb512d5494a 1-27
+.agents/skills/hallmark/references/components/n1-wordmark-2-links.md
+  s_8c8a274509502a::t_4c86790156b4f8 1-12
+.agents/skills/hallmark/references/components/n10-floating-on-scroll-morph.md
+  s_8c8a274509502a::t_d9c5e1288706e6 1-19
+.agents/skills/hallmark/references/components/n11-mega-menu.md
+  s_8c8a274509502a::t_2255705046eb2f 1-40
+.agents/skills/hallmark/references/components/n12-banner-retract.md
+  s_8c8a274509502a::t_5c5ce7adbbef38 1-34
+.agents/skills/hallmark/references/components/n13-inline-cmdk-pill.md
+  s_8c8a274509502a::t_df8b0e034029c0 1-39
+.agents/skills/hallmark/references/components/n1b-saas-three-section.md
+  s_8c8a274509502a::t_d960aa30947a4f 1-35
+.agents/skills/hallmark/references/components/n2-floating-chip.md
+  s_8c8a274509502a::t_5ee8139e758620 1-14
+.agents/skills/hallmark/references/components/n3-side-rail.md
+  s_8c8a274509502a::t_ec5d8d4179a60d 1-14
+.agents/skills/hallmark/references/components/n4-hidden-behind-k.md
+  s_8c8a274509502a::t_ab8cc259c315ce 1-9
+.agents/skills/hallmark/references/components/n5-floating-pill.md
+  s_8c8a274509502a::t_36aeecd5f20d2a 1-28
+.agents/skills/hallmark/references/components/n6-newspaper-masthead.md
+  s_8c8a274509502a::t_48cd862e16b82f 1-24
+.agents/skills/hallmark/references/components/n7-brutal-slab.md
+  s_8c8a274509502a::t_9ae8e34b49c92e 1-22
+.agents/skills/hallmark/references/components/n8-terminal-command.md
+  s_8c8a274509502a::t_fa353ee5dd5bfb 1-21
+.agents/skills/hallmark/references/components/n9-edge-aligned-minimal.md
+  s_8c8a274509502a::t_685aca5fd8d971 1-17
+.agents/skills/hallmark/references/components/s1-left-margin-numbered.md
+  s_8c8a274509502a::t_4f603a3b1bebe5 1-15
+.agents/skills/hallmark/references/components/s2-hanging.md
+  s_8c8a274509502a::t_12768aeda86f6e 1-13
+.agents/skills/hallmark/references/components/s3-sticky-pinned.md
+  s_8c8a274509502a::t_316c6b0c5fd3bd 1-19
+.agents/skills/hallmark/references/components/s4-inline-no-break.md
+  s_8c8a274509502a::t_0d1c0e2f184fb4 1-11
+.agents/skills/hallmark/references/components/s5-bottom-anchored.md
+  s_8c8a274509502a::t_d2fee62ddd6c76 1-13
+.agents/skills/hallmark/references/components/t1-pull-quote-with-marginalia.md
+  s_8c8a274509502a::t_5648a293a2a46f 1-12
+.agents/skills/hallmark/references/components/t2-logo-wall-hairline.md
+  s_8c8a274509502a::t_5a8863cd3cf428 1-19
+.agents/skills/hallmark/references/components/t3-single-huge-quote.md
+  s_8c8a274509502a::t_288d5bc2c00642 1-11
+.agents/skills/hallmark/references/components/t4-numbered-stat-strip.md
+  s_8c8a274509502a::t_a689523f10b61b 1-14
+.agents/skills/hallmark/references/contract.md
+  s_8c8a274509502a::t_2ce335d0cdf23b 1-25
+.agents/skills/hallmark/references/copy.md
+  s_8c8a274509502a::t_fca547c2c4e7fb 1-182
+.agents/skills/hallmark/references/custom-craft.md
+  s_8c8a274509502a::t_085c13bf84f2cc 1-626
+.agents/skills/hallmark/references/custom-theme.md
+  s_8c8a274509502a::t_956ba482e020fd 1-367
+.agents/skills/hallmark/references/design-md.md
+  s_8c8a274509502a::t_027509c6b46862 1-116
+.agents/skills/hallmark/references/export-formats.md
+  s_8c8a274509502a::t_a31393ab4b2664 1-329
+.agents/skills/hallmark/references/floating-nav.md
+  s_8c8a274509502a::t_9b953e2ad09849 1-89
+.agents/skills/hallmark/references/genres/atmospheric.md
+  s_8c8a274509502a::t_b6e6e833e35233 1-69
+.agents/skills/hallmark/references/genres/editorial.md
+  s_8c8a274509502a::t_0ffccb5b119ed0 1-72
+.agents/skills/hallmark/references/genres/modern-minimal.md
+  s_8c8a274509502a::t_5d168d64c0d878 1-71
+.agents/skills/hallmark/references/genres/playful.md
+  s_8c8a274509502a::t_44b866d97c753f 1-70
+.agents/skills/hallmark/references/hero-enrichment.md
+  s_8c8a274509502a::t_307c9a1e0f0af1 1-475
+.agents/skills/hallmark/references/imagery-kit.md
+  s_8c8a274509502a::t_6902a21ccdd77e 1-170
+.agents/skills/hallmark/references/interaction-and-states.md
+  s_8c8a274509502a::t_6bcaa12c13529c 1-208
+.agents/skills/hallmark/references/layout-and-space.md
+  s_8c8a274509502a::t_0b1e6bf56e5ff7 1-112
+.agents/skills/hallmark/references/macrostructures.md
+  s_8c8a274509502a::t_de9375ae95ffc8 1-89
+.agents/skills/hallmark/references/macrostructures/01-bento-grid.md
+  s_8c8a274509502a::t_ce95c6b3752290 1-35
+.agents/skills/hallmark/references/macrostructures/02-long-document.md
+  s_8c8a274509502a::t_5d10ddb5efa866 1-34
+.agents/skills/hallmark/references/macrostructures/03-marquee-hero.md
+  s_8c8a274509502a::t_833426976c8ba3 1-31
+.agents/skills/hallmark/references/macrostructures/04-stat-led.md
+  s_8c8a274509502a::t_8c3da74d97a7eb 1-34
+.agents/skills/hallmark/references/macrostructures/05-workbench.md
+  s_8c8a274509502a::t_6dafb200940bca 1-32
+.agents/skills/hallmark/references/macrostructures/06-conversational-faq.md
+  s_8c8a274509502a::t_ab478a329bcc33 1-33
+.agents/skills/hallmark/references/macrostructures/07-manifesto.md
+  s_8c8a274509502a::t_15b9a2b367d302 1-32
+.agents/skills/hallmark/references/macrostructures/08-photographic.md
+  s_8c8a274509502a::t_efd9511aed7798 1-34
+.agents/skills/hallmark/references/macrostructures/09-quote-led.md
+  s_8c8a274509502a::t_2aedbfe2526dad 1-32
+.agents/skills/hallmark/references/macrostructures/10-specimen.md
+  s_8c8a274509502a::t_0ee99b7601861f 1-32
+.agents/skills/hallmark/references/macrostructures/11-catalogue.md
+  s_8c8a274509502a::t_75d7c3849b8322 1-23
+.agents/skills/hallmark/references/macrostructures/12-letter.md
+  s_8c8a274509502a::t_0b0a1d2b655392 1-23
+.agents/skills/hallmark/references/macrostructures/13-index-first.md
+  s_8c8a274509502a::t_656095a3086cad 1-23
+.agents/skills/hallmark/references/macrostructures/14-narrative-workflow.md
+  s_8c8a274509502a::t_0318bcaee85f87 1-23
+.agents/skills/hallmark/references/macrostructures/15-split-studio.md
+  s_8c8a274509502a::t_a39a1fe86bbbda 1-23
+.agents/skills/hallmark/references/macrostructures/16-feature-stack.md
+  s_8c8a274509502a::t_eea3fec326709c 1-23
+.agents/skills/hallmark/references/macrostructures/17-type-specimen.md
+  s_8c8a274509502a::t_c06e67783e9c54 1-23
+.agents/skills/hallmark/references/macrostructures/18-portfolio-grid.md
+  s_8c8a274509502a::t_eca2862d3900c5 1-23
+.agents/skills/hallmark/references/macrostructures/19-map-diagram.md
+  s_8c8a274509502a::t_66eff777fc309c 1-23
+.agents/skills/hallmark/references/macrostructures/20-ecosystem-index.md
+  s_8c8a274509502a::t_12038909a01a60 1-23
+.agents/skills/hallmark/references/macrostructures/21-component-playground.md
+  s_8c8a274509502a::t_f7121fc1a621b9 1-23
+.agents/skills/hallmark/references/microinteractions.md
+  s_8c8a274509502a::t_c75c2358bc7c18 1-258
+.agents/skills/hallmark/references/motion.md
+  s_8c8a274509502a::t_b3bea0646cf11c 1-109
+.agents/skills/hallmark/references/preview-examples.md
+  s_8c8a274509502a::t_94816946d8e7f9 1-49
+.agents/skills/hallmark/references/responsive.md
+  s_8c8a274509502a::t_34e862cac118c7 1-138
+.agents/skills/hallmark/references/slop-test.md
+  s_8c8a274509502a::t_4261e17b8135ad 1-192
+.agents/skills/hallmark/references/structure.md
+  s_8c8a274509502a::t_81d563f1f5788e 1-160
+.agents/skills/hallmark/references/study.md
+  s_8c8a274509502a::t_251a0ff61dd0d1 1-509
+.agents/skills/hallmark/references/themes/carnival.md
+  s_8c8a274509502a::t_95b0f9d9302030 1-301
+.agents/skills/hallmark/references/themes/cobalt.md
+  s_8c8a274509502a::t_f47f9a8af8d98e 1-146
+.agents/skills/hallmark/references/themes/grid.md
+  s_8c8a274509502a::t_d24124505adaec 1-161
+.agents/skills/hallmark/references/themes/hum.md
+  s_8c8a274509502a::t_78d454aa47f483 1-403
+.agents/skills/hallmark/references/themes/lumen.md
+  s_8c8a274509502a::t_55f6817632ee8e 1-478
+.agents/skills/hallmark/references/typography.md
+  s_8c8a274509502a::t_ff09e61c2ee229 1-243
+.agents/skills/hallmark/references/verbs/audit.md
+  s_8c8a274509502a::t_32f8e689af39bf 1-25
+.agents/skills/hallmark/references/verbs/redesign.md
+  s_8c8a274509502a::t_9e5763ef4d7732 1-269
+.claude/skills/hallmark
+  s_8c8a274509502a::t_b25769edda5864 1
+skills-lock.json
+  s_8c8a274509502a::t_faa7a6795af713 1-11
+CLAUDE.md
+  s_8c8a274509502a::t_4ff4bc72daba5c 20,22-23,56-58,81-82,88-124,127-132,148-151
+PLAN.md
+  s_8c8a274509502a::t_50012a3aecc322 4
+api/main.py
+  s_8c8a274509502a::t_3e6c3319649f52 101-108,112,256-339
+config/sources.yaml
+  s_8c8a274509502a::t_b73c757ec58bf2 44-91
+design.md
+  s_8c8a274509502a::t_1cfc8b35c80519 1-99
+docs/fase-10.md
+  s_8c8a274509502a::t_6002c1b09b8976 1-143
+docs/fase-9.md
+  s_8c8a274509502a::t_30161c2e5c77c8 18-22
+docs/resumen.md
+  s_8c8a274509502a::t_ae59e82128ee93 55
+pipeline/run_daily.py
+  s_8c8a274509502a::t_eef47d7a7ce0a8 6,24
+pipeline/synthesize.py
+  s_8c8a274509502a::t_e57db0ae3ecf2f 28-30,48-63,81,86,92-117,148-152,156-157
+web/src/layouts/Base.astro
+  s_8c8a274509502a::t_deca15b2b9d8c9 2-3,12-17,20-29,31,33,37-47,53-56,58-96,98,100-101,104-383
+web/src/lib/ui.ts
+  s_8c8a274509502a::t_640545e87490dc 1-62
+web/src/pages/cluster.astro
+  s_8c8a274509502a::t_9bd87434d099ec 3-4,7-8,12,14-24,27,29-33,35,38-92,94-104,106,109-125,128-221
+web/src/pages/index.astro
+  s_8c8a274509502a::t_2f18d5a4ff8f62 3-5,8-14,18,20,22-33,36,38-63,65-85,88-123,125,130-227
+web/src/pages/radar.astro
+  s_8c8a274509502a::t_babf11eb40b8be 1-144
+web/src/pages/seccion.astro
+  s_8c8a274509502a::t_8f22f28b649ef5 1-131
+web/src/pages/tendencias.astro
+  s_8c8a274509502a::t_9ac96c5bbe638b 3-6,9-10,12-18,24,26-28,31-40,43-55,58-62,64-73,77-78,82,84-85,88,90,92-118,120,122-128,130-155,159-201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "13efba3d3e8ff51c2a4f1bee04cc29370658e7cd",
+  "prompts": {},
+  "sessions": {
+    "s_8c8a274509502a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a3d15c3-ada6-46d9-9628-811d750e0761",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
