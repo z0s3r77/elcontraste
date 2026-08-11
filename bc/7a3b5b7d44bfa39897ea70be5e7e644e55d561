@@ -1,0 +1,23 @@
+pipeline/extract.py
+  s_1d94626668ff21::t_a5f75d1cbbcad5 1-163
+scripts/pipeline_cron.sh
+  s_1d94626668ff21::t_21484673440c35 13
+docs/fase-2.md
+  s_1d94626668ff21::t_6afadd479fc59a 1-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "bc7a3b5b7d44bfa39897ea70be5e7e644e55d561",
+  "prompts": {},
+  "sessions": {
+    "s_1d94626668ff21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dd4aed0-fa9f-451f-98e1-bb5145f002e2",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
