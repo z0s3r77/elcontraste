@@ -1,0 +1,35 @@
+scripts/pipeline_cron.sh
+  s_7d30bdc0bf5b26::t_6fa1a882ea75ea 1-13
+CLAUDE.md
+  s_7d30bdc0bf5b26::t_324fe39d5a993d 26-30,32-37,51-55
+Dockerfile
+  s_7d30bdc0bf5b26::t_2731042aefaa1c 15-22
+certs/README.md
+  s_7d30bdc0bf5b26::t_716919097c96e4 1-21
+config/sources.yaml
+  s_7d30bdc0bf5b26::t_405bc9ed2663c8 6
+docs/fase-1.md
+  s_7d30bdc0bf5b26::t_a64877362e15bd 1-357
+pipeline/backfill.py
+  s_7d30bdc0bf5b26::t_1681c4db17a2b5 1-120
+pipeline/ingest.py
+  s_7d30bdc0bf5b26::t_7367b8198715b7 1-207
+.gitignore
+  s_7d30bdc0bf5b26::t_321c1abf453a81 6,23-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "09965823356a365eef083f39b12b1836db0dc742",
+  "prompts": {},
+  "sessions": {
+    "s_7d30bdc0bf5b26": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "738d525f-bb15-44a1-aa44-43a95def7704",
+        "model": "claude-fable-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
