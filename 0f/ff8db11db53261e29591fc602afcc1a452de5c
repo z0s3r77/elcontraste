@@ -1,0 +1,19 @@
+docs/plan-fase-11.md
+  s_8c8a274509502a::t_1d29859160f3e3 1-323
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "0fff8db11db53261e29591fc602afcc1a452de5c",
+  "prompts": {},
+  "sessions": {
+    "s_8c8a274509502a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a3d15c3-ada6-46d9-9628-811d750e0761",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
