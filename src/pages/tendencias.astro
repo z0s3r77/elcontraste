@@ -1,0 +1,91 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="newsdigest — tendencias">
+  <h1>Tendencias por tema</h1>
+  <div id="acelerando"></div>
+  <div id="chart" class="panel" style="overflow-x:auto"></div>
+  <div id="tabla" class="status">Cargando…</div>
+</Base>
+
+<script>
+  import uPlot from "uplot";
+  import "uplot/dist/uPlot.min.css";
+
+  const API = location.port === "4321" ? "http://localhost:8000" : "";
+  const esc = (s: string) =>
+    s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+  const COLORS = ["#0b5fff", "#b42318", "#067647", "#b54708", "#7839ee", "#dd2590", "#175cd3", "#c11574"];
+
+  async function main() {
+    const [trends, accel] = await Promise.all([
+      fetch(`${API}/api/trends?days=180`).then((r) => r.json()),
+      fetch(`${API}/api/trends/accelerating`).then((r) => r.json()),
+    ]);
+
+    // Temas en aceleración (media 7d > 2× media 90d)
+    if (accel.length) {
+      document.getElementById("acelerando")!.innerHTML = `
+        <div class="panel">
+          <h3>🚀 Subiendo</h3>
+          ${accel
+            .map((a: any) => `<span class="pill">${esc(a.topic)} (${a.avg_7d} vs ${a.avg_90d})</span>`)
+            .join(" ")}
+        </div>`;
+    }
+
+    const tabla = document.getElementById("tabla")!;
+    if (!trends.length) {
+      tabla.textContent = "Aún no hay días suficientes. El cron los irá acumulando.";
+      return;
+    }
+
+    // Gráfica uPlot: los 8 temas con más días de datos, clústeres/día.
+    const top = trends.slice(0, 8);
+    const days = [...new Set(top.flatMap((t: any) => t.points.map((p: any) => p.day)))].sort();
+    const x = days.map((d) => new Date(d + "T00:00:00Z").getTime() / 1000);
+    const series = top.map((t: any) => {
+      const by = Object.fromEntries(t.points.map((p: any) => [p.day, p.n_clusters]));
+      return days.map((d) => by[d] ?? 0);
+    });
+
+    new uPlot(
+      {
+        width: Math.max(700, days.length * 40),
+        height: 300,
+        title: "Clústeres por tema y día",
+        series: [
+          {},
+          ...top.map((t: any, i: number) => ({
+            label: t.topic, stroke: COLORS[i % COLORS.length], width: 2,
+          })),
+        ],
+        axes: [{}, { label: "clústeres" }],
+      },
+      [x, ...series] as any,
+      document.getElementById("chart")!
+    );
+
+    // Tabla completa
+    tabla.className = "panel";
+    tabla.innerHTML = `
+      <table>
+        <thead><tr><th>Tema</th><th>Sección</th><th>Días con datos</th><th>Clústeres totales</th></tr></thead>
+        <tbody>
+          ${trends
+            .map(
+              (t: any) => `
+            <tr>
+              <td>${esc(t.topic)}</td><td>${esc(t.section)}</td>
+              <td>${t.points.length}</td>
+              <td>${t.points.reduce((acc: number, p: any) => acc + p.n_clusters, 0)}</td>
+            </tr>`
+            )
+            .join("")}
+        </tbody>
+      </table>`;
+  }
+  main();
+</script>

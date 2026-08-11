@@ -1,0 +1,108 @@
+---
+const { title = "newsdigest" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">📰 newsdigest</a>
+      <nav>
+        <a href="/">Hoy</a>
+        <a href="/tendencias">Tendencias</a>
+        <a href="/docs" target="_blank">API</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      Agregador personal · síntesis generadas por IA a partir de los medios enlazados ·
+      lee siempre los originales
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #1a1d21;
+    --muted: #667085;
+    --line: #e4e7ec;
+    --accent: #0b5fff;
+    --social: #b42318;
+    --geopolitica: #175cd3;
+    --economico: #067647;
+    --deportes: #b54708;
+    --arte: #7839ee;
+    --gaming: #dd2590;
+    --moda: #c11574;
+    --kpop: #dd2590;
+    --sin-clasificar: #667085;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.8rem 1.4rem; background: var(--card);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .brand { font-weight: 700; font-size: 1.05rem; color: var(--ink); text-decoration: none; }
+  .topbar nav a {
+    margin-left: 1.1rem; color: var(--muted); text-decoration: none; font-size: 0.95rem;
+  }
+  .topbar nav a:hover { color: var(--accent); }
+  main { max-width: 60rem; margin: 0 auto; padding: 1.4rem 1rem 3rem; }
+  footer {
+    max-width: 60rem; margin: 0 auto; padding: 1rem;
+    color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--line);
+  }
+  h1 { font-size: 1.4rem; margin: 0.4rem 0 1rem; }
+  h2.section-title {
+    font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em;
+    margin: 1.8rem 0 0.7rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; display: inline-block; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 0.9rem 1.1rem; margin-bottom: 0.7rem; display: block;
+    color: inherit; text-decoration: none; transition: border-color 0.15s;
+  }
+  a.card:hover { border-color: var(--accent); }
+  .card .headline { font-weight: 600; }
+  .meta { color: var(--muted); font-size: 0.82rem; margin-top: 0.35rem; }
+  .pill {
+    display: inline-block; padding: 0.05rem 0.55rem; border-radius: 99px;
+    background: var(--bg); border: 1px solid var(--line);
+    font-size: 0.75rem; color: var(--muted); margin-right: 0.3rem;
+  }
+  .medio { font-weight: 600; }
+  .muted { color: var(--muted); }
+  .status { color: var(--muted); padding: 2rem 0; text-align: center; }
+  ul.hechos { padding-left: 1.2rem; }
+  ul.hechos li { margin-bottom: 0.45rem; }
+  .divergente {
+    border-left: 3px solid var(--social); padding: 0.5rem 0.9rem;
+    background: var(--card); border-radius: 0 8px 8px 0; margin-bottom: 0.6rem;
+  }
+  .panel {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1rem;
+  }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+</style>

@@ -1,0 +1,62 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="newsdigest — hoy">
+  <h1 id="titulo">Digest del día</h1>
+  <div id="app" class="status">Cargando el digest…</div>
+</Base>
+
+<script>
+  // Shell estático + isla que hace fetch: la filosofía Astro del plan.
+  // En dev (puerto 4321) la API vive en :8000; servido por FastAPI, mismo origen.
+  const API = location.port === "4321" ? "http://localhost:8000" : "";
+
+  const SECTION_LABEL: Record<string, string> = {
+    social: "🏛️ Social", geopolitica: "🌍 Geopolítica", economico: "📈 Económico",
+    deportes: "⚽ Deportes", arte: "🎬 Arte", gaming: "🎮 Gaming",
+    moda: "👗 Moda", kpop: "🎤 Kpop", "sin-clasificar": "· Sin clasificar",
+  };
+
+  const esc = (s: string) =>
+    s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+  async function main() {
+    const app = document.getElementById("app")!;
+    try {
+      const res = await fetch(`${API}/api/digest/latest`);
+      if (!res.ok) throw new Error(await res.text());
+      const digest = await res.json();
+      document.getElementById("titulo")!.textContent =
+        `Digest del ${digest.date} — ${digest.n_clusters} historias contrastadas`;
+
+      app.className = "";
+      app.innerHTML = digest.sections
+        .map(
+          (sec: any) => `
+        <h2 class="section-title">
+          <span class="dot" style="background: var(--${sec.section}, var(--muted))"></span>
+          ${esc(SECTION_LABEL[sec.section] ?? sec.section)}
+          <span class="muted">· ${sec.clusters.length}</span>
+        </h2>
+        ${sec.clusters
+          .map(
+            (c: any) => `
+          <a class="card" href="/cluster?id=${c.id}">
+            <div class="headline">${esc(c.headline ?? "(sin síntesis todavía)")}</div>
+            <div class="meta">
+              ${c.media.map((m: string) => `<span class="pill medio">${esc(m)}</span>`).join("")}
+              ${c.topics.map((t: string) => `<span class="pill">${esc(t)}</span>`).join("")}
+              <span class="pill">${c.n_articles} artículos</span>
+            </div>
+          </a>`
+          )
+          .join("")}`
+        )
+        .join("");
+    } catch (err) {
+      app.textContent = `No se pudo cargar el digest: ${err}`;
+    }
+  }
+  main();
+</script>

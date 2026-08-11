@@ -1,0 +1,78 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="newsdigest — detalle">
+  <div id="app" class="status">Cargando la historia…</div>
+</Base>
+
+<script>
+  const API = location.port === "4321" ? "http://localhost:8000" : "";
+
+  const esc = (s: string) =>
+    s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+  async function main() {
+    const app = document.getElementById("app")!;
+    const id = new URLSearchParams(location.search).get("id");
+    if (!id) { app.textContent = "Falta el parámetro ?id="; return; }
+    try {
+      const res = await fetch(`${API}/api/clusters/${id}`);
+      if (!res.ok) throw new Error(await res.text());
+      const c = await res.json();
+      const s = c.synthesis;
+      document.title = `newsdigest — ${c.headline ?? "detalle"}`;
+
+      app.className = "";
+      app.innerHTML = `
+        <p class="muted" style="margin-bottom:0.2rem">
+          ${esc(c.digest_date)} · ${esc(c.section ?? "sin sección")} ·
+          ${c.topics.map((t: string) => `<span class="pill">${esc(t)}</span>`).join("")}
+        </p>
+        <h1>${esc(c.headline ?? "(este clúster aún no tiene síntesis)")}</h1>
+
+        ${s ? `
+          <div class="panel">
+            <h3>✅ En lo que coinciden</h3>
+            <ul class="hechos">
+              ${s.hechos_comunes.map((h: string) => `<li>${esc(h)}</li>`).join("")}
+            </ul>
+          </div>
+
+          ${s.hechos_divergentes.length ? `
+            <h3>⚡ Lo que solo cuenta alguno</h3>
+            ${s.hechos_divergentes
+              .map(
+                (d: any) => `
+              <div class="divergente">
+                ${d.solo_en.map((m: string) => `<span class="pill medio">${esc(m)}</span>`).join("")}
+                ${esc(d.hecho)}
+              </div>`
+              )
+              .join("")}` : ""}
+
+          <div class="panel">
+            <h3>🔍 Diferencias de encuadre</h3>
+            <p>${esc(s.diferencias_de_encuadre)}</p>
+            <h3>❓ Qué falta por saber</h3>
+            <p>${esc(s.que_falta_por_saber)}</p>
+          </div>` : ""}
+
+        <div class="panel">
+          <h3>📎 Los originales (léelos)</h3>
+          ${c.articles
+            .map(
+              (a: any) => `
+            <p style="margin:0.4rem 0">
+              <span class="pill medio">${esc(a.medio)}</span>
+              <a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.title)}</a>
+            </p>`
+            )
+            .join("")}
+        </div>`;
+    } catch (err) {
+      app.textContent = `No se pudo cargar: ${err}`;
+    }
+  }
+  main();
+</script>
