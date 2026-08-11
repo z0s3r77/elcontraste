@@ -1,0 +1,33 @@
+Dockerfile
+  s_1d94626668ff21::t_f83b241b6d9bc9 29-35
+docker-compose.yml
+  s_1d94626668ff21::t_8039795a036ebd 7,13-15
+notebooks/fase3_laboratorio.ipynb
+  s_1d94626668ff21::t_a8e575b6ea019c 1-265
+pipeline/embed.py
+  s_1d94626668ff21::t_291d6f115f15b3 1-87
+pyproject.toml
+  s_1d94626668ff21::t_38bdce42fe4563 23-25
+CLAUDE.md
+  s_1d94626668ff21::t_63a0ac9523bc87 26-46,70-75
+README.md
+  s_1d94626668ff21::t_01b2e2c7a3adde 22-28,80-83
+docs/fase-3.md
+  s_1d94626668ff21::t_2a72ea7812e815 1-159
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c0372dfd59537929f49d432b546f5206b9033fe5",
+  "prompts": {},
+  "sessions": {
+    "s_1d94626668ff21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8dd4aed0-fa9f-451f-98e1-bb5145f002e2",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
