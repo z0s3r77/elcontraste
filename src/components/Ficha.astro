@@ -12,22 +12,28 @@ const { c, destacada = false } = Astro.props;
 
 const medios = (c.media ?? []).join(" · ");
 const temas = c.topics ?? [];
+
+// Sin síntesis, el titular es el ORIGINAL de un medio. Hay que marcarlo: una
+// síntesis neutral la redacta el modelo leyendo a todos, y esto es el encuadre
+// de uno solo. Confundirlos le quitaría el argumento al sitio entero.
+const prestado = !c.has_synthesis && c.titular_de;
 ---
 
-<article class:list={["ficha", { "ficha-destacada": destacada }]}>
+<article class:list={["ficha", { "ficha-destacada": destacada, "ficha-prestada": prestado }]}>
   <a class="ficha-titular" href={urlCluster(c.id)}>
-    {c.headline ?? "(sin titular todavía)"}
+    {c.headline ?? "Sin titular"}
   </a>
 
-  {
-    c.entradilla ? (
-      <p class="ficha-entradilla">{c.entradilla}</p>
-    ) : c.has_synthesis ? null : (
-      <p class="ficha-entradilla muted">Agrupada, todavía sin síntesis.</p>
-    )
-  }
+  {c.entradilla && <p class="ficha-entradilla">{c.entradilla}</p>}
 
   <p class="ficha-pie">
+    {
+      prestado && (
+        <span class="ficha-prestamo">
+          titular de {c.titular_de} · sin contrastar
+        </span>
+      )
+    }
     <span class="dato">{c.n_sources}</span> medios ·
     <span class="dato">{c.n_articles}</span> versiones
     {temas.length > 0 && <> · {temas.map((t) => <span class="tema">{t}</span>)}</>}

@@ -49,7 +49,17 @@ const comunes = s?.hechos_comunes ?? [];
           <a href={urlSeccion(c.section)}>{rotula(c.section ?? "—")}</a>
           {(c.topics ?? []).map((t) => <span class="tema">{t}</span>)}
         </p>
-        <h1>{c.headline ?? "(sin titular todavía)"}</h1>
+        <h1 class:list={{ prestado: !c.synthesis && c.titular_de }}>
+          {c.headline ?? "Sin titular"}
+        </h1>
+        {
+          !c.synthesis && c.titular_de && (
+            <p class="doc-prestamo">
+              Titular de <strong>{c.titular_de}</strong>. Esta historia está agrupada pero no
+              contrastada: lo de arriba es el encuadre de un medio, no una síntesis de todos.
+            </p>
+          )
+        }
         <p class="doc-meta">
           Contrastada entre <span class="dato">{c.n_sources}</span> medios sobre
           <span class="dato">{c.n_articles}</span> versiones ·

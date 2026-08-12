@@ -73,7 +73,15 @@ try {
             <ul class="lista-titulares">
               {s.clusters.slice(0, 6).map((c) => (
                 <li>
-                  <a href={urlCluster(c.id)}>{c.headline ?? "(sin titular todavía)"}</a>
+                  <a
+                    href={urlCluster(c.id)}
+                    class:list={{ prestado: !c.has_synthesis && c.titular_de }}
+                    title={!c.has_synthesis && c.titular_de
+                      ? `Titular de ${c.titular_de} — esta historia todavía no tiene síntesis`
+                      : undefined}
+                  >
+                    {c.headline ?? "Sin titular"}
+                  </a>
                   <span class="dato muted">{c.n_sources}m</span>
                 </li>
               ))}
@@ -96,7 +104,7 @@ try {
           {huecos.slice(0, 8).map((h) => (
             <li>
               <span class={`marca-bloque marca-${h.covered_by}`}>{h.covered_by}</span>
-              <a href={urlCluster(h.id)}>{h.headline ?? "(sin titular todavía)"}</a>
+              <a href={urlCluster(h.id)}>{h.headline ?? "Sin titular"}</a>
             </li>
           ))}
         </ul>

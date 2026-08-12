@@ -52,6 +52,8 @@ export async function traer<T>(ruta: string): Promise<T> {
 export interface FichaCluster {
   id: number;
   headline: string | null;
+  /** Medio del que sale el titular cuando NO hay síntesis. Ver _cluster_card. */
+  titular_de?: string | null;
   entradilla?: string | null;
   n_articles: number;
   n_sources: number;

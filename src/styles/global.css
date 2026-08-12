@@ -363,6 +363,20 @@
     display: block;
     margin-top: 2px;
   }
+  /* Titular prestado de un medio (historia sin síntesis). Se distingue de un
+     titular neutral sin gritarlo: el titular en cursiva y una línea de
+     atribución antes de los datos. */
+  .ficha-prestada .ficha-titular {
+    font-style: italic;
+    font-size: var(--text-md);
+  }
+  .ficha-prestamo {
+    display: block;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-neutral);
+  }
   .tema {
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -741,6 +755,19 @@
   .doc-cabecera h1 {
     font-size: clamp(1.875rem, 5vw, 3rem);
     margin: 0 0 var(--spacing-xs);
+  }
+  /* Titular prestado: cursiva, igual que en la ficha. */
+  h1.prestado,
+  .lista-titulares a.prestado {
+    font-style: italic;
+  }
+  .doc-prestamo {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    color: var(--color-neutral);
+    margin: 0 0 var(--spacing-xs);
+    max-width: var(--measure);
   }
   .doc-meta {
     font-family: var(--font-outlier);
