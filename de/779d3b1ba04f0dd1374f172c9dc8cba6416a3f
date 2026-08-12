@@ -1,0 +1,65 @@
+docs/plan-fase-11.md
+  s_f253bafcbd4833::t_2ea4737a477b2e 144,773
+scripts/icono.py
+  s_f253bafcbd4833::t_4ff97bb2546c57 1-73
+scripts/publicar.sh
+  s_f253bafcbd4833::t_37bc5a9f4cc17c 2
+web/.github/workflows/deploy.yml
+  s_f253bafcbd4833::t_dcb2cb5258e5fe 1
+web/README.md
+  s_f253bafcbd4833::t_bdfb993e2a2db7 1,3
+web/package-lock.json
+  s_f253bafcbd4833::t_ab7052f9e1b486 9,69-88,1951-1968,2092-2097,5006-5024,5056-5061,5275-5280
+web/package.json
+  s_f253bafcbd4833::t_83ec62036bfd7c 11
+web/public/favicon.svg
+  s_f253bafcbd4833::t_97924ae0bbf5f7 1-29
+web/src/components/SeccionVista.astro
+  s_f253bafcbd4833::t_ea5085b971f50f 57
+web/src/pages/404.astro
+  s_f253bafcbd4833::t_506efae4a2dc50 1-44
+web/src/pages/index.astro
+  s_f253bafcbd4833::t_a45c4cf99a631f 41
+web/src/pages/radar/[seccion].astro
+  s_f253bafcbd4833::t_75206e4d55ce9f 33
+web/src/pages/tendencias.astro
+  s_f253bafcbd4833::t_0166c3df55eaff 35
+ESTADO.md
+  s_f253bafcbd4833::t_1400bdc4aa0924 1,6-12
+web/astro.config.mjs
+  s_f253bafcbd4833::t_f89bd98ecc6c59 2,12-14,16-19,25
+web/src/components/Tema.astro
+  s_f253bafcbd4833::t_834192b0b4ea37 1-38
+web/src/lib/ui.ts
+  s_f253bafcbd4833::t_3edeaab41f04b3 51-56
+web/src/pages/cluster/[id].astro
+  s_f253bafcbd4833::t_da1fbe26f2fc99 39-48,52,54
+web/src/pages/contacto.astro
+  s_f253bafcbd4833::t_35262bf0109551 1-62
+web/src/pages/robots.txt.ts
+  s_f253bafcbd4833::t_48e9c5dc17207d 1-20
+web/src/styles/global.css
+  s_f253bafcbd4833::t_0d266195359c2e 2,71-77,89-104,106,125-166,309-350,376-388,856-866,928-954
+CLAUDE.md
+  s_f253bafcbd4833::t_c364c8af12b3d8 232-282,292-303
+docs/despliegue.md
+  s_f253bafcbd4833::t_fb4f7f3b8caeed 1,181-291,303-305
+web/src/layouts/Base.astro
+  s_f253bafcbd4833::t_7b2620a5129c49 8-16,24-25,28,31-32,34-45,54-111,124,141-144,157,165-167,170-195
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "de779d3b1ba04f0dd1374f172c9dc8cba6416a3f",
+  "prompts": {},
+  "sessions": {
+    "s_f253bafcbd4833": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1371897c-0728-493a-9fca-f7b84319db76",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
