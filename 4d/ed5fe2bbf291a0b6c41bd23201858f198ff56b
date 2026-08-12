@@ -1,0 +1,29 @@
+.env.example
+  s_f770e0ace1cab6::t_9fea4194cbf70f 14-15,19-33
+CLAUDE.md
+  s_f770e0ace1cab6::t_adea0eb9701712 201-207,210-213
+api/ejecutar.py
+  s_f770e0ace1cab6::t_54a2f9116b2868 114-146,153,168-174,192,227-228,230,233,261-263,327,330,332,340-341
+docker-compose.yml
+  s_f770e0ace1cab6::t_abbc853f1763de 45-46,48-49,52-67,72-75
+docs/despliegue.md
+  s_f770e0ace1cab6::t_803098655bb54c 70-72,74,76-85,88-89,91,93-95,97,99-103,105-110,112,114-116,118-120,122,124-125,127-131,133-134,136-144,146-151,153-158,160,170,172-173
+web/.github/workflows/deploy.yml
+  s_f770e0ace1cab6::t_9ed7e9e61c3989 26-33,61-64,67-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4ded5fe2bbf291a0b6c41bd23201858f198ff56b",
+  "prompts": {},
+  "sessions": {
+    "s_f770e0ace1cab6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d283a33-748d-49d7-9101-3bdd7dc34ba5",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
