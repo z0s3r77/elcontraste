@@ -48,3 +48,9 @@ export const urlSeccion = (s: string, tema?: string | null) =>
 export const urlRadar = (s: string) => `${BASE}/radar/${s}/`;
 
 export const urlTendencias = () => `${BASE}/tendencias/`;
+
+export const urlContacto = () => `${BASE}/contacto/`;
+
+/** URL de un fichero de `public/`. Mismo prefijo, misma trampa: un
+ *  `href="/favicon.svg"` a pelo funciona en local y 404 en /<repo>/. */
+export const urlEstatico = (nombre: string) => `${BASE}/${nombre}`;

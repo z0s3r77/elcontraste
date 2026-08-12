@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="El Contraste">
+  <!-- Marca de El Contraste. La misma columna, dos tratamientos: una sólida y
+       otra en contorno. Es el proyecto entero en 32 px — la misma historia
+       contada por dos medios.
+
+       Tokens de design.md § Theme (ink y paper), en hex: un favicon se pinta
+       fuera del documento y no hereda las variables de global.css.
+
+       El icono se invierte de noche: en modo oscuro la barra de pestañas es
+       casi negra y un cuadro de tinta sobre ella desaparece. -->
+  <style>
+    .fondo { fill: #12171b; }
+    .marca { fill: #f2f5f9; stroke: #f2f5f9; }
+    @media (prefers-color-scheme: dark) {
+      .fondo { fill: #f2f5f9; }
+      .marca { fill: #12171b; stroke: #12171b; }
+    }
+  </style>
+
+  <rect class="fondo" width="32" height="32" rx="5" />
+
+  <!-- Columna 1: sólida. -->
+  <rect class="marca" x="6.5" y="6" width="8" height="20" stroke="none" />
+
+  <!-- Columna 2: el mismo rectángulo, solo contorno. El trazo va centrado,
+       así que el 18.5/7 + sw 2 cae exactamente sobre 17.5..25.5 × 6..26 y
+       las dos columnas comparten caja. -->
+  <rect class="marca" x="18.5" y="7" width="6" height="18" fill="none" stroke-width="2" />
+</svg>

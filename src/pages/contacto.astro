@@ -1,0 +1,62 @@
+---
+// Página estática: no llama a la API. Es la única del sitio sin datos —
+// por eso no importa `traer` ni recibe `edicion` calculada.
+//
+// Reutiliza el Long Document de design.md (.doc / .doc-cuerpo) sin aparato al
+// margen: aquí no hay atribución que enfrentar, solo prosa en su medida.
+import Base from "../layouts/Base.astro";
+
+const CORREO = "contacto@noticiasdoxa.es";
+---
+
+<Base title="Contacto — La Doxa" seccion="contacto" edicion="Quién hay detrás y cómo escribir">
+  <article class="doc doc-solo">
+    <div class="doc-cuerpo">
+      <header class="doc-cabecera">
+        <p class="doc-seccion">La Doxa</p>
+        <h1>Contacto</h1>
+        <p class="doc-meta">
+          Proyecto personal · sin ánimo de lucro · sin publicidad
+        </p>
+      </header>
+
+      <div class="relato">
+        <p>
+          La Doxa agrupa las versiones que distintos medios dan de una misma noticia y
+          enseña en qué coinciden y en qué divergen. No es una redacción ni aspira a
+          serlo: es un agregador personal que enlaza siempre al original y que existe
+          para que se vea el encuadre, que suele ser lo primero que se pierde cuando
+          uno lee un solo periódico.
+        </p>
+        <p>
+          Para cualquier cosa —una corrección, un medio que falta, un agrupamiento que
+          no tiene sentido o una petición de retirada— escribe a la dirección de abajo.
+          Se lee todo.
+        </p>
+      </div>
+
+      <p class="rotulo-doc">Escribir</p>
+      <p class="correo">
+        <a href={`mailto:${CORREO}`}>{CORREO}</a>
+      </p>
+
+      <p class="rotulo-doc">Correcciones y retirada</p>
+      <p class="prosa">
+        Si eres responsable de un medio y no quieres que tus titulares aparezcan aquí,
+        basta con decirlo a esa dirección: se retira el medio entero y se deja de
+        leer su fuente. No se republica el texto de los artículos, no se sortean muros
+        de pago y se respeta el <code class="dato">robots.txt</code> de cada dominio.
+      </p>
+
+      <p class="rotulo-doc">Cómo se hace esto</p>
+      <p class="prosa">
+        Las noticias se leen de los canales públicos de cada medio, se agrupan por
+        similitud semántica —vectores, no palabras clave— dentro de una ventana de 48
+        horas, y solo forman historia si al menos dos medios la cuentan. El resumen de
+        cada historia lo redacta un modelo de lenguaje a partir de esos textos, y por
+        tanto <strong>puede contener errores</strong>: los enlaces al original están en
+        cada historia y son los que mandan.
+      </p>
+    </div>
+  </article>
+</Base>

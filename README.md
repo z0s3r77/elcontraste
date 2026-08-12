@@ -1,6 +1,6 @@
-# El Contraste — el sitio
+# La Doxa — el sitio
 
-Front de **El Contraste**, un agregador de noticias contrastadas: agrupa las
+Front de **La Doxa**, un agregador de noticias contrastadas: agrupa las
 versiones que distintos medios dan de la misma noticia y muestra en qué
 coinciden y en qué divergen.
 

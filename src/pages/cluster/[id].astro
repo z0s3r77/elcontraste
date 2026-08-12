@@ -36,11 +36,22 @@ const divs = s?.hechos_divergentes ?? [];
 const contradicciones = divs.filter((d) => (d.solo_en ?? []).length > 1);
 const exclusivas = divs.filter((d) => (d.solo_en ?? []).length === 1);
 const comunes = s?.hechos_comunes ?? [];
+
+// Lo que se ve al compartir la historia. El arranque del relato dice más que
+// cualquier plantilla; sin síntesis se cae al recuento de medios, que al menos
+// es cierto. Se recorta por palabra: un corte a mitad de palabra canta.
+const arranque = (s?.relato ?? "").replace(/\s+/g, " ").trim();
+const descripcion = arranque
+  ? arranque.length > 200
+    ? arranque.slice(0, arranque.lastIndexOf(" ", 200)) + "…"
+    : arranque
+  : `Cómo cuentan esta noticia ${c.n_sources} medios, en ${c.n_articles} versiones.`;
 ---
 
 <Base
-  title={`${c.headline ?? "Historia"} — El Contraste`}
+  title={`${c.headline ?? "Historia"} — La Doxa`}
   edicion={`${rotula(c.section ?? "")} · ${c.digest_date ?? ""}`}
+  descripcion={descripcion}
 >
   <article class="doc">
     <div class="doc-cuerpo">

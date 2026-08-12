@@ -5,7 +5,15 @@
 // Todo el CSS del sitio vive en src/styles/global.css, importado aquí una
 // sola vez. Ver la cabecera de ese fichero para el porqué.
 import "../styles/global.css";
-import { urlInicio, urlSeccion, urlRadar, urlTendencias } from "../lib/ui";
+import Tema from "../components/Tema.astro";
+import {
+  urlInicio,
+  urlSeccion,
+  urlRadar,
+  urlTendencias,
+  urlContacto,
+  urlEstatico,
+} from "../lib/ui";
 
 // `edicion` es la línea de arriba de la cabecera. Antes la escribía cada
 // isla por JS al terminar su fetch; ahora llega horneada desde el build.
@@ -13,12 +21,28 @@ interface Props {
   title?: string;
   seccion?: string;
   edicion?: string;
+  /** Resumen de la página: <meta description> y tarjeta al compartir. */
+  descripcion?: string;
 }
 const {
-  title = "El Contraste",
+  title = "La Doxa",
   seccion = "",
   edicion = "Agregador de prensa contrastada",
+  descripcion = "Las versiones que distintos medios dan de la misma noticia, " +
+    "agrupadas para ver en qué coinciden y en qué divergen.",
 } = Astro.props;
+
+// URL absoluta de ESTA página. Sale de `site` (SITE_URL en el workflow), así
+// que con el dominio propio conectado el canonical y las tarjetas apuntan a
+// noticiasdoxa.es sin tocar nada más. Astro.site puede faltar en un `astro
+// dev` mal configurado: sin canonical se vive, con uno roto no.
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+// Tarjeta social de 1200×630 (public/og.png). Con ella la tarjeta pasa de
+// `summary` (icono pequeño al lado del texto) a `summary_large_image`.
+// Cómo se regenera: docs/despliegue.md § La tarjeta social.
+const imagenSocial = Astro.site
+  ? new URL(`${import.meta.env.BASE_URL.replace(/\/$/, "")}/og.png`, Astro.site).href
+  : undefined;
 ---
 
 <!doctype html>
@@ -27,6 +51,64 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <meta name="description" content={descripcion} />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <!-- El icono se sirve desde public/. Con `urlEstatico` porque Astro no
+         reescribe los href escritos a mano y en GitHub Pages el sitio cuelga
+         de /<repo>/ (mismo motivo que el resto de helpers de ui.ts). -->
+    <link rel="icon" href={urlEstatico("favicon.svg")} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={urlEstatico("apple-touch-icon.png")} />
+
+    <!-- El color de la barra del navegador sigue al papel del tema: sin esto,
+         en móvil el sistema pinta una franja blanca sobre la portada nocturna.
+         Son los hex exactos de --color-paper (design.md § Theme).
+         Una sola etiqueta, sin `media`: desde que hay botón, el tema puede no
+         coincidir con el del sistema y el script de abajo la mantiene al día. -->
+    <meta name="theme-color" content="#f2f5f9" />
+
+    <!-- Tema elegido. `is:inline` y aquí arriba a propósito: tiene que correr
+         ANTES del primer pintado o se ve un fogonazo claro antes de aplicarse
+         el modo oscuro. Por eso no puede ser el script normal de Astro, que va
+         diferido. Es la única lógica del sitio que no puede esperar. -->
+    <script is:inline>
+      (function () {
+        try {
+          var elegido = localStorage.getItem("tema");
+          if (elegido === "dark" || elegido === "light") {
+            document.documentElement.dataset.theme = elegido;
+          }
+          var oscuro = elegido
+            ? elegido === "dark"
+            : matchMedia("(prefers-color-scheme: dark)").matches;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.content = oscuro ? "#090e12" : "#f2f5f9";
+        } catch (e) {
+          /* localStorage puede fallar (modo privado, cookies bloqueadas).
+             Sin preferencia guardada el sitio sigue el sistema y todo va. */
+        }
+      })();
+    </script>
+
+    <!-- Tarjeta al compartir. Sin esto un enlace pegado en WhatsApp o Mastodon
+         sale como una URL desnuda. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="La Doxa" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={descripcion} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {
+      imagenSocial && (
+        <>
+          <meta property="og:image" content={imagenSocial} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content="La Doxa · agregador de prensa contrastada" />
+        </>
+      )
+    }
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -39,7 +121,7 @@ const {
          sobresalir por los lados, que era el desajuste más visible en ancho. -->
     <header class="mast marco">
       <p class="mast-line">{edicion}</p>
-      <a class="mast-name" href={urlInicio()}>El Contraste</a>
+      <a class="mast-name" href={urlInicio()}>La Doxa</a>
       <nav class="mast-nav" aria-label="Principal">
         <ul>
           <li><a href={urlInicio()} class={seccion === "hoy" ? "activo" : ""}>Portada</a></li>
@@ -56,6 +138,10 @@ const {
               Tendencias
             </a>
           </li>
+          <li>
+            <a href={urlContacto()} class={seccion === "contacto" ? "activo" : ""}>Contacto</a>
+          </li>
+          <li><Tema /></li>
         </ul>
       </nav>
       <hr class="rule-double" aria-hidden="true" />
@@ -68,7 +154,7 @@ const {
     <footer class="colofon">
       <div class="marco">
         <p>
-          El Contraste · agregador personal, sin ánimo de lucro · Las síntesis las
+          La Doxa · agregador personal, sin ánimo de lucro · Las síntesis las
           redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de los
           medios enlazados; pueden contener errores. Lee siempre el original.
           Agrupación por similitud coseno ≥ 0,75 sobre embeddings MiniLM
@@ -76,7 +162,36 @@ const {
           republica el texto de los artículos ni se sortean muros de pago.
           Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
         </p>
+        <p class="colofon-contacto">
+          Contacto · <a href="mailto:contacto@noticiasdoxa.es">contacto@noticiasdoxa.es</a>
+        </p>
       </div>
     </footer>
+
+    <!-- Este SÍ puede ir diferido: nadie pulsa el botón antes de que cargue.
+         El estado "actual" se resuelve preguntando, no guardando una variable:
+         sin elección previa el tema lo manda el sistema, y leer el DOM es la
+         única forma de que el primer clic vaya en la dirección correcta. -->
+    <script>
+      const raiz = document.documentElement;
+      const meta = document.querySelector('meta[name="theme-color"]');
+      const boton = document.querySelector(".tema");
+
+      const esOscuro = () =>
+        raiz.dataset.theme
+          ? raiz.dataset.theme === "dark"
+          : matchMedia("(prefers-color-scheme: dark)").matches;
+
+      boton?.addEventListener("click", () => {
+        const nuevo = esOscuro() ? "light" : "dark";
+        raiz.dataset.theme = nuevo;
+        if (meta) meta.content = nuevo === "dark" ? "#090e12" : "#f2f5f9";
+        try {
+          localStorage.setItem("tema", nuevo);
+        } catch (e) {
+          /* Sin persistencia el tema dura lo que la pestaña. Mejor que nada. */
+        }
+      });
+    </script>
   </body>
 </html>

@@ -1,0 +1,44 @@
+---
+// GitHub Pages sirve este 404.html en cualquier ruta que no exista. Importa
+// más de lo normal en este sitio: las historias caducan del build (la ventana
+// son VENTANA_DIAS días), así que un enlace viejo compartido acaba aquí.
+import Base from "../layouts/Base.astro";
+import { urlInicio, urlSeccion, SECCIONES } from "../lib/ui";
+
+const secciones = Object.keys(SECCIONES).filter((s) => s !== "sin-clasificar");
+---
+
+<Base
+  title="Página no encontrada — La Doxa"
+  edicion="Esta dirección no lleva a ninguna parte"
+  descripcion="La página que buscas no existe o su historia ya salió de la ventana del sitio."
+>
+  <article class="doc doc-solo">
+    <div class="doc-cuerpo">
+      <header class="doc-cabecera">
+        <p class="doc-seccion">Error 404</p>
+        <h1>Aquí no hay nada</h1>
+        <p class="doc-meta">La dirección no existe, o la historia ya no está publicada</p>
+      </header>
+
+      <p class="prosa">
+        El sitio solo hornea las historias de los últimos días: si has llegado desde un
+        enlace antiguo, es probable que esa historia siga en la base de datos pero ya no
+        tenga página. Los medios enlazados en su día siguen siendo los suyos y no se
+        pierden nada.
+      </p>
+
+      <p class="rotulo-doc">Por dónde seguir</p>
+      <ul class="lista-titulares">
+        <li><a href={urlInicio()}>La portada de hoy</a></li>
+        {
+          secciones.map((s) => (
+            <li>
+              <a href={urlSeccion(s)}>{SECCIONES[s]}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </article>
+</Base>

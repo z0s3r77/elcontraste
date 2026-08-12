@@ -1,5 +1,5 @@
 /* ==========================================================================
-   El Contraste — hoja global única.
+   La Doxa — hoja global única.
    Sistema: design.md (Newsprint · editorial). Tailwind v4 no sustituye al
    sistema de diseño: lo sirve. Los tokens de design.md viven en @theme y se
    convierten en utilidades, así que `bg-paper` o `gap-md` SON el sistema y no
@@ -68,6 +68,13 @@
   --page-gutter: clamp(1rem, 4vw, 2.5rem);
   --measure: 64ch;
 
+  /* Qué icono enseña el botón de tema. Es un token y no una regla de CSS
+     porque así viaja en los MISMOS tres bloques que los colores: el icono no
+     puede desincronizarse del tema aunque se toque uno de los dos. De día se
+     ofrece la luna (lo que vas a activar), de noche el sol. */
+  --icono-sol: none;
+  --icono-luna: block;
+
   /* Series de la gráfica de tendencias (uPlot las lee por getComputedStyle). */
   --serie-1: oklch(48% 0.140 245);
   --serie-2: oklch(48% 0.150 25);
@@ -79,9 +86,24 @@
   --serie-8: oklch(58% 0.090 100);
 }
 
-/* El papel se invierte de noche; los papeles del sistema conservan su rol. */
+/* El papel se invierte de noche; los papeles del sistema conservan su rol.
+   ------------------------------------------------------------------------
+   TRES estados, no dos, desde que hay botón (2026-08-13):
+     1. sin elegir        → manda `prefers-color-scheme` (el bloque de abajo)
+     2. elegido "claro"   → gana sobre un sistema oscuro (de ahí el :not())
+     3. elegido "oscuro"  → gana sobre un sistema claro (el bloque de después)
+   El `:not([data-theme="light"])` es lo que hace que el botón pueda devolverte
+   al modo claro estando el sistema en oscuro; sin él, la media query se
+   impondría siempre y el botón solo funcionaría en una dirección.
+
+   Los valores están escritos dos veces a propósito: CSS no sabe reutilizar un
+   bloque de declaraciones entre un @media y un selector. Se probó `light-dark()`,
+   que lo evitaría, pero uPlot lee las series con getComputedStyle y pinta en
+   canvas, y canvas no sabe resolver `light-dark()`: la gráfica de tendencias
+   se quedaría sin color. Si tocas un token de noche, tócalo en LOS DOS sitios.
+   ------------------------------------------------------------------------ */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --color-paper: oklch(16% 0.012 250);
     --color-paper-2: oklch(20% 0.012 250);
     --color-rule: oklch(32% 0.010 250);
@@ -100,6 +122,48 @@
     --serie-6: oklch(76% 0.100 195);
     --serie-7: oklch(70% 0.120 340);
     --serie-8: oklch(80% 0.090 100);
+
+    --icono-sol: block;
+    --icono-luna: none;
+  }
+}
+
+/* Estado 3: oscuro elegido a mano, con el sistema en claro. Mismos valores. */
+:root[data-theme="dark"] {
+  --color-paper: oklch(16% 0.012 250);
+  --color-paper-2: oklch(20% 0.012 250);
+  --color-rule: oklch(32% 0.010 250);
+  --color-neutral: oklch(60% 0.010 250);
+  --color-muted: oklch(72% 0.008 250);
+  --color-ink: oklch(93% 0.006 250);
+  --color-accent: oklch(76% 0.130 245);
+  --color-focus: oklch(80% 0.160 245);
+  --color-alerta: oklch(72% 0.140 25);
+
+  --serie-1: oklch(76% 0.130 245);
+  --serie-2: oklch(72% 0.140 25);
+  --serie-3: oklch(74% 0.120 150);
+  --serie-4: oklch(78% 0.120 70);
+  --serie-5: oklch(72% 0.130 310);
+  --serie-6: oklch(76% 0.100 195);
+  --serie-7: oklch(70% 0.120 340);
+  --serie-8: oklch(80% 0.090 100);
+
+  --icono-sol: block;
+  --icono-luna: none;
+}
+
+/* Que los controles nativos (scrollbars, selects, autofill) sigan al tema
+   elegido y no solo al del sistema. */
+:root {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
   }
 }
 
@@ -242,6 +306,48 @@
     border-bottom: 2px solid var(--color-accent);
   }
 
+  /* ---- Botón de tema ----
+     Se compone como un enlace más de la cabecera (mono, versalitas, mismo
+     color) y no como un botón sólido: design.md § "Voz de los enlaces de
+     acción". Va dentro del <ul>, así que hereda el flex-wrap de la fila. */
+  .tema {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-3xs);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    background: none;
+    border: 0;
+    padding: 0 0 2px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tema:hover {
+    color: var(--color-accent);
+  }
+  /* El icono lo elige el tema, no el script: ver --icono-sol/--icono-luna. */
+  .tema-sol {
+    display: var(--icono-sol);
+  }
+  .tema-luna {
+    display: var(--icono-luna);
+  }
+  /* El texto es para lectores de pantalla y pantallas anchas; en móvil el
+     icono basta y ahorra el salto de línea de la navegación. */
+  @media (width < 52rem) {
+    .tema-texto {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
   .rule-double {
     border: 0;
     border-top: var(--rule-hair) solid var(--color-ink);
@@ -266,6 +372,19 @@
     font-size: var(--text-xs);
     line-height: 1.7;
     color: var(--color-neutral);
+  }
+  /* El contacto va separado del bloque de parámetros: es lo único del colofón
+     con lo que se puede interactuar y se pierde dentro del párrafo denso. */
+  .colofon p.colofon-contacto {
+    margin-top: var(--spacing-2xs);
+    padding-top: var(--spacing-2xs);
+    border-top: var(--rule-hair) solid var(--color-rule);
+  }
+  .colofon-contacto a {
+    text-decoration: underline;
+  }
+  .colofon-contacto a:hover {
+    color: var(--color-ink);
   }
 
   /* ---------------------------------------------------- piezas comunes */
@@ -734,6 +853,17 @@
     }
   }
 
+  /* Un .doc sin aparato al margen (contacto). Sin esto, en xl la prosa se
+     queda pegada a la izquierda haciendo hueco a una columna que no existe. */
+  @media (width >= 80rem) {
+    .doc-solo {
+      grid-template-columns: minmax(0, var(--measure));
+    }
+    .doc-solo .doc-cuerpo {
+      margin-inline: auto;
+    }
+  }
+
   .doc-cabecera {
     margin-bottom: var(--spacing-lg);
   }
@@ -793,6 +923,33 @@
     line-height: 0.82;
     padding: 0.05em 0.08em 0 0;
     color: var(--color-accent);
+  }
+
+  /* Prosa suelta dentro de un .doc-cuerpo (la página de contacto). Va por
+     clase y no por `.doc-cuerpo > p`: ese selector le ganaría en peso a
+     .aviso, .firma-ia y .rotulo-doc, que también son <p> del cuerpo y ya
+     traen sus propios márgenes. */
+  .prosa {
+    max-width: var(--measure);
+    margin: 0 0 var(--spacing-sm);
+    line-height: 1.7;
+  }
+
+  /* La dirección de contacto es lo único accionable de su página: se compone
+     como una cifra, no como un enlace más dentro del párrafo. */
+  .correo {
+    font-family: var(--font-outlier);
+    font-size: var(--text-lg);
+    margin: 0 0 var(--spacing-md);
+    overflow-wrap: anywhere;
+  }
+  .correo a {
+    text-decoration: none;
+    border-bottom: 2px solid var(--color-rule);
+    padding-bottom: 2px;
+  }
+  .correo a:hover {
+    border-bottom-color: var(--color-accent);
   }
 
   .firma-ia {
