@@ -1,0 +1,25 @@
+pipeline/run_daily.py
+  s_8c8a274509502a::t_ff0d3f1954bec5 27-33,40
+CLAUDE.md
+  s_8c8a274509502a::t_c635a7654b10a9 125-150
+README.md
+  s_8c8a274509502a::t_aa4427fcd1d75c 71,75,78-128,131-143
+pipeline/synthesize.py
+  s_8c8a274509502a::t_1499bcef39cd3c 33-40,127-151,181-187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "5b81cb549f83d5806b43b78dc8bcd42599f6cc9a",
+  "prompts": {},
+  "sessions": {
+    "s_8c8a274509502a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a3d15c3-ada6-46d9-9628-811d750e0761",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
