@@ -1,0 +1,33 @@
+CLAUDE.md
+  s_f770e0ace1cab6::t_3abf8dc356607b 22
+pipeline/run_daily.py
+  s_f770e0ace1cab6::t_4b56e45503c0fa 6,24-37
+api/main.py
+  s_f770e0ace1cab6::t_569877e396b60f 113-135,138-139
+web/src/components/Ficha.astro
+  s_f770e0ace1cab6::t_2eb3be409a7a00 15-19,22,24,27,30-36
+web/src/lib/api.ts
+  s_f770e0ace1cab6::t_4aded7e38676f9 55-56
+web/src/pages/cluster/[id].astro
+  s_f770e0ace1cab6::t_d14ae9d1e4be8f 52-62
+web/src/pages/index.astro
+  s_f770e0ace1cab6::t_c9ccde8a422782 76-84,107
+web/src/styles/global.css
+  s_f770e0ace1cab6::t_34bb99b802084f 366-379,759-771
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "79a82b90bf06e879b9d5bb5d810f44c90bde1a6f",
+  "prompts": {},
+  "sessions": {
+    "s_f770e0ace1cab6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d283a33-748d-49d7-9101-3bdd7dc34ba5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
