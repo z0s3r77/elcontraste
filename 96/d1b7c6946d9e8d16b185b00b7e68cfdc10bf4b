@@ -1,0 +1,21 @@
+ESTADO.md
+  s_f770e0ace1cab6::t_be0354a402bb7a 104-108
+scripts/publicar.sh
+  s_f770e0ace1cab6::t_881fedbffe5821 38-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "96d1b7c6946d9e8d16b185b00b7e68cfdc10bf4b",
+  "prompts": {},
+  "sessions": {
+    "s_f770e0ace1cab6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d283a33-748d-49d7-9101-3bdd7dc34ba5",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
