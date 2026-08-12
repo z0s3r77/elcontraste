@@ -1,0 +1,12 @@
+# Este .gitignore es el del REPO PÚBLICO (web/ tras el subtree split).
+# Mientras web/ siga dentro del repo privado, el de la raíz también aplica.
+node_modules/
+dist/
+.astro/
+
+# Secretos del build: API_BASE_URL y el service token de Access.
+.env
+.env.*
+!.env.example
+
+.DS_Store

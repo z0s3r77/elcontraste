@@ -1,0 +1,24 @@
+---
+// Texto llano de la síntesis → párrafos. Línea en blanco separa párrafo,
+// salto simple es un <br>. Antes esto se hacía concatenando HTML y llamando
+// a esc(); aquí lo escapa Astro al interpolar.
+import { parrafos } from "../lib/ui";
+
+interface Props {
+  texto: string;
+}
+const bloques = parrafos(Astro.props.texto);
+---
+
+{
+  bloques.map((lineas) => (
+    <p>
+      {lineas.map((linea, i) => (
+        <>
+          {i > 0 && <br />}
+          {linea}
+        </>
+      ))}
+    </p>
+  ))
+}

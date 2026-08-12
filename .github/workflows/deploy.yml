@@ -1,0 +1,103 @@
+# Publica El Contraste en GitHub Pages.
+#
+# MANUAL a propósito (`workflow_dispatch`): el sitio se hornea con los datos
+# que sirve el backend del portátil por un túnel de Cloudflare, así que antes
+# de lanzarlo hay que tener, EN ESTE ORDEN:
+#
+#   1. El portátil encendido y `docker compose up -d`.
+#   2. El pipeline del día ya ejecutado (si no, se publica el digest de ayer).
+#   3. El túnel arriba (`cloudflared tunnel run el-contraste`).
+#
+# Secrets necesarios (Settings → Secrets and variables → Actions):
+#   API_BASE_URL              https://api.tu-dominio.tld   ← también es secreto:
+#                             este workflow es público y el hostname del túnel
+#                             no tiene por qué estarlo.
+#   CF_ACCESS_CLIENT_ID       service token de Cloudflare Access
+#   CF_ACCESS_CLIENT_SECRET   idem
+#
+# Variables (no secretas):
+#   SITE_URL    https://usuario.github.io  o  https://tu-dominio.tld
+#   BASE_PATH   /el-contraste-web/         o  /
+
+name: Publicar el sitio
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Nunca dos despliegues a la vez, y sin cancelar el que ya va por la mitad:
+# cancelar a mitad de un deploy deja Pages en un estado raro.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Hornear el sitio
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          BASE_PATH: ${{ vars.BASE_PATH }}
+        run: npm run build
+        # src/lib/api.ts ya se cae solo si la API no responde, si devuelve el
+        # HTML de login de Access en vez de JSON, o si el digest viene sin un
+        # solo clúster. Este paso hereda esos fallos.
+
+      - name: Guardarraíl · el sitio no puede salir vacío
+        run: |
+          set -euo pipefail
+          paginas=$(find dist -name '*.html' | wc -l | tr -d ' ')
+          echo "Páginas generadas: $paginas"
+
+          # Un digest real trae decenas de historias; por debajo de esto algo
+          # ha ido mal aunque el build haya terminado en verde.
+          if [ "$paginas" -lt 20 ]; then
+            echo "::error::Solo $paginas páginas. Se aborta antes de publicar" \
+                 "un sitio pelado encima de uno bueno."
+            exit 1
+          fi
+
+          # Si esto aparece, el HTML se quedó con el esqueleto de las islas
+          # viejas y los datos no se hornearon.
+          if grep -rq "Componiendo la portada" dist/index.html; then
+            echo "::error::La portada salió sin datos horneados."
+            exit 1
+          fi
+
+          # Pages sirve `dist` tal cual desde Actions (no pasa por Jekyll),
+          # pero el fichero es gratis y protege si algún día se vuelve al
+          # despliegue por rama, donde Jekyll SÍ se comería `_astro/`.
+          touch dist/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  desplegar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v4

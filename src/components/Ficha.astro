@@ -1,0 +1,36 @@
+---
+// Ficha de historia (portada, sección). Era una plantilla de cadena en
+// lib/ui.ts; ahora es marcado real, así que el escapado lo hace Astro.
+import type { FichaCluster } from "../lib/api";
+import { urlCluster } from "../lib/ui";
+
+interface Props {
+  c: FichaCluster;
+  destacada?: boolean;
+}
+const { c, destacada = false } = Astro.props;
+
+const medios = (c.media ?? []).join(" · ");
+const temas = c.topics ?? [];
+---
+
+<article class:list={["ficha", { "ficha-destacada": destacada }]}>
+  <a class="ficha-titular" href={urlCluster(c.id)}>
+    {c.headline ?? "(sin titular todavía)"}
+  </a>
+
+  {
+    c.entradilla ? (
+      <p class="ficha-entradilla">{c.entradilla}</p>
+    ) : c.has_synthesis ? null : (
+      <p class="ficha-entradilla muted">Agrupada, todavía sin síntesis.</p>
+    )
+  }
+
+  <p class="ficha-pie">
+    <span class="dato">{c.n_sources}</span> medios ·
+    <span class="dato">{c.n_articles}</span> versiones
+    {temas.length > 0 && <> · {temas.map((t) => <span class="tema">{t}</span>)}</>}
+    <span class="ficha-medios">{medios}</span>
+  </p>
+</article>

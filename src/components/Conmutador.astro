@@ -1,0 +1,24 @@
+---
+// Chips de navegación (sección, radar). Outlined, nunca botón sólido:
+// design.md § "Voz de los enlaces de acción".
+interface Props {
+  opciones: { etiqueta: string; href: string; activo?: boolean }[];
+  etiquetaAria: string;
+  temas?: boolean;
+}
+const { opciones, etiquetaAria, temas = false } = Astro.props;
+---
+
+<nav class:list={["conmutador", { "conmutador-temas": temas }]} aria-label={etiquetaAria}>
+  {
+    opciones.map((o) => (
+      <a
+        class:list={["chip", { "chip-activo": o.activo }]}
+        href={o.href}
+        aria-current={o.activo ? "page" : undefined}
+      >
+        {o.etiqueta}
+      </a>
+    ))
+  }
+</nav>

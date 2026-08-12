@@ -1,0 +1,92 @@
+---
+// Vista de sección, compartida por /seccion/[s]/ y /seccion/[s]/[tema]/.
+// Vive en un componente y no duplicada en las dos páginas porque solo cambia
+// un parámetro; la lógica es la misma.
+import Base from "../layouts/Base.astro";
+import Conmutador from "./Conmutador.astro";
+import Ficha from "./Ficha.astro";
+import { taxonomia, traer, type FichaCluster } from "../lib/api";
+import { rotula, urlSeccion } from "../lib/ui";
+
+interface Props {
+  seccion: string;
+  tema?: string;
+}
+const { seccion, tema } = Astro.props;
+
+// Ventana fija: era `?dias=`, y en estático un parámetro libre significaría
+// hornear una página por cada valor posible. Siete días es el valor que ya
+// traía por defecto.
+const DIAS = 7;
+
+const tax = await taxonomia();
+const actual = tax.find((t) => t.section === seccion);
+
+const q = `/api/section/${encodeURIComponent(seccion)}?days=${DIAS}${
+  tema ? `&topic=${encodeURIComponent(tema)}` : ""
+}`;
+const datos = await traer<{ n_clusters: number; clusters: FichaCluster[] }>(q);
+
+// Agrupado por día: el orden natural de un archivo de prensa.
+const porDia = new Map<string, FichaCluster[]>();
+for (const c of datos.clusters ?? []) {
+  const dia = c.digest_date ?? "—";
+  if (!porDia.has(dia)) porDia.set(dia, []);
+  porDia.get(dia)!.push(c);
+}
+
+const chipsSeccion = tax.map((t) => ({
+  etiqueta: rotula(t.section),
+  href: urlSeccion(t.section),
+  activo: t.section === seccion,
+}));
+
+const chipsTema = actual
+  ? [
+      { etiqueta: "todos", href: urlSeccion(seccion), activo: !tema },
+      ...actual.topics.map((t) => ({
+        etiqueta: t,
+        href: urlSeccion(seccion, t),
+        activo: t === tema,
+      })),
+    ]
+  : [];
+---
+
+<Base
+  title={`${rotula(seccion)}${tema ? ` · ${tema}` : ""} — El Contraste`}
+  seccion="seccion"
+  edicion={`${rotula(seccion)}${tema ? ` · ${tema}` : ""} · últimos ${DIAS} días`}
+>
+  <Conmutador opciones={chipsSeccion} etiquetaAria="Secciones" />
+  {chipsTema.length > 0 && <Conmutador opciones={chipsTema} etiquetaAria="Temas" temas />}
+
+  <div class="banda">
+    <span class="banda-num">01</span>
+    <h2>{rotula(seccion)}{tema ? ` · ${tema}` : ""}</h2>
+    {datos.n_clusters > 0 && (
+      <span class="cuenta">{datos.n_clusters} historias / {DIAS} días</span>
+    )}
+  </div>
+
+  {
+    datos.n_clusters === 0 ? (
+      <p class="aviso">
+        Ninguna historia en esta sección en los últimos {DIAS} días. Si acabas de añadir
+        feeds, la sección se llena a partir del próximo digest.
+      </p>
+    ) : (
+      [...porDia.entries()].map(([dia, cs]) => (
+        <section class="jornada">
+          <h3 class="jornada-fecha dato">{dia}</h3>
+          <div class="jornada-lista">
+            {cs.map((c) => (
+              <Ficha c={c} />
+            ))}
+          </div>
+        </section>
+      ))
+    )
+  }
+</Base>
+

@@ -1,0 +1,18 @@
+---
+import SeccionVista from "../../../components/SeccionVista.astro";
+import { taxonomia } from "../../../lib/api";
+
+// El filtro por tema era `?tema=`. En estático no hay quien resuelva un query
+// string, así que cada par sección/tema es una página propia (~60 en total).
+
+export async function getStaticPaths() {
+  const tax = await taxonomia();
+  return tax.flatMap((t) =>
+    t.topics.map((tema) => ({ params: { seccion: t.section, tema } })),
+  );
+}
+
+const { seccion, tema } = Astro.params;
+---
+
+<SeccionVista seccion={seccion!} tema={tema!} />

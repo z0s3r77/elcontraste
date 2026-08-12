@@ -1,0 +1,17 @@
+---
+// Rótulo de banda: numeral + etiqueta + recuento a la derecha.
+import { numeral } from "../lib/ui";
+
+interface Props {
+  i: number;
+  titulo: string;
+  cuenta?: string;
+}
+const { i, titulo, cuenta } = Astro.props;
+---
+
+<div class="banda">
+  <span class="banda-num">{numeral(i)}</span>
+  <h2>{titulo}</h2>
+  {cuenta && <span class="cuenta">{cuenta}</span>}
+</div>

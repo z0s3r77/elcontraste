@@ -1,0 +1,16 @@
+---
+import SeccionVista from "../../../components/SeccionVista.astro";
+import { taxonomia } from "../../../lib/api";
+
+// Familia índice (20 · Ecosystem Index): navegar una categoría a lo largo del
+// tiempo, que es donde la taxonomía cerrada empieza a pagar.
+
+export async function getStaticPaths() {
+  const tax = await taxonomia();
+  return tax.map((t) => ({ params: { seccion: t.section } }));
+}
+
+const { seccion } = Astro.params;
+---
+
+<SeccionVista seccion={seccion!} />

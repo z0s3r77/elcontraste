@@ -1,201 +1,175 @@
 ---
 import Base from "../layouts/Base.astro";
+import { traer, type Tendencia } from "../lib/api";
+import { rotula, urlSeccion } from "../lib/ui";
+
 // Familia datos (04 · Stat-Led). La cobertura diferencial se ha movido a la
 // portada (superficie 03 del Ecosystem Index): aquí sobraba duplicada y allí
 // es lo que engancha. Esta página se queda con la serie temporal, que es lo
 // único que necesita histórico.
+//
+// La tabla se hornea; la gráfica NO puede: uPlot dibuja en canvas y necesita
+// el navegador. Los datos viajan en un <script type="application/json"> y el
+// cliente solo pinta — no vuelve a llamar a la API.
+
+const [trends, accel] = await Promise.all([
+  traer<Tendencia[]>("/api/trends?days=180"),
+  traer<{ section: string; topic: string; avg_7d: number; avg_90d: number }[]>(
+    "/api/trends/accelerating",
+  ),
+]);
+
+const dias = new Set(trends.flatMap((t) => t.points.map((p) => p.day))).size;
+
+// Los 8 temas con más días de datos.
+const top = trends.slice(0, 8);
+const ejeDias = [...new Set(top.flatMap((t) => t.points.map((p) => p.day)))].sort();
+const series = top.map((t) => {
+  const by = Object.fromEntries(t.points.map((p) => [p.day, p.n_clusters]));
+  return ejeDias.map((d) => by[d] ?? 0);
+});
+const datosGrafica = { etiquetas: top.map((t) => t.topic), dias: ejeDias, series };
 ---
 
-<Base title="El Contraste — tendencias" seccion="tendencias">
-  <div id="cabecera"></div>
-  <div id="acelerando"></div>
+<Base
+  title="El Contraste — tendencias"
+  seccion="tendencias"
+  edicion={`Tendencias · ${dias} ${dias === 1 ? "día" : "días"} de histórico`}
+>
+  <section class="cifra-hero">
+    <p class="cifra dato">{dias}</p>
+    <p class="cifra-frase">
+      {dias === 1 ? "día registrado" : "días registrados"} desde que el pipeline empezó a
+      contar temas. La serie gana sentido a partir de dos o tres semanas.
+    </p>
+  </section>
+
+  {
+    accel.length > 0 && (
+      <>
+        <div class="banda">
+          <span class="banda-num">00</span>
+          <h2>Subiendo</h2>
+          <span class="cuenta">7 días &gt; 2× la media de 90</span>
+        </div>
+        <ul class="lista-acelera">
+          {accel.map((a) => (
+            <li>
+              <a href={urlSeccion(a.section, a.topic)}>{a.topic}</a>
+              <span class="dato muted">
+                {a.avg_7d} vs {a.avg_90d}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
   <div class="banda">
     <span class="banda-num">01</span>
     <h2>Historias por tema y día</h2>
     <span class="cuenta">8 temas con más histórico</span>
   </div>
-  <div id="grafica" class="grafica"></div>
-  <div id="tabla"><p class="estado">Cargando la serie…</p></div>
+
+  {
+    trends.length === 0 ? (
+      <p class="aviso">
+        Todavía no hay días suficientes. El cron los va acumulando en cada pasada.
+      </p>
+    ) : (
+      <>
+        <div id="grafica" class="grafica" />
+        <script type="application/json" id="datos-grafica" set:html={JSON.stringify(datosGrafica)} />
+
+        <div class="banda">
+          <span class="banda-num">02</span>
+          <h2>Todos los temas</h2>
+          <span class="cuenta">{trends.length} con datos</span>
+        </div>
+        <div class="tabla-envoltorio">
+          <table class="tabla-radar">
+            <thead>
+              <tr>
+                <th scope="col">Tema</th>
+                <th scope="col">Sección</th>
+                <th scope="col">Días</th>
+                <th scope="col">Historias</th>
+              </tr>
+            </thead>
+            <tbody>
+              {trends.map((t) => (
+                <tr>
+                  <th scope="row">
+                    <a href={urlSeccion(t.section, t.topic)}>{t.topic}</a>
+                  </th>
+                  <td>{rotula(t.section)}</td>
+                  <td class="dato">{t.points.length}</td>
+                  <td class="dato">{t.points.reduce((acc, p) => acc + p.n_clusters, 0)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
+    )
+  }
 </Base>
 
 <script>
   import uPlot from "uplot";
   import "uplot/dist/uPlot.min.css";
-  import { esc, traer, rotula } from "../lib/ui";
 
-  // Los colores de serie salen de tokens, no de hex sueltos (design.md).
-  const token = (n: string) =>
-    getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const crudo = document.getElementById("datos-grafica")?.textContent;
+  const contenedor = document.getElementById("grafica");
 
-  async function main() {
-    const tabla = document.getElementById("tabla")!;
-    let trends: any[], accel: any[];
-    try {
-      [trends, accel] = await Promise.all([
-        traer<any[]>("/api/trends?days=180"),
-        traer<any[]>("/api/trends/accelerating"),
-      ]);
-    } catch (err) {
-      tabla.innerHTML = `<p class="estado">No se pudieron cargar las tendencias: ${esc(err)}</p>`;
-      return;
-    }
+  if (crudo && contenedor) {
+    const { etiquetas, dias, series } = JSON.parse(crudo) as {
+      etiquetas: string[];
+      dias: string[];
+      series: number[][];
+    };
 
-    const dias = new Set(trends.flatMap((t) => t.points.map((p: any) => p.day))).size;
-    document.getElementById("mast-edicion")!.textContent =
-      `Tendencias · ${dias} ${dias === 1 ? "día" : "días"} de histórico`;
-
-    document.getElementById("cabecera")!.innerHTML = `
-      <section class="cifra-hero">
-        <p class="cifra dato">${dias}</p>
-        <p class="cifra-frase">
-          ${dias === 1 ? "día registrado" : "días registrados"} desde que el pipeline
-          empezó a contar temas. La serie gana sentido a partir de dos o tres semanas.
-        </p>
-      </section>`;
-
-    if (accel.length) {
-      document.getElementById("acelerando")!.innerHTML = `
-        <div class="banda">
-          <span class="banda-num">00</span><h2>Subiendo</h2>
-          <span class="cuenta">7 días &gt; 2× la media de 90</span>
-        </div>
-        <ul class="lista-acelera">
-          ${accel
-            .map(
-              (a: any) => `<li>
-                <a href="/seccion?s=${encodeURIComponent(a.section)}&tema=${encodeURIComponent(a.topic)}">${esc(
-                  a.topic,
-                )}</a>
-                <span class="dato muted">${a.avg_7d} vs ${a.avg_90d}</span>
-              </li>`,
-            )
-            .join("")}
-        </ul>`;
-    }
-
-    if (!trends.length) {
-      tabla.innerHTML = `<p class="aviso">Todavía no hay días suficientes.
-        El cron los va acumulando en cada pasada.</p>`;
-      return;
-    }
-
-    // ── Gráfica: los 8 temas con más días de datos.
-    const top = trends.slice(0, 8);
-    const dd = [...new Set(top.flatMap((t: any) => t.points.map((p: any) => p.day)))].sort();
-    const x = dd.map((d) => new Date(d + "T00:00:00Z").getTime() / 1000);
-    const series = top.map((t: any) => {
-      const by = Object.fromEntries(t.points.map((p: any) => [p.day, p.n_clusters]));
-      return dd.map((d) => by[d] ?? 0);
-    });
+    // Los colores de serie salen de tokens, no de hex sueltos (design.md).
+    const token = (n: string) =>
+      getComputedStyle(document.documentElement).getPropertyValue(n).trim();
     const colores = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => token(`--serie-${i}`));
 
-    const contenedor = document.getElementById("grafica")!;
-    const pintar = () =>
-      new uPlot(
-        {
-          width: Math.max(contenedor.clientWidth || 640, dd.length * 44),
-          height: 300,
-          series: [
-            {},
-            ...top.map((t: any, i: number) => ({
-              label: t.topic,
-              stroke: colores[i % colores.length],
-              width: 2,
-            })),
-          ],
-          axes: [
-            { stroke: token("--color-neutral"), grid: { stroke: token("--color-rule") } },
-            {
-              label: "historias",
-              stroke: token("--color-neutral"),
-              grid: { stroke: token("--color-rule") },
-            },
-          ],
-        },
-        [x, ...series] as any,
-        contenedor,
-      );
-    pintar();
+    const x = dias.map((d) => new Date(d + "T00:00:00Z").getTime() / 1000);
+    // Un mínimo por día para que la serie no se aplaste; por encima de eso,
+    // manda el ancho real del contenedor.
+    const ancho = () => Math.max(contenedor.clientWidth || 640, dias.length * 44);
 
-    // ── Tabla completa: el archivo, ordenado por volumen.
-    tabla.innerHTML = `
-      <div class="banda">
-        <span class="banda-num">02</span><h2>Todos los temas</h2>
-        <span class="cuenta">${trends.length} con datos</span>
-      </div>
-      <div class="tabla-envoltorio">
-        <table class="tabla-radar">
-          <thead>
-            <tr>
-              <th scope="col">Tema</th><th scope="col">Sección</th>
-              <th scope="col">Días</th><th scope="col">Historias</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${trends
-              .map(
-                (t: any) => `
-              <tr>
-                <th scope="row">
-                  <a href="/seccion?s=${encodeURIComponent(t.section)}&tema=${encodeURIComponent(
-                    t.topic,
-                  )}">${esc(t.topic)}</a>
-                </th>
-                <td>${esc(rotula(t.section))}</td>
-                <td class="dato">${t.points.length}</td>
-                <td class="dato">${t.points.reduce(
-                  (acc: number, p: any) => acc + p.n_clusters,
-                  0,
-                )}</td>
-              </tr>`,
-              )
-              .join("")}
-          </tbody>
-        </table>
-      </div>`;
+    const grafica = new uPlot(
+      {
+        width: ancho(),
+        height: 300,
+        series: [
+          {},
+          ...etiquetas.map((label, i) => ({
+            label,
+            stroke: colores[i % colores.length],
+            width: 2,
+          })),
+        ],
+        axes: [
+          { stroke: token("--color-neutral"), grid: { stroke: token("--color-rule") } },
+          {
+            label: "historias",
+            stroke: token("--color-neutral"),
+            grid: { stroke: token("--color-rule") },
+          },
+        ],
+      },
+      [x, ...series] as any,
+      contenedor,
+    );
+
+    // uPlot NO es responsive por su cuenta: fija el tamaño al construirse y se
+    // queda con él. Sin esto, la gráfica ignora cualquier cambio de ventana.
+    new ResizeObserver(() => grafica.setSize({ width: ancho(), height: 300 })).observe(
+      contenedor,
+    );
   }
-  main();
 </script>
 
-<style is:global>
-  :root {
-    --serie-1: oklch(48% 0.140 245);
-    --serie-2: oklch(48% 0.150 25);
-    --serie-3: oklch(50% 0.120 150);
-    --serie-4: oklch(55% 0.130 70);
-    --serie-5: oklch(45% 0.140 310);
-    --serie-6: oklch(52% 0.110 195);
-    --serie-7: oklch(42% 0.120 340);
-    --serie-8: oklch(58% 0.090 100);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --serie-1: oklch(76% 0.130 245);
-      --serie-2: oklch(72% 0.140 25);
-      --serie-3: oklch(74% 0.120 150);
-      --serie-4: oklch(78% 0.120 70);
-      --serie-5: oklch(72% 0.130 310);
-      --serie-6: oklch(76% 0.100 195);
-      --serie-7: oklch(70% 0.120 340);
-      --serie-8: oklch(80% 0.090 100);
-    }
-  }
-
-  .grafica {
-    overflow-x: auto;
-    margin-bottom: var(--space-lg);
-  }
-  .grafica .u-legend { font-family: var(--font-outlier); font-size: var(--text-xs); }
-  .grafica .u-title { display: none; }
-
-  .lista-acelera {
-    list-style: none; margin: 0 0 var(--space-lg); padding: 0;
-    display: flex; flex-wrap: wrap; gap: var(--space-2xs) var(--space-md);
-  }
-  .lista-acelera li {
-    display: flex; gap: var(--space-3xs); align-items: baseline;
-    font-family: var(--font-outlier); font-size: var(--text-xs);
-  }
-  .lista-acelera a { color: var(--color-accent); text-decoration: none; }
-  .lista-acelera a:hover { text-decoration: underline; }
-</style>

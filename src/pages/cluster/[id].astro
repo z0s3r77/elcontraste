@@ -1,0 +1,162 @@
+---
+import Base from "../../layouts/Base.astro";
+import Parrafos from "../../components/Parrafos.astro";
+import { traer, fechasHorneables, type Digest, type Historia } from "../../lib/api";
+import { rotula, urlSeccion } from "../../lib/ui";
+
+// Macrostructure: 02 · Long Document — el relato se lee de corrido y el
+// aparato de contraste cuelga de él. A partir de xl el aparato deja de
+// colgar por debajo y se pone al margen (ver .doc en global.css): la prosa
+// mantiene su medida y el lector ve quién cuenta qué SIN dejar de leer.
+
+export async function getStaticPaths() {
+  // Se hornean los clústeres de los digests dentro de la ventana. El resto
+  // sigue en la DB: a ~48 clústeres/día, hornearlo todo no escala.
+  const fechas = await fechasHorneables();
+  const digests = await Promise.all(fechas.map((f) => traer<Digest>(`/api/digest/${f}`)));
+
+  const ids = [
+    ...new Set(digests.flatMap((d) => d.sections.flatMap((s) => s.clusters.map((c) => c.id)))),
+  ];
+
+  const historias = await Promise.all(ids.map((id) => traer<Historia>(`/api/clusters/${id}`)));
+
+  return historias.map((c) => ({ params: { id: String(c.id) }, props: { c } }));
+}
+
+const { c } = Astro.props;
+const s = c.synthesis;
+
+// `hechos_divergentes` mezcla DOS cosas distintas, y llamarlas a las dos
+// "contradicciones" engaña: en la base hay ~200 exclusivas por cada ~31
+// desacuerdos reales. El discriminante es cuántos medios hay en `solo_en`:
+//   1 medio  -> exclusiva: lo cuenta solo él (decisión editorial)
+//  2+ medios -> contradicción: cada uno da una versión del MISMO hecho
+const divs = s?.hechos_divergentes ?? [];
+const contradicciones = divs.filter((d) => (d.solo_en ?? []).length > 1);
+const exclusivas = divs.filter((d) => (d.solo_en ?? []).length === 1);
+const comunes = s?.hechos_comunes ?? [];
+---
+
+<Base
+  title={`${c.headline ?? "Historia"} — El Contraste`}
+  edicion={`${rotula(c.section ?? "")} · ${c.digest_date ?? ""}`}
+>
+  <article class="doc">
+    <div class="doc-cuerpo">
+      <header class="doc-cabecera">
+        <p class="doc-seccion">
+          <a href={urlSeccion(c.section)}>{rotula(c.section ?? "—")}</a>
+          {(c.topics ?? []).map((t) => <span class="tema">{t}</span>)}
+        </p>
+        <h1>{c.headline ?? "(sin titular todavía)"}</h1>
+        <p class="doc-meta">
+          Contrastada entre <span class="dato">{c.n_sources}</span> medios sobre
+          <span class="dato">{c.n_articles}</span> versiones ·
+          <span class="dato">{c.digest_date}</span>
+        </p>
+      </header>
+
+      {
+        !s && (
+          <p class="aviso">
+            Esta historia está agrupada pero todavía no tiene síntesis: el presupuesto
+            diario cubre las historias con más medios detrás.
+          </p>
+        )
+      }
+
+      {
+        s && (
+          <>
+            {s.relato && (
+              <div class="relato">
+                <Parrafos texto={s.relato} />
+              </div>
+            )}
+
+            <p class="firma-ia">
+              Relato y contraste redactados por un modelo de lenguaje a partir de los textos
+              enlazados al margen. Puede contener errores: los originales mandan.
+            </p>
+
+            {comunes.length > 0 && (
+              <>
+                <h2 class="rotulo-doc">En qué coinciden todos</h2>
+                <ul class="hechos">
+                  {comunes.map((h) => (
+                    <li>{h}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            {contradicciones.length > 0 && (
+              <>
+                <h2 class="rotulo-doc">Dónde no cuadran las versiones</h2>
+                {contradicciones.map((d) => (
+                  <div class="divergencia">
+                    <p class="divergencia-hecho">{d.hecho}</p>
+                    <ul>
+                      {(d.solo_en ?? []).map((x) => (
+                        <li>{x}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {s.diferencias_de_encuadre && (
+              <>
+                <h2 class="rotulo-doc">Cómo lo encuadra cada medio</h2>
+                <Parrafos texto={s.diferencias_de_encuadre} />
+              </>
+            )}
+
+            {s.que_falta_por_saber && (
+              <>
+                <h2 class="rotulo-doc">Qué falta por saber</h2>
+                <Parrafos texto={s.que_falta_por_saber} />
+              </>
+            )}
+          </>
+        )
+      }
+    </div>
+
+    {/* Aparato de atribución: quién la cuenta y qué cuenta solo uno. Las dos
+        cosas son "de quién sale cada dato", así que van juntas y al margen. */}
+    <aside class="doc-aparato">
+      {
+        exclusivas.length > 0 && (
+          <>
+            <h2 class="rotulo-doc">Lo que solo cuenta un medio</h2>
+            <ul class="exclusivas">
+              {exclusivas.map((d) => (
+                <li>
+                  <span class="exclusiva-medio">{d.solo_en![0]}</span>
+                  <span>{d.hecho}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+
+      <h2 class="rotulo-doc">Las versiones originales</h2>
+      <ul class="fuentes">
+        {
+          (c.articles ?? []).map((a) => (
+            <li>
+              <span class="fuente-medio">{a.medio}</span>
+              <a href={a.url} target="_blank" rel="noopener noreferrer">
+                {a.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </aside>
+  </article>
+</Base>

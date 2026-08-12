@@ -1,15 +1,8 @@
-// Utilidades compartidas por las islas de fetch.
-// En dev (astro dev, puerto 4321) la API vive en :8000; servido por FastAPI, mismo origen.
-export const API = location.port === "4321" ? "http://localhost:8000" : "";
-
-const ENTIDADES: Record<string, string> = {
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-};
-
-/** Escapa SIEMPRE antes de pintar. El pipeline ingiere HTML de terceros:
- *  pintarlo crudo es XSS almacenado con el titular de otro como vector. */
-export const esc = (s: unknown): string =>
-  String(s ?? "").replace(/[&<>"']/g, (c) => ENTIDADES[c]!);
+// Helpers de presentación. Puros: sirven igual en el build y en el cliente.
+//
+// Ya no hay `esc()`: desde que el sitio se hornea, Astro escapa al interpolar
+// con {}. Si alguna vez vuelve a aparecer un `set:html`, el escapado vuelve a
+// ser tuyo — es la regla 1 de design.md y no ha dejado de valer.
 
 export const SECCIONES: Record<string, string> = {
   social: "Social",
@@ -29,34 +22,29 @@ export const rotula = (s: string): string => SECCIONES[s] ?? s;
 /** Numeral de banda al estilo editorial: 01, 02, 03… */
 export const numeral = (i: number): string => String(i + 1).padStart(2, "0");
 
-export async function traer<T>(ruta: string): Promise<T> {
-  const res = await fetch(`${API}${ruta}`);
-  if (!res.ok) throw new Error(`${res.status} — ${await res.text()}`);
-  return res.json() as Promise<T>;
-}
+/** Parte un texto en párrafos (línea en blanco) y líneas (salto simple). */
+export const parrafos = (texto: string): string[][] =>
+  texto
+    .split(/\n{2,}/)
+    .map((p) => p.split("\n"))
+    .filter((p) => p.join("").trim() !== "");
 
-/** Ficha de historia. `destacada` la pinta a tamaño de portada. */
-export function ficha(c: any, destacada = false): string {
-  const medios = (c.media ?? []).map((m: string) => esc(m)).join(" · ");
-  const temas = (c.topics ?? [])
-    .map((t: string) => `<span class="tema">${esc(t)}</span>`)
-    .join("");
-  const entradilla = c.entradilla
-    ? `<p class="ficha-entradilla">${esc(c.entradilla)}</p>`
-    : c.has_synthesis
-      ? ""
-      : `<p class="ficha-entradilla muted">Agrupada, todavía sin síntesis.</p>`;
-  return `
-    <article class="ficha${destacada ? " ficha-destacada" : ""}">
-      <a class="ficha-titular" href="/cluster?id=${encodeURIComponent(c.id)}">
-        ${esc(c.headline ?? "(sin titular todavía)")}
-      </a>
-      ${entradilla}
-      <p class="ficha-pie">
-        <span class="dato">${c.n_sources}</span> medios ·
-        <span class="dato">${c.n_articles}</span> versiones
-        ${temas ? ` · ${temas}` : ""}
-        <span class="ficha-medios">${medios}</span>
-      </p>
-    </article>`;
-}
+// Prefijo de todas las URLs internas. En un *project page* de GitHub el sitio
+// no cuelga de la raíz sino de /<repo>/, y Astro NO reescribe los href que
+// escribimos a mano: sin este prefijo, con dominio propio funciona y en
+// usuario.github.io/repo se rompen TODOS los enlaces. Con dominio propio
+// BASE_URL es "/" y esto no hace nada.
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+export const urlInicio = () => `${BASE}/`;
+
+/** URL de una historia. Estático: ruta, no query string. */
+export const urlCluster = (id: number | string) => `${BASE}/cluster/${id}/`;
+
+/** URL de sección, con tema opcional. */
+export const urlSeccion = (s: string, tema?: string | null) =>
+  tema ? `${BASE}/seccion/${s}/${tema}/` : `${BASE}/seccion/${s}/`;
+
+export const urlRadar = (s: string) => `${BASE}/radar/${s}/`;
+
+export const urlTendencias = () => `${BASE}/tendencias/`;

@@ -1,0 +1,115 @@
+---
+import Base from "../../layouts/Base.astro";
+import Conmutador from "../../components/Conmutador.astro";
+import { taxonomia, traer, type Radar } from "../../lib/api";
+import { rotula, urlRadar, urlSeccion } from "../../lib/ui";
+
+// Macrostructure: 04 · Stat-Led — la cifra manda y el texto la cualifica.
+// La cifra es real (artículos rastreados). Gate 46: nunca un número inventado,
+// y nunca un número solo: siempre emparejado con lo que significa.
+
+export async function getStaticPaths() {
+  const tax = await taxonomia();
+  return tax.map((t) => ({ params: { seccion: t.section } }));
+}
+
+const { seccion } = Astro.params;
+const DIAS = 30;
+
+const tax = await taxonomia();
+const d = await traer<Radar>(`/api/radar/${encodeURIComponent(seccion!)}?days=${DIAS}`);
+
+const total = d.temas.reduce((a, t) => a + (t.n_articles ?? 0), 0);
+const maximo = Math.max(1, ...d.temas.map((t) => t.n_articles ?? 0));
+
+const chips = tax.map((t) => ({
+  etiqueta: rotula(t.section),
+  href: urlRadar(t.section),
+  activo: t.section === seccion,
+}));
+---
+
+<Base
+  title={`Radar de ${rotula(seccion!)} — El Contraste`}
+  seccion="radar"
+  edicion={`Radar de ${rotula(seccion!)} · ${d.dias_de_historia} días de historia`}
+>
+  <Conmutador opciones={chips} etiquetaAria="Secciones del radar" />
+
+  <section class="cifra-hero">
+    <p class="cifra dato">{total}</p>
+    <p class="cifra-frase">
+      artículos de {rotula(seccion!)} rastreados en {DIAS} días, repartidos en
+      <span class="dato">{d.temas.length}</span> temas de la taxonomía cerrada.
+    </p>
+  </section>
+
+  {
+    /* El aviso NO es decorativo: con poca historia el momentum es ruido y la
+       página lo dice en palabras en vez de dibujar una flecha que miente. */
+    !d.senal_fiable && (
+      <p class="aviso">
+        <strong>Señal todavía débil.</strong> El radar lleva
+        <span class="dato">{d.dias_de_historia}</span>
+        {d.dias_de_historia === 1 ? " día" : " días"} de historia acumulada y hacen falta unos
+        14 para que el momentum signifique algo. Lo de abajo es un recuento honesto, no una
+        tendencia: la columna de momentum queda oculta hasta que haya base para calcularla.
+      </p>
+    )
+  }
+
+  <div class="banda">
+    <span class="banda-num">01</span>
+    <h2>Atención por tema</h2>
+    <span class="cuenta">ventana de {DIAS} días</span>
+  </div>
+
+  {
+    d.temas.length === 0 ? (
+      <p class="aviso">Todavía no hay nada clasificado en esta sección.</p>
+    ) : (
+      <div class="tabla-envoltorio">
+        <table class="tabla-radar">
+          <thead>
+            <tr>
+              <th scope="col">Tema</th>
+              <th scope="col">Artículos</th>
+              <th scope="col">Historias</th>
+              <th scope="col"><span class="visualmente-oculto">Proporción</span></th>
+              {d.senal_fiable && <th scope="col">Momentum</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {d.temas.map((t) => (
+              <tr>
+                <th scope="row">
+                  <a href={urlSeccion(seccion!, t.topic)}>{t.topic}</a>
+                </th>
+                <td class="dato">{t.n_articles}</td>
+                <td class="dato">{t.n_clusters}</td>
+                <td class="celda-barra">
+                  <span
+                    class="barra"
+                    style={`inline-size: ${Math.round(((t.n_articles ?? 0) / maximo) * 100)}%`}
+                  />
+                </td>
+                {d.senal_fiable && (
+                  <td class:list={["dato", { sube: t.momentum && t.momentum > 1.2 }]}>
+                    {t.momentum ? `×${t.momentum}` : "—"}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  <p class="descargo">
+    Esto mide <strong>cobertura mediática</strong>, no mercado: cuánto se habla de un asunto,
+    no si conviene invertir en él. Un tema se dispara igual por una oportunidad que por una
+    crisis, y el radar no distingue entre las dos.
+  </p>
+</Base>
+

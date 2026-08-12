@@ -1,6 +1,24 @@
 ---
 // Hallmark · genre: editorial · design-system: design.md · designed-as-app
-const { title = "El Contraste", seccion = "" } = Astro.props;
+// theme: Newsprint · nav: N6 · footer: Ft4
+//
+// Todo el CSS del sitio vive en src/styles/global.css, importado aquí una
+// sola vez. Ver la cabecera de ese fichero para el porqué.
+import "../styles/global.css";
+import { urlInicio, urlSeccion, urlRadar, urlTendencias } from "../lib/ui";
+
+// `edicion` es la línea de arriba de la cabecera. Antes la escribía cada
+// isla por JS al terminar su fetch; ahora llega horneada desde el build.
+interface Props {
+  title?: string;
+  seccion?: string;
+  edicion?: string;
+}
+const {
+  title = "El Contraste",
+  seccion = "",
+  edicion = "Agregador de prensa contrastada",
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -17,368 +35,48 @@ const { title = "El Contraste", seccion = "" } = Astro.props;
     />
   </head>
   <body>
-    <header class="mast">
-      <p class="mast-line" id="mast-edicion">Agregador de prensa contrastada</p>
-      <a class="mast-name" href="/">El Contraste</a>
+    <!-- `marco` en los tres: la cabecera se alinea con el contenido en vez de
+         sobresalir por los lados, que era el desajuste más visible en ancho. -->
+    <header class="mast marco">
+      <p class="mast-line">{edicion}</p>
+      <a class="mast-name" href={urlInicio()}>El Contraste</a>
       <nav class="mast-nav" aria-label="Principal">
         <ul>
-          <li><a href="/" class={seccion === "hoy" ? "activo" : ""}>Portada</a></li>
-          <li><a href="/seccion?s=economico" class={seccion === "seccion" ? "activo" : ""}>Secciones</a></li>
-          <li><a href="/radar" class={seccion === "radar" ? "activo" : ""}>Radar</a></li>
-          <li><a href="/tendencias" class={seccion === "tendencias" ? "activo" : ""}>Tendencias</a></li>
+          <li><a href={urlInicio()} class={seccion === "hoy" ? "activo" : ""}>Portada</a></li>
+          <li>
+            <a href={urlSeccion("economico")} class={seccion === "seccion" ? "activo" : ""}>
+              Secciones
+            </a>
+          </li>
+          <li>
+            <a href={urlRadar("economico")} class={seccion === "radar" ? "activo" : ""}>Radar</a>
+          </li>
+          <li>
+            <a href={urlTendencias()} class={seccion === "tendencias" ? "activo" : ""}>
+              Tendencias
+            </a>
+          </li>
         </ul>
       </nav>
       <hr class="rule-double" aria-hidden="true" />
     </header>
 
-    <main>
+    <main class="contenido marco">
       <slot />
     </main>
 
     <footer class="colofon">
-      <p>
-        El Contraste · agregador personal, sin ánimo de lucro · Las síntesis las
-        redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de los
-        medios enlazados; pueden contener errores. Lee siempre el original.
-        Agrupación por similitud coseno ≥ 0,75 sobre embeddings MiniLM
-        multilingüe, ventana de 48 h, mínimo 2 medios por historia. No se
-        republica el texto de los artículos ni se sortean muros de pago.
-        Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
-      </p>
+      <div class="marco">
+        <p>
+          El Contraste · agregador personal, sin ánimo de lucro · Las síntesis las
+          redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de los
+          medios enlazados; pueden contener errores. Lee siempre el original.
+          Agrupación por similitud coseno ≥ 0,75 sobre embeddings MiniLM
+          multilingüe, ventana de 48 h, mínimo 2 medios por historia. No se
+          republica el texto de los artículos ni se sortean muros de pago.
+          Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
+        </p>
+      </div>
     </footer>
   </body>
 </html>
-
-<style is:global>
-  /* Hallmark · genre: editorial · macrostructure: per-page (design.md) ·
-     theme: Newsprint · enrichment: none · nav: N6 · footer: Ft4
-     pre-emit critique: P5 H5 E4 S5 R5 V4 */
-
-  :root {
-    --color-paper:   oklch(97% 0.006 250);
-    --color-paper-2: oklch(94% 0.008 250);
-    --color-rule:    oklch(84% 0.008 250);
-    --color-neutral: oklch(56% 0.010 250);
-    --color-muted:   oklch(42% 0.010 250);
-    --color-ink:     oklch(20% 0.012 250);
-    --color-accent:  oklch(48% 0.140 245);
-    --color-focus:   oklch(55% 0.180 245);
-    --color-alerta:  oklch(48% 0.150 25);
-
-    --font-display: "Libre Caslon Display", ui-serif, Georgia, serif;
-    --font-body: "Spectral", ui-serif, Georgia, serif;
-    --font-outlier: "IBM Plex Mono", ui-monospace, monospace;
-
-    --space-3xs: 0.25rem; --space-2xs: 0.5rem;  --space-xs: 0.75rem;
-    --space-sm:  1rem;    --space-md:  1.5rem;  --space-lg: 2rem;
-    --space-xl:  3rem;    --space-2xl: 4.5rem;  --space-3xl: 7rem;
-
-    --text-xs: 0.75rem;  --text-sm: 0.875rem; --text-md: 1.0625rem;
-    --text-lg: 1.4rem;   --text-xl: 1.875rem; --text-2xl: 2.5rem;
-
-    --rule-hair: 1px;
-    --page-gutter: clamp(1rem, 4vw, 2.5rem);
-    --measure: 64ch;
-  }
-
-  /* El papel se invierte de noche; los papeles del sistema conservan su rol. */
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-paper:   oklch(16% 0.012 250);
-      --color-paper-2: oklch(20% 0.012 250);
-      --color-rule:    oklch(32% 0.010 250);
-      --color-neutral: oklch(60% 0.010 250);
-      --color-muted:   oklch(72% 0.008 250);
-      --color-ink:     oklch(93% 0.006 250);
-      --color-accent:  oklch(76% 0.130 245);
-      --color-focus:   oklch(80% 0.160 245);
-      --color-alerta:  oklch(72% 0.140 25);
-    }
-  }
-
-  * { box-sizing: border-box; }
-  html, body { overflow-x: clip; }
-
-  body {
-    margin: 0;
-    background: var(--color-paper);
-    color: var(--color-ink);
-    font-family: var(--font-body);
-    font-size: var(--text-md);
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  a { color: var(--color-accent); text-underline-offset: 0.18em; }
-  a:focus-visible, button:focus-visible {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 2px;
-  }
-
-  /* ---------------------------------------------------- N6 · cabecera */
-  .mast {
-    display: grid;
-    gap: var(--space-3xs);
-    padding: var(--space-md) var(--page-gutter) 0;
-    text-align: center;
-  }
-  .mast-line {
-    font-family: var(--font-outlier);
-    font-variant: small-caps;
-    letter-spacing: 0.1em;
-    font-size: var(--text-xs);
-    color: var(--color-muted);
-    margin: 0;
-    text-transform: lowercase;
-  }
-  .mast-name {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    line-height: 0.95;
-    letter-spacing: -0.01em;
-    color: var(--color-ink);
-    text-decoration: none;
-    overflow-wrap: anywhere;
-    min-width: 0;
-  }
-  .mast-nav ul {
-    display: flex; flex-wrap: wrap; justify-content: center;
-    gap: var(--space-sm) var(--space-md);
-    list-style: none; padding: 0; margin: var(--space-2xs) 0 0;
-  }
-  .mast-nav a {
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--color-muted);
-    text-decoration: none;
-    white-space: nowrap;
-    padding-bottom: 2px;
-  }
-  .mast-nav a:hover { color: var(--color-accent); }
-  .mast-nav a.activo {
-    color: var(--color-ink);
-    border-bottom: 2px solid var(--color-accent);
-  }
-
-  .rule-double {
-    border: 0;
-    border-top: var(--rule-hair) solid var(--color-ink);
-    border-bottom: var(--rule-hair) solid var(--color-ink);
-    height: 3px;
-    margin: var(--space-sm) 0 0;
-  }
-
-  main {
-    max-width: 68rem;
-    margin: 0 auto;
-    padding: var(--space-lg) var(--page-gutter) var(--space-2xl);
-  }
-
-  /* ---------------------------------------------------- Ft4 · colofón */
-  .colofon {
-    border-top: var(--rule-hair) solid var(--color-rule);
-    padding: var(--space-md) var(--page-gutter) var(--space-xl);
-  }
-  .colofon p {
-    max-width: 72ch;
-    margin: 0 auto;
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    line-height: 1.7;
-    color: var(--color-neutral);
-  }
-
-  /* ---------------------------------------------------- tipografía común */
-  h1, h2, h3 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-style: normal;
-    line-height: 1.15;
-    overflow-wrap: anywhere;
-    min-width: 0;
-  }
-  h1 { font-size: var(--text-2xl); margin: 0 0 var(--space-xs); }
-  h2 { font-size: var(--text-xl); margin: 0 0 var(--space-xs); }
-
-  /* Rótulo de banda: numeral + etiqueta, alineado al filete. */
-  .banda {
-    display: flex; align-items: baseline; gap: var(--space-xs);
-    border-top: var(--rule-hair) solid var(--color-ink);
-    padding-top: var(--space-2xs);
-    margin: var(--space-xl) 0 var(--space-sm);
-  }
-  .banda-num {
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    color: var(--color-accent);
-  }
-  .banda h2 { font-size: var(--text-lg); margin: 0; }
-  .banda .cuenta {
-    margin-left: auto;
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    color: var(--color-neutral);
-    white-space: nowrap;
-  }
-
-  .dato { font-family: var(--font-outlier); font-variant-numeric: tabular-nums; }
-  .muted { color: var(--color-neutral); }
-  .estado {
-    font-family: var(--font-outlier);
-    font-size: var(--text-sm);
-    color: var(--color-neutral);
-    padding: var(--space-xl) 0;
-    text-align: center;
-  }
-
-  /* Aviso de señal débil: el proyecto prefiere decirlo a dibujar una flecha. */
-  .aviso {
-    border-left: 3px solid var(--color-alerta);
-    padding: var(--space-2xs) var(--space-sm);
-    margin: var(--space-sm) 0;
-    font-size: var(--text-sm);
-    color: var(--color-muted);
-  }
-
-  .enlace-accion {
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .enlace-accion:hover { text-decoration: underline; }
-
-  /* ================================================================
-     Componentes compartidos por varias páginas.
-     Viven AQUÍ y no en la página: un `<style is:global>` de página
-     solo viaja en el bundle de esa página, así que una ficha pintada
-     desde seccion.astro con CSS declarado en index.astro sale desnuda.
-     ================================================================ */
-
-  /* ---- Ficha de historia (portada, sección) ---- */
-  .ficha { padding-bottom: var(--space-sm); }
-  .ficha-titular {
-    display: block;
-    font-family: var(--font-display);
-    font-size: var(--text-lg);
-    line-height: 1.15;
-    color: var(--color-ink);
-    text-decoration: none;
-    overflow-wrap: anywhere;
-  }
-  .ficha-titular:hover { color: var(--color-accent); }
-  .ficha-destacada .ficha-titular { font-size: clamp(1.75rem, 4vw, 2.75rem); }
-  .ficha-destacada .ficha-entradilla { font-size: 1.125rem; max-width: 46ch; }
-  .ficha-entradilla {
-    margin: var(--space-2xs) 0 0;
-    font-size: var(--text-sm);
-    line-height: 1.6;
-    color: var(--color-muted);
-  }
-  .ficha-pie {
-    margin: var(--space-2xs) 0 0;
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    color: var(--color-neutral);
-  }
-  .ficha-medios { display: block; margin-top: 2px; }
-  .tema {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-accent);
-  }
-  .tema + .tema::before { content: " · "; color: var(--color-neutral); }
-
-  /* ---- Conmutador de chips (sección, radar) ---- */
-  .conmutador {
-    display: flex; flex-wrap: wrap; gap: var(--space-3xs) var(--space-2xs);
-    margin-bottom: var(--space-2xs);
-  }
-  .conmutador-temas { margin-bottom: var(--space-lg); }
-  .chip {
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    border: var(--rule-hair) solid var(--color-rule);
-    padding: 2px var(--space-2xs);
-    color: var(--color-muted);
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .chip:hover { border-color: var(--color-accent); color: var(--color-accent); }
-  .chip-activo {
-    border-color: var(--color-ink);
-    background: var(--color-ink);
-    color: var(--color-paper);
-  }
-
-  /* ---- Cifra de apertura (radar, tendencias) ---- */
-  .cifra-hero {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--space-md);
-    align-items: baseline;
-    border-bottom: var(--rule-hair) solid var(--color-ink);
-    padding-bottom: var(--space-md);
-    margin: var(--space-sm) 0 var(--space-lg);
-  }
-  .cifra {
-    font-size: clamp(4rem, 14vw, 9rem);
-    line-height: 0.82;
-    margin: 0;
-    letter-spacing: -0.03em;
-  }
-  .cifra-frase {
-    font-family: var(--font-display);
-    font-size: clamp(1.125rem, 2.4vw, 1.6rem);
-    line-height: 1.25;
-    margin: 0;
-    max-width: 34ch;
-  }
-
-  /* ---- Tabla de datos (radar, tendencias) ---- */
-  .tabla-envoltorio { overflow-x: auto; }
-  .tabla-radar { border-collapse: collapse; width: 100%; min-width: 34rem; }
-  .tabla-radar th, .tabla-radar td {
-    text-align: left;
-    padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) 0;
-    border-bottom: var(--rule-hair) dotted var(--color-rule);
-    vertical-align: baseline;
-  }
-  .tabla-radar thead th {
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-neutral);
-    border-bottom: var(--rule-hair) solid var(--color-ink);
-    font-weight: 400;
-  }
-  .tabla-radar tbody th { font-weight: 400; }
-  .tabla-radar tbody th a { color: var(--color-ink); text-decoration: none; }
-  .tabla-radar tbody th a:hover { color: var(--color-accent); text-decoration: underline; }
-  .celda-barra { width: 40%; }
-  .barra {
-    display: block;
-    block-size: 0.5rem;
-    background: var(--color-accent);
-    opacity: 0.55;
-    min-inline-size: 2px;
-  }
-  .sube { color: var(--color-accent); }
-
-  .visualmente-oculto {
-    position: absolute; width: 1px; height: 1px;
-    padding: 0; margin: -1px; overflow: hidden;
-    clip-path: inset(50%); white-space: nowrap;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; animation: none !important; }
-  }
-</style>
