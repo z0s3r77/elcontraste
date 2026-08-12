@@ -1,0 +1,23 @@
+CLAUDE.md
+  s_f770e0ace1cab6::t_9e1e315a09d3f5 222-232
+api/ejecutar.py
+  s_f770e0ace1cab6::t_514156c65f8312 48-52,55,262-268,305,309-314,317
+docs/despliegue.md
+  s_f770e0ace1cab6::t_d0b11354086053 23-24,39-48,149-155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6d8b6750ea613f2709aa8cb6598266d65597a68d",
+  "prompts": {},
+  "sessions": {
+    "s_f770e0ace1cab6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d283a33-748d-49d7-9101-3bdd7dc34ba5",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
