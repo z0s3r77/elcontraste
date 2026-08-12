@@ -23,6 +23,14 @@ name: Publicar el sitio
 
 on:
   workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: >-
+          URL pública de la API. La rellena sola la llamada desde el backend;
+          si lanzas el workflow a mano desde la web de GitHub, pégala aquí
+          (con un quick tunnel cambia en cada arranque).
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -50,11 +58,19 @@ jobs:
 
       - name: Hornear el sitio
         env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          # El input manda: con un quick tunnel la URL es distinta cada vez y
+          # la manda el backend al disparar. El secret es el respaldo, para
+          # cuando algún día haya un túnel con nombre y hostname fijo.
+          API_BASE_URL: ${{ inputs.api_base_url || secrets.API_BASE_URL }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-          SITE_URL: ${{ vars.SITE_URL }}
-          BASE_PATH: ${{ vars.BASE_PATH }}
+          # Se deducen del propio repo: con el dominio por defecto de Pages el
+          # sitio cuelga de /<repo>/, y si BASE_PATH no coincide EXACTAMENTE
+          # con el nombre del repo, el sitio sale sin CSS y con los enlaces
+          # rotos. Deducirlo evita ese fallo por completo.
+          # Las variables solo hacen falta el día que haya dominio propio.
+          SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io', github.repository_owner) }}
+          BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
         run: npm run build
         # src/lib/api.ts ya se cae solo si la API no responde, si devuelve el
         # HTML de login de Access en vez de JSON, o si el digest viene sin un
