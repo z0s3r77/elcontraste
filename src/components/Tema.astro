@@ -3,7 +3,9 @@
 // `flex-wrap` de la cabecera: a 390 px se coloca solo, sin reglas propias.
 //
 // Qué icono se ve NO lo decide este componente ni JS, lo decide el CSS a
-// través de --icono-sol / --icono-luna (global.css, los tres estados de tema).
+// través del token numérico --es-oscuro (global.css, los tres estados de
+// tema): los dos iconos están siempre en el DOM, superpuestos, y ese número
+// interpola su opacidad y su giro. Con `display` no habría nada que animar.
 // Si lo pintara JS habría un parpadeo con el icono equivocado en cada carga,
 // porque el sitio es HTML estático y el script llega después del primer pintado.
 //
@@ -18,21 +20,23 @@
   aria-label="Cambiar entre modo claro y oscuro"
   title="Cambiar entre modo claro y oscuro"
 >
-  <svg class="tema-luna" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-    <path
-      d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.7"
-      stroke-linejoin="round"></path>
-  </svg>
-  <svg class="tema-sol" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-    <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"></circle>
-    <path
-      d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"
-      stroke="currentColor"
-      stroke-width="1.7"
-      stroke-linecap="round"></path>
-  </svg>
+  <span class="tema-iconos">
+    <svg class="tema-luna" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <path
+        d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linejoin="round"></path>
+    </svg>
+    <svg class="tema-sol" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"></circle>
+      <path
+        d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"></path>
+    </svg>
+  </span>
   <span class="tema-texto">Tema</span>
 </button>

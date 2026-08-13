@@ -14,16 +14,23 @@
 @import "tailwindcss";
 
 @theme {
-  /* ---- Paleta Newsprint (design.md § Theme) ---- */
-  --color-paper: oklch(97% 0.006 250);
-  --color-paper-2: oklch(94% 0.008 250);
-  --color-rule: oklch(84% 0.008 250);
-  --color-neutral: oklch(56% 0.010 250);
-  --color-muted: oklch(42% 0.010 250);
-  --color-ink: oklch(20% 0.012 250);
-  --color-accent: oklch(48% 0.140 245);
-  --color-focus: oklch(55% 0.180 245);
-  --color-alerta: oklch(48% 0.150 25);
+  /* ---- Paleta Newsprint (design.md § Theme) ----
+     Papel CÁLIDO desde el 2026-08-13: el tono pasó de 250 (azul) a ~60-85
+     (crema), que es el color real del papel de periódico, y de paso subió el
+     contraste de todo el texto secundario. El cambio no fue estético: medido
+     con la fórmula WCAG, `neutral` sobre `paper` daba **4,25:1**, por debajo
+     del mínimo AA de 4,5 — y `neutral` es el color de TODA la metadata en
+     monoespaciada (colofón, pies de ficha, recuentos). Ahora da 6,53.
+     Si tocas estos valores, vuelve a medir; el aspecto engaña. */
+  --color-paper: oklch(97% 0.010 85);
+  --color-paper-2: oklch(94% 0.014 82);
+  --color-rule: oklch(75% 0.018 78);
+  --color-neutral: oklch(46% 0.016 70);
+  --color-muted: oklch(34% 0.016 65);
+  --color-ink: oklch(16% 0.018 60);
+  --color-accent: oklch(44% 0.150 245);
+  --color-focus: oklch(52% 0.180 245);
+  --color-alerta: oklch(45% 0.165 28);
 
   /* ---- Regla 2+1: tres familias como techo ---- */
   --font-display: "Libre Caslon Display", ui-serif, Georgia, serif;
@@ -68,12 +75,18 @@
   --page-gutter: clamp(1rem, 4vw, 2.5rem);
   --measure: 64ch;
 
-  /* Qué icono enseña el botón de tema. Es un token y no una regla de CSS
-     porque así viaja en los MISMOS tres bloques que los colores: el icono no
-     puede desincronizarse del tema aunque se toque uno de los dos. De día se
-     ofrece la luna (lo que vas a activar), de noche el sol. */
-  --icono-sol: none;
-  --icono-luna: block;
+  /* Estado del tema como NÚMERO (0 claro · 1 oscuro), no como `display`.
+     Es la pieza que hace que el botón se anime: de un número se puede
+     interpolar opacidad y giro, de `display: none` no se puede interpolar
+     nada. Vive en los mismos tres bloques que los colores, así que el icono
+     no puede desincronizarse del tema. */
+  --es-oscuro: 0;
+
+  /* ---- Movimiento (design.md § Motion) ---- */
+  --curva: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-corta: 180ms;
+  --dur-media: 320ms;
+  --dur-larga: 520ms;
 
   /* Series de la gráfica de tendencias (uPlot las lee por getComputedStyle). */
   --serie-1: oklch(48% 0.140 245);
@@ -104,15 +117,15 @@
    ------------------------------------------------------------------------ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-paper: oklch(16% 0.012 250);
-    --color-paper-2: oklch(20% 0.012 250);
-    --color-rule: oklch(32% 0.010 250);
-    --color-neutral: oklch(60% 0.010 250);
-    --color-muted: oklch(72% 0.008 250);
-    --color-ink: oklch(93% 0.006 250);
-    --color-accent: oklch(76% 0.130 245);
-    --color-focus: oklch(80% 0.160 245);
-    --color-alerta: oklch(72% 0.140 25);
+    --color-paper: oklch(17% 0.014 70);
+    --color-paper-2: oklch(21% 0.016 70);
+    --color-rule: oklch(44% 0.018 72);
+    --color-neutral: oklch(70% 0.018 78);
+    --color-muted: oklch(82% 0.014 82);
+    --color-ink: oklch(96% 0.010 88);
+    --color-accent: oklch(80% 0.130 245);
+    --color-focus: oklch(84% 0.160 245);
+    --color-alerta: oklch(76% 0.140 30);
 
     --serie-1: oklch(76% 0.130 245);
     --serie-2: oklch(72% 0.140 25);
@@ -123,22 +136,21 @@
     --serie-7: oklch(70% 0.120 340);
     --serie-8: oklch(80% 0.090 100);
 
-    --icono-sol: block;
-    --icono-luna: none;
+    --es-oscuro: 1;
   }
 }
 
 /* Estado 3: oscuro elegido a mano, con el sistema en claro. Mismos valores. */
 :root[data-theme="dark"] {
-  --color-paper: oklch(16% 0.012 250);
-  --color-paper-2: oklch(20% 0.012 250);
-  --color-rule: oklch(32% 0.010 250);
-  --color-neutral: oklch(60% 0.010 250);
-  --color-muted: oklch(72% 0.008 250);
-  --color-ink: oklch(93% 0.006 250);
-  --color-accent: oklch(76% 0.130 245);
-  --color-focus: oklch(80% 0.160 245);
-  --color-alerta: oklch(72% 0.140 25);
+  --color-paper: oklch(17% 0.014 70);
+  --color-paper-2: oklch(21% 0.016 70);
+  --color-rule: oklch(44% 0.018 72);
+  --color-neutral: oklch(70% 0.018 78);
+  --color-muted: oklch(82% 0.014 82);
+  --color-ink: oklch(96% 0.010 88);
+  --color-accent: oklch(80% 0.130 245);
+  --color-focus: oklch(84% 0.160 245);
+  --color-alerta: oklch(76% 0.140 30);
 
   --serie-1: oklch(76% 0.130 245);
   --serie-2: oklch(72% 0.140 25);
@@ -149,8 +161,7 @@
   --serie-7: oklch(70% 0.120 340);
   --serie-8: oklch(80% 0.090 100);
 
-  --icono-sol: block;
-  --icono-luna: none;
+  --es-oscuro: 1;
 }
 
 /* Que los controles nativos (scrollbars, selects, autofill) sigan al tema
@@ -328,12 +339,40 @@
   .tema:hover {
     color: var(--color-accent);
   }
-  /* El icono lo elige el tema, no el script: ver --icono-sol/--icono-luna. */
+  /* Los dos iconos están SIEMPRE en el DOM, superpuestos: solo así hay algo
+     que animar. `--es-oscuro` vale 0 o 1 y de él salen las dos propiedades —
+     el que se va gira y se encoge, el que entra gira hasta 0 y crece. Un
+     único número gobierna las dos mitades, así que no pueden contradecirse. */
+  .tema-iconos {
+    position: relative;
+    width: 15px;
+    height: 15px;
+    flex: none;
+  }
+  .tema-sol,
+  .tema-luna {
+    position: absolute;
+    inset: 0;
+    transition:
+      opacity var(--dur-media) var(--curva),
+      transform var(--dur-larga) var(--curva);
+  }
   .tema-sol {
-    display: var(--icono-sol);
+    opacity: var(--es-oscuro);
+    transform: rotate(calc((1 - var(--es-oscuro)) * -120deg))
+      scale(calc(0.4 + 0.6 * var(--es-oscuro)));
   }
   .tema-luna {
-    display: var(--icono-luna);
+    opacity: calc(1 - var(--es-oscuro));
+    transform: rotate(calc(var(--es-oscuro) * 120deg))
+      scale(calc(1 - 0.6 * var(--es-oscuro)));
+  }
+  /* El botón entero acusa el clic: un giro corto que confirma la acción. */
+  .tema:active .tema-iconos {
+    transform: rotate(-25deg);
+  }
+  .tema-iconos {
+    transition: transform var(--dur-corta) var(--curva);
   }
   /* El texto es para lectores de pantalla y pantallas anchas; en móvil el
      icono basta y ahorra el salto de línea de la navegación. */
@@ -1149,5 +1188,111 @@
   }
   .lista-acelera a:hover {
     text-decoration: underline;
+  }
+}
+
+/* ==========================================================================
+   MOVIMIENTO (design.md § Motion)
+   --------------------------------------------------------------------------
+   El sistema decía "ninguna" hasta el 2026-08-13. Ahora hay movimiento, pero
+   con tres reglas que lo mantienen del lado del periódico y no del carrusel:
+
+   1. Nada se mueve por decoración: o confirma una acción (hover, clic del
+      tema) o acompaña a algo que ENTRA (cabecera al cargar, fichas al
+      aparecer). Nada parpadea, nada rebota, nada se repite en bucle.
+   2. Todo cuelga de --dur-* y --curva. No hay duraciones sueltas.
+   3. `prefers-reduced-motion` lo apaga entero — y de verdad: el revelado se
+      esconde solo dentro de `no-preference`, así que quien pide menos
+      movimiento no ve el contenido oculto ni un instante.
+
+   El revelado además solo se esconde bajo [data-js], que pone el script en
+   línea del <head>. Si el JS no llega, el contenido está visible: nunca se
+   publica una página cuyo texto dependa de que un script arranque.
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes entrar {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+  @keyframes trazar {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  /* La cabecera se compone sola al cargar, de arriba abajo, y el filete
+     doble se traza de izquierda a derecha: es la única entrada escalonada
+     del sitio y solo ocurre una vez por carga. */
+  .mast-line {
+    animation: entrar var(--dur-media) var(--curva) both;
+  }
+  .mast-name {
+    animation: entrar var(--dur-larga) var(--curva) 60ms both;
+  }
+  .mast-nav {
+    animation: entrar var(--dur-larga) var(--curva) 140ms both;
+  }
+  .mast .rule-double {
+    transform-origin: left;
+    animation: trazar var(--dur-larga) var(--curva) 200ms both;
+  }
+
+  [data-js] .revelable {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  [data-js] .revelable.visible {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--dur-larga) var(--curva) var(--retraso, 0ms),
+      transform var(--dur-larga) var(--curva) var(--retraso, 0ms);
+  }
+
+  /* Micro-respuestas. Todas ≤ 180 ms: se notan, no se esperan. */
+  .mast-nav a,
+  .chip,
+  .lista-titulares a,
+  .lista-huecos a,
+  .rotulo-seccion a,
+  .enlace-accion,
+  .ficha-titular,
+  .correo a,
+  .tema {
+    transition:
+      color var(--dur-corta) var(--curva),
+      background-color var(--dur-corta) var(--curva),
+      border-color var(--dur-corta) var(--curva),
+      transform var(--dur-corta) var(--curva);
+  }
+  .chip:hover {
+    transform: translateY(-1px);
+  }
+  /* El titular reacciona al pasar por CUALQUIER punto de su ficha, no solo
+     sobre el texto: el área de clic real es la ficha entera. */
+  .ficha:hover .ficha-titular,
+  .ficha:focus-within .ficha-titular {
+    color: var(--color-accent);
+  }
+  .lista-titulares li:hover a,
+  .lista-huecos li:hover a {
+    transform: translateX(3px);
+  }
+  .tema:hover .tema-iconos {
+    transform: rotate(12deg);
+  }
+
+  /* Cambio de tema: los colores se funden en vez de saltar. La transición se
+     enciende SOLO durante el cambio (la clase la pone y la quita el script):
+     dejarla siempre puesta haría que cada hover arrastrase un fundido de
+     fondo, y que la primera pintura de la página llegara con retardo. */
+  :root.cambiando-tema,
+  :root.cambiando-tema *:not(.tema-sol):not(.tema-luna) {
+    transition:
+      background-color var(--dur-media) var(--curva),
+      color var(--dur-media) var(--curva),
+      border-color var(--dur-media) var(--curva) !important;
   }
 }

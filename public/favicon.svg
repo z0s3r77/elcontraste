@@ -9,11 +9,11 @@
        El icono se invierte de noche: en modo oscuro la barra de pestañas es
        casi negra y un cuadro de tinta sobre ella desaparece. -->
   <style>
-    .fondo { fill: #12171b; }
-    .marca { fill: #f2f5f9; stroke: #f2f5f9; }
+    .fondo { fill: #130b06; }
+    .marca { fill: #f8f5ee; stroke: #f8f5ee; }
     @media (prefers-color-scheme: dark) {
-      .fondo { fill: #f2f5f9; }
-      .marca { fill: #12171b; stroke: #12171b; }
+      .fondo { fill: #f8f5ee; }
+      .marca { fill: #130b06; stroke: #130b06; }
     }
   </style>
 

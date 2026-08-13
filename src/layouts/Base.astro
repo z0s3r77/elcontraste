@@ -65,7 +65,7 @@ const imagenSocial = Astro.site
          Son los hex exactos de --color-paper (design.md § Theme).
          Una sola etiqueta, sin `media`: desde que hay botón, el tema puede no
          coincidir con el del sistema y el script de abajo la mantiene al día. -->
-    <meta name="theme-color" content="#f2f5f9" />
+    <meta name="theme-color" content="#f8f5ee" />
 
     <!-- Tema elegido. `is:inline` y aquí arriba a propósito: tiene que correr
          ANTES del primer pintado o se ve un fogonazo claro antes de aplicarse
@@ -73,6 +73,10 @@ const imagenSocial = Astro.site
          diferido. Es la única lógica del sitio que no puede esperar. -->
     <script is:inline>
       (function () {
+        // Marca de que hay JS. El revelado al hacer scroll solo esconde
+        // contenido si esta marca está puesta: sin script, la página se ve
+        // entera. Va aquí y no al final para que el CSS ya la encuentre.
+        document.documentElement.dataset.js = "";
         try {
           var elegido = localStorage.getItem("tema");
           if (elegido === "dark" || elegido === "light") {
@@ -82,7 +86,7 @@ const imagenSocial = Astro.site
             ? elegido === "dark"
             : matchMedia("(prefers-color-scheme: dark)").matches;
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.content = oscuro ? "#090e12" : "#f2f5f9";
+          if (meta) meta.content = oscuro ? "#130e09" : "#f8f5ee";
         } catch (e) {
           /* localStorage puede fallar (modo privado, cookies bloqueadas).
              Sin preferencia guardada el sitio sigue el sistema y todo va. */
@@ -182,16 +186,61 @@ const imagenSocial = Astro.site
           ? raiz.dataset.theme === "dark"
           : matchMedia("(prefers-color-scheme: dark)").matches;
 
+      let quitarFundido;
       boton?.addEventListener("click", () => {
         const nuevo = esOscuro() ? "light" : "dark";
+
+        // El fundido se enciende solo durante el cambio y se apaga después:
+        // dejarlo puesto arrastraría una transición de fondo en cada hover.
+        raiz.classList.add("cambiando-tema");
+        clearTimeout(quitarFundido);
+        quitarFundido = setTimeout(() => raiz.classList.remove("cambiando-tema"), 400);
+
         raiz.dataset.theme = nuevo;
-        if (meta) meta.content = nuevo === "dark" ? "#090e12" : "#f2f5f9";
+        if (meta) meta.content = nuevo === "dark" ? "#130e09" : "#f8f5ee";
         try {
           localStorage.setItem("tema", nuevo);
         } catch (e) {
           /* Sin persistencia el tema dura lo que la pestaña. Mejor que nada. */
         }
       });
+
+      // ---- Revelado al entrar en pantalla -------------------------------
+      // IntersectionObserver y no scroll: el navegador avisa, nadie sondea.
+      // Se deja de observar en cuanto algo aparece — es una entrada, no un
+      // efecto que deba repetirse cada vez que subes y bajas.
+      if (matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+        const piezas = document.querySelectorAll(
+          ".ficha, .banda, .cifra-hero, .rotulo-doc, .tabla-envoltorio, .lista-huecos, .relato",
+        );
+        const vigia = new IntersectionObserver(
+          (entradas) => {
+            for (const e of entradas) {
+              if (!e.isIntersecting) continue;
+              e.target.classList.add("visible");
+              vigia.unobserve(e.target);
+            }
+          },
+          // Un margen negativo abajo evita que algo se "revele" cuando aún
+          // asoma un píxel; rootMargin arriba deja pasar lo que ya está leído.
+          { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
+        );
+
+        // Lo que YA se ve al cargar no se esconde. Es deliberado: ocultar el
+        // titular principal hasta que corra un script retrasa el LCP y deja
+        // la portada en blanco si el JS tarda o falla. La entrada de la
+        // primera pantalla la hace el CSS (la cabecera), que no depende de
+        // nada. El revelado es solo para lo que llega al hacer scroll.
+        let bajoElPliegue = 0;
+        piezas.forEach((pieza) => {
+          if (pieza.getBoundingClientRect().top < innerHeight) return;
+          pieza.classList.add("revelable");
+          // Escalonado por orden de aparición, con techo: en una portada de
+          // 88 fichas, sin tope la última entraría cinco segundos tarde.
+          pieza.style.setProperty("--retraso", Math.min(bajoElPliegue++, 4) * 60 + "ms");
+          vigia.observe(pieza);
+        });
+      }
     </script>
   </body>
 </html>
