@@ -17,20 +17,44 @@ if (import.meta.env.CF_ACCESS_CLIENT_ID && import.meta.env.CF_ACCESS_CLIENT_SECR
   CABECERAS["CF-Access-Client-Secret"] = import.meta.env.CF_ACCESS_CLIENT_SECRET;
 }
 
+/** Reintentos ante 429/5xx. Ver `traer`. */
+const INTENTOS = 4;
+const espera = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export async function traer<T>(ruta: string): Promise<T> {
   const url = `${BASE}${ruta}`;
   let res: Response;
-  try {
-    res = await fetch(url, { headers: CABECERAS });
-  } catch (causa) {
-    throw new Error(
-      `No se pudo conectar con la API en ${url}. ¿Está el backend levantado ` +
-        `(docker compose up) o el túnel arriba?\n  ${causa}`,
-    );
+
+  // El build hace cientos de peticiones seguidas por un quick tunnel, y
+  // Cloudflare estrangula: el 2026-08-13 el build murió con 429 al pedir el
+  // clúster nº 20 de 93. Un 429 no significa "no existe", significa "espera",
+  // así que se espera — con backoff exponencial y respetando Retry-After.
+  // Los 5xx entran en el mismo saco: por el túnel son casi siempre
+  // congestión, no un fallo real de la API.
+  for (let intento = 1; ; intento++) {
+    try {
+      res = await fetch(url, { headers: CABECERAS });
+    } catch (causa) {
+      throw new Error(
+        `No se pudo conectar con la API en ${url}. ¿Está el backend levantado ` +
+          `(docker compose up) o el túnel arriba?\n  ${causa}`,
+      );
+    }
+    if (res.ok || intento >= INTENTOS || (res.status !== 429 && res.status < 500)) break;
+
+    const cabecera = Number(res.headers.get("retry-after"));
+    const pausa = Number.isFinite(cabecera) && cabecera > 0 ? cabecera * 1000 : 400 * 2 ** intento;
+    console.warn(`  ${res.status} en ${ruta}; reintento ${intento}/${INTENTOS - 1} en ${pausa} ms`);
+    await espera(pausa);
   }
 
   if (!res.ok) {
-    throw new Error(`${res.status} ${res.statusText} al pedir ${url}`);
+    throw new Error(
+      `${res.status} ${res.statusText} al pedir ${url}` +
+        (res.status === 429
+          ? ". El túnel estranguló la petición incluso tras reintentar: baja EN_PARALELO."
+          : ""),
+    );
   }
 
   // Access, cuando rechaza, NO devuelve un 401 limpio: devuelve 200 con el
@@ -45,6 +69,33 @@ export async function traer<T>(ruta: string): Promise<T> {
   }
 
   return (await res.json()) as T;
+}
+
+/** Peticiones simultáneas máximas contra la API. Ver `enLote`. */
+const EN_PARALELO = 6;
+
+/**
+ * Pide muchas rutas con un tope de peticiones en vuelo.
+ *
+ * `Promise.all(ids.map(traer))` abre TODAS a la vez: con 93 clústeres son 93
+ * conexiones simultáneas por el túnel, y ahí es donde saltó el 429. El tope
+ * no hace el build más lento de forma apreciable (la latencia domina, no el
+ * paralelismo) y lo hace independiente del número de historias del día, que
+ * es lo que no puede seguir creciendo sin avisar.
+ */
+export async function enLote<T>(rutas: string[], enParalelo = EN_PARALELO): Promise<T[]> {
+  const salida = new Array<T>(rutas.length);
+  let siguiente = 0;
+
+  const obrero = async () => {
+    while (siguiente < rutas.length) {
+      const i = siguiente++;
+      salida[i] = await traer<T>(rutas[i]);
+    }
+  };
+
+  await Promise.all(Array.from({ length: Math.min(enParalelo, rutas.length) }, obrero));
+  return salida;
 }
 
 // ---------------------------------------------------------------- tipos

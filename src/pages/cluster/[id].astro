@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Parrafos from "../../components/Parrafos.astro";
-import { traer, fechasHorneables, type Digest, type Historia } from "../../lib/api";
+import { enLote, fechasHorneables, type Digest, type Historia } from "../../lib/api";
 import { rotula, urlSeccion } from "../../lib/ui";
 
 // Macrostructure: 02 · Long Document — el relato se lee de corrido y el
@@ -12,14 +12,16 @@ import { rotula, urlSeccion } from "../../lib/ui";
 export async function getStaticPaths() {
   // Se hornean los clústeres de los digests dentro de la ventana. El resto
   // sigue en la DB: a ~48 clústeres/día, hornearlo todo no escala.
+  // `enLote` y no `Promise.all`: son ~100 peticiones y abrirlas todas a la vez
+  // hizo que el túnel devolviera 429 y tumbara el build (2026-08-13).
   const fechas = await fechasHorneables();
-  const digests = await Promise.all(fechas.map((f) => traer<Digest>(`/api/digest/${f}`)));
+  const digests = await enLote<Digest>(fechas.map((f) => `/api/digest/${f}`));
 
   const ids = [
     ...new Set(digests.flatMap((d) => d.sections.flatMap((s) => s.clusters.map((c) => c.id)))),
   ];
 
-  const historias = await Promise.all(ids.map((id) => traer<Historia>(`/api/clusters/${id}`)));
+  const historias = await enLote<Historia>(ids.map((id) => `/api/clusters/${id}`));
 
   return historias.map((c) => ({ params: { id: String(c.id) }, props: { c } }));
 }
