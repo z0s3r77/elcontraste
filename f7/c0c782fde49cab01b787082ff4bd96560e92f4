@@ -1,0 +1,19 @@
+web/public/CNAME
+  s_f253bafcbd4833::t_8b053757b62b99 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "f7c0c782fde49cab01b787082ff4bd96560e92f4",
+  "prompts": {},
+  "sessions": {
+    "s_f253bafcbd4833": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1371897c-0728-493a-9fca-f7b84319db76",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
