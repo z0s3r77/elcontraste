@@ -1,0 +1,35 @@
+CLAUDE.md
+  s_f253bafcbd4833::t_91d89ea897386b 248-261,273-276
+docs/despliegue.md
+  s_f253bafcbd4833::t_077a7ad433170a 280-292
+scripts/icono.py
+  s_f253bafcbd4833::t_0ee57ea8d23d02 17
+web/public/favicon.svg
+  s_f253bafcbd4833::t_7e4b349c52aa73 12-13,15-16
+web/src/components/Tema.astro
+  s_f253bafcbd4833::t_b494fd3a5ac684 6-8,23-40
+web/src/styles/global.css
+  s_f253bafcbd4833::t_aa51dd98647867 17-33,78-89,120-128,139,145-153,164,342-359,361-363,366-375,1193-1298
+scripts/tarjeta-og.html
+  s_f253bafcbd4833::t_937cdd59910a38 1-123
+web/src/layouts/Base.astro
+  s_f253bafcbd4833::t_776474b1c3ceff 68,76-79,89,189,192-198,200,207-243
+design.md
+  s_f253bafcbd4833::t_3a269379b09dba 30,33-39,41-48,51-58,125-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c2394f6111c51a02882bd8a56d655120b566d902",
+  "prompts": {},
+  "sessions": {
+    "s_f253bafcbd4833": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1371897c-0728-493a-9fca-f7b84319db76",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
