@@ -39,6 +39,32 @@ const contradicciones = divs.filter((d) => (d.solo_en ?? []).length > 1);
 const exclusivas = divs.filter((d) => (d.solo_en ?? []).length === 1);
 const comunes = s?.hechos_comunes ?? [];
 
+// Tope de exclusivas. Medido el 2026-08-14 sobre las 15 síntesis del día: 73 de
+// las 98 divergencias (74 %) eran exclusivas de un solo medio, y en los
+// clústeres grandes son trivia —"La Vanguardia: seis o siete minutos", sobre el
+// eclipse de 2027— porque un mega-clúster mezcla subhistorias que no comparten
+// tema. Eran la mitad del alto de la página y ninguna era contraste.
+const MAX_EXCLUSIVAS = 3;
+const exclusivasVisibles = exclusivas.slice(0, MAX_EXCLUSIVAS);
+
+// Las versiones originales, agrupadas por medio y con tope por medio. El
+// eclipse traía 98 enlaces en una lista plana: para ir al original de ABC había
+// que recorrer 22 de eldiario.es. Lo que el lector quiere es UNA versión del
+// medio en el que confía, así que se enseñan las tres primeras de cada uno y el
+// resto queda a un clic, sin perderse.
+const MAX_POR_MEDIO = 3;
+const porMedio = new Map<string, typeof c.articles>();
+for (const a of c.articles ?? []) {
+  if (!porMedio.has(a.medio)) porMedio.set(a.medio, []);
+  porMedio.get(a.medio)!.push(a);
+}
+const medios = [...porMedio.entries()].map(([medio, arts]) => ({
+  medio,
+  visibles: arts.slice(0, MAX_POR_MEDIO),
+  ocultas: arts.slice(MAX_POR_MEDIO),
+}));
+const nOcultas = medios.reduce((n, m) => n + m.ocultas.length, 0);
+
 // Lo que se ve al compartir la historia. El arranque del relato dice más que
 // cualquier plantilla; sin síntesis se cae al recuento de medios, que al menos
 // es cierto. Se recorta por palabra: un corte a mitad de palabra canta.
@@ -149,37 +175,92 @@ const descripcion = arranque
     </div>
 
     {/* Aparato de atribución: quién la cuenta y qué cuenta solo uno. Las dos
-        cosas son "de quién sale cada dato", así que van juntas y al margen. */}
+        cosas son "de quién sale cada dato", así que van juntas y al margen.
+        Los dos bloques se pliegan, y el PRIMERO va abierto: una columna que
+        empieza toda cerrada parece rota y esconde de qué va. Cuál es el primero
+        depende del clúster —sin exclusivas, lo son las versiones—, así que el
+        `open` se calcula, no se escribe fijo. */}
     <aside class="doc-aparato">
       {
-        exclusivas.length > 0 && (
-          <>
-            <h2 class="rotulo-doc">Lo que solo cuenta un medio</h2>
+        exclusivasVisibles.length > 0 && (
+          <details class="pliegue" open>
+            <summary class="rotulo-doc">
+              Lo que solo cuenta un medio
+              <span class="pliegue-cuenta">
+                {
+                  exclusivas.length > exclusivasVisibles.length
+                    ? `${exclusivasVisibles.length} de ${exclusivas.length}`
+                    : exclusivas.length
+                }
+              </span>
+            </summary>
             <ul class="exclusivas">
-              {exclusivas.map((d) => (
+              {exclusivasVisibles.map((d) => (
                 <li>
                   <span class="exclusiva-medio">{d.solo_en![0]}</span>
                   <span>{d.hecho}</span>
                 </li>
               ))}
             </ul>
-          </>
+            {exclusivas.length > exclusivasVisibles.length && (
+              <p class="pliegue-nota">
+                Se muestran {exclusivasVisibles.length} de {exclusivas.length}. Son datos que
+                ningún otro medio recoge, no versiones enfrentadas.
+              </p>
+            )}
+          </details>
         )
       }
 
-      <h2 class="rotulo-doc">Las versiones originales</h2>
-      <ul class="fuentes">
+      <details class="pliegue" open={exclusivasVisibles.length === 0}>
+        <summary class="rotulo-doc">
+          Las versiones originales
+          <span class="pliegue-cuenta">{c.n_articles}</span>
+        </summary>
+        <div class="fuentes">
+          {
+            medios.map((m) => (
+              <section class="fuente-grupo">
+                <h3 class="fuente-medio">{m.medio}</h3>
+                <ul>
+                  {m.visibles.map((a) => (
+                    <li>
+                      <a href={a.url} target="_blank" rel="noopener noreferrer">
+                        {a.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))
+          }
+        </div>
         {
-          (c.articles ?? []).map((a) => (
-            <li>
-              <span class="fuente-medio">{a.medio}</span>
-              <a href={a.url} target="_blank" rel="noopener noreferrer">
-                {a.title}
-              </a>
-            </li>
-          ))
+          nOcultas > 0 && (
+            <details class="pliegue pliegue-interior">
+              <summary class="rotulo-doc">Y {nOcultas} versiones más</summary>
+              <div class="fuentes">
+                {medios
+                  .filter((m) => m.ocultas.length > 0)
+                  .map((m) => (
+                    <section class="fuente-grupo">
+                      <h3 class="fuente-medio">{m.medio}</h3>
+                      <ul>
+                        {m.ocultas.map((a) => (
+                          <li>
+                            <a href={a.url} target="_blank" rel="noopener noreferrer">
+                              {a.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  ))}
+              </div>
+            </details>
+          )
         }
-      </ul>
+      </details>
     </aside>
   </article>
 </Base>

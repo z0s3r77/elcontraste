@@ -1072,7 +1072,14 @@
     }
   }
 
+  /* Las versiones van AGRUPADAS POR MEDIO desde el 2026-08-14. En lista plana,
+     el eclipse ponía 98 enlaces seguidos y llegar al de ABC exigía pasar 22 de
+     eldiario.es. Agrupado, el lector encuentra su medio de un vistazo. */
   .fuentes {
+    margin: 0;
+    padding: 0;
+  }
+  .fuentes ul {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -1081,6 +1088,9 @@
     padding: var(--spacing-2xs) 0;
     border-bottom: var(--rule-hair) dotted var(--color-rule);
   }
+  .fuente-grupo + .fuente-grupo {
+    margin-top: var(--spacing-sm);
+  }
   .fuente-medio {
     display: block;
     font-family: var(--font-outlier);
@@ -1088,6 +1098,7 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-neutral);
+    margin: 0 0 var(--spacing-3xs);
   }
   .fuentes a {
     color: var(--color-ink);
@@ -1097,6 +1108,65 @@
   .fuentes a:hover {
     color: var(--color-accent);
     text-decoration: underline;
+  }
+
+  /* Pliegue: lo que existe pero no debe empujar la lectura. `<details>` nativo
+     a propósito — sin JS funciona con teclado y con el buscador del navegador, y
+     nada queda inalcanzable. No lleva animación de apertura: el género es un
+     periódico y `details` no anima su altura sin JS. El único movimiento es el
+     color al pasar por encima, que confirma que se puede pulsar. */
+  .pliegue {
+    border-bottom: var(--rule-hair) solid var(--color-rule);
+  }
+  .pliegue > summary {
+    cursor: pointer;
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-2xs);
+    list-style: none;
+    transition: color var(--dur-corta) var(--curva);
+  }
+  .pliegue > summary::-webkit-details-marker {
+    display: none;
+  }
+  /* El signo va al final y cambia al abrir: es el estado, no un adorno. */
+  .pliegue > summary::after {
+    content: "+";
+    margin-left: auto;
+    font-family: var(--font-outlier);
+    color: var(--color-accent);
+  }
+  .pliegue[open] > summary::after {
+    content: "−";
+  }
+  .pliegue > summary:hover {
+    color: var(--color-accent);
+  }
+  .pliegue-cuenta {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-neutral);
+    letter-spacing: 0.04em;
+  }
+  .pliegue-nota {
+    font-size: var(--text-sm);
+    color: var(--color-neutral);
+    margin: var(--spacing-2xs) 0 var(--spacing-sm);
+  }
+  /* Pliegue dentro de otro pliegue (las versiones que sobran, dentro de "Las
+     versiones originales"). Sin filete propio: dos rayas seguidas leen como dos
+     secciones hermanas y son madre e hija. */
+  .pliegue-interior {
+    border-bottom: 0;
+    margin-top: var(--spacing-2xs);
+  }
+  .pliegue-interior > summary {
+    color: var(--color-neutral);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pliegue > summary {
+      transition: none;
+    }
   }
 
   /* ================================================== SECCIÓN ========= */
