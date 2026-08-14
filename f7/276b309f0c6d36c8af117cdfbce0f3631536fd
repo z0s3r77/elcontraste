@@ -1,0 +1,23 @@
+api/main.py
+  s_91bb3bb6756dc0::t_2f7e4ca981ff49 147-160,187-188,308
+web/src/lib/api.ts
+  s_91bb3bb6756dc0::t_b5727a1639e841 116-122
+web/src/pages/index.astro
+  s_91bb3bb6756dc0::t_03f4066dc98faa 18-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "f7276b309f0c6d36c8af117cdfbce0f3631536fd",
+  "prompts": {},
+  "sessions": {
+    "s_91bb3bb6756dc0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5657c302-70d7-43d6-95b8-600eec577376",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
