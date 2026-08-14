@@ -15,8 +15,17 @@ const todas: FichaCluster[] = digest.sections.flatMap((s) =>
   s.clusters.map((c) => ({ ...c, section: s.section })),
 );
 
-// Superficie 1: más medios = más contrastada. No hay "editor" que elija.
-const portada = [...todas].sort((a, b) => b.n_sources - a.n_sources);
+// Superficie 1: manda la RELEVANCIA que calcula la API — cobertura ponderada
+// por la edad media de los artículos (ver `pipeline/relevancia.py`). Aquí se
+// reordena porque la portada mezcla secciones y la API solo ordena dentro de
+// cada una; el criterio, en cambio, no se reinventa.
+//
+// ⚠️ Hasta el 2026-08-14 esta línea ordenaba por `n_sources`, y con eso el
+// clúster del eclipse abrió el sitio tres días seguidos: daba igual lo que
+// hiciera el backend, la portada lo deshacía. Si `relevancia` llegara nula
+// —una API vieja— se cae a `n_sources`, que es el comportamiento anterior.
+const peso = (c: FichaCluster) => c.relevancia ?? c.n_sources;
+const portada = [...todas].sort((a, b) => peso(b) - peso(a));
 const lead = portada[0];
 // Seis, no cuatro: a partir de xl la columna lateral se parte en dos, y con
 // cuatro fichas quedaban dos columnas cortas al lado de una apertura alta.

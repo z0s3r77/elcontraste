@@ -113,6 +113,13 @@ export interface FichaCluster {
   has_synthesis?: boolean;
   digest_date?: string;
   section?: string;
+  /**
+   * Cobertura ponderada por la edad media de los artículos, calculada en la API
+   * (`pipeline/relevancia.py`). Es el orden en el que vienen los clústeres; la
+   * portada lo necesita como número porque mezcla secciones y tiene que
+   * reordenar. `null` en respuestas que no la traen (el detalle de un clúster).
+   */
+  relevancia?: number | null;
 }
 
 export interface Digest {
