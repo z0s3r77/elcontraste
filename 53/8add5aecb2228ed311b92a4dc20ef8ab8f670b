@@ -1,0 +1,19 @@
+docs/despliegue.md
+  s_91bb3bb6756dc0::t_ccb93017ee2aee 349,354-381
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "538add5aecb2228ed311b92a4dc20ef8ab8f670b",
+  "prompts": {},
+  "sessions": {
+    "s_91bb3bb6756dc0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5657c302-70d7-43d6-95b8-600eec577376",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
