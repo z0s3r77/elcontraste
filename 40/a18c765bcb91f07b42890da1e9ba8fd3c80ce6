@@ -1,0 +1,31 @@
+api/main.py
+  s_91bb3bb6756dc0::t_b6809b9df1c6d7 23,173,302-304
+pipeline/relevancia.py
+  s_91bb3bb6756dc0::t_5fdb8b57a22e0b 1-52
+pipeline/synthesize.py
+  s_91bb3bb6756dc0::t_b49b454426dd8f 23,143-151,154,181,223-228,230-233
+CLAUDE.md
+  s_91bb3bb6756dc0::t_5892bd1ce992a4 337-363
+design.md
+  s_91bb3bb6756dc0::t_d3e3db5b546756 163-185
+web/src/pages/cluster/[id].astro
+  s_91bb3bb6756dc0::t_1ffab92623597f 42-67,178-182,185-196,198,205-211,215-237,239-261,263
+web/src/styles/global.css
+  s_91bb3bb6756dc0::t_5eee2ecc938715 1075-1077,1079-1082,1091-1093,1101,1113-1171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "40a18c765bcb91f07b42890da1e9ba8fd3c80ce6",
+  "prompts": {},
+  "sessions": {
+    "s_91bb3bb6756dc0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5657c302-70d7-43d6-95b8-600eec577376",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
