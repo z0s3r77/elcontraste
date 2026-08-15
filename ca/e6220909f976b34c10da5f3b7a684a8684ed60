@@ -1,0 +1,27 @@
+CLAUDE.md
+  s_5dafd11141fc6b::t_c17ae27aa9f3c7 387-419
+docs/despliegue.md
+  s_5dafd11141fc6b::t_e520dbeee7f74b 349-351,357-404
+pipeline/classify.py
+  s_5dafd11141fc6b::t_0b0beac2348fa4 24,202,218-226
+pipeline/llm.py
+  s_5dafd11141fc6b::t_076156d4fbe08c 1-36
+pipeline/synthesize.py
+  s_5dafd11141fc6b::t_c0eb142a2bac99 23,242,254-263
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "cae6220909f976b34c10da5f3b7a684a8684ed60",
+  "prompts": {},
+  "sessions": {
+    "s_5dafd11141fc6b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5c1f174-28f3-4ba8-9407-ba5d1fb21c97",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
