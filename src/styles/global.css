@@ -405,19 +405,48 @@
     padding-block: var(--spacing-md) var(--spacing-xl);
   }
   .colofon p {
-    max-width: 72ch;
-    margin: 0 auto;
+    margin: 0;
     font-family: var(--font-outlier);
     font-size: var(--text-xs);
     line-height: 1.7;
     color: var(--color-neutral);
   }
-  /* El contacto va separado del bloque de parámetros: es lo único del colofón
-     con lo que se puede interactuar y se pierde dentro del párrafo denso. */
+  /* Columnas de colofón: apiladas en móvil, dos a partir de md y las cuatro a
+     partir de xl. Cada columna se queda en ~40 caracteres por línea, que es la
+     medida de un colofón de periódico; el párrafo único de antes iba a 72ch
+     centrados y, en un monitor ancho, se leía como una maqueta de móvil
+     estirada en medio de la página. */
+  .colofon-rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-sm) var(--spacing-lg);
+  }
+  @media (width >= 52rem) {
+    .colofon-rejilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (width >= 80rem) {
+    .colofon-rejilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  /* El rótulo de cada dato. Es lo que permite repartir el colofón sin perder
+     densidad: el bloque sigue siendo el mismo texto, pero cada cosa dice qué
+     es en vez de ir seguida detrás de un punto medio. */
+  .colofon p.colofon-rotulo {
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    border-bottom: var(--rule-hair) solid var(--color-rule);
+    padding-bottom: var(--spacing-3xs);
+    margin-bottom: var(--spacing-2xs);
+  }
+  /* El contacto es lo único del colofón con lo que se puede interactuar: se
+     separa del dato que lleva encima para que no se lea como parte de él. */
   .colofon p.colofon-contacto {
     margin-top: var(--spacing-2xs);
-    padding-top: var(--spacing-2xs);
-    border-top: var(--rule-hair) solid var(--color-rule);
+    overflow-wrap: anywhere;
   }
   .colofon-contacto a {
     text-decoration: underline;
@@ -698,12 +727,31 @@
   }
 
   /* ================================================== PORTADA ========= */
+  /* El lema del sitio, justo debajo del filete doble. Cuelga de una cabecera
+     CENTRADA, así que va centrado: alineado a la izquierda y capado a 52ch se
+     quedaba pegado a un lado con media página en blanco al otro, y lo que
+     parecía era que la maqueta se había roto ahí.
+     Va en la display porque pertenece a la cabecera, no al cuerpo, pero en
+     `--text-lg` y en `muted`: es el subtítulo de la cabecera, no un titular
+     que compita con la apertura. `balance` reparte las líneas — centrado, un
+     último renglón corto y suelto es lo que peor se ve. */
   .posicionamiento {
-    max-width: 52ch;
-    margin: 0 0 var(--spacing-lg);
+    max-width: 60ch;
+    margin: 0 auto var(--spacing-lg);
+    font-family: var(--font-display);
     font-size: var(--text-lg);
-    line-height: 1.4;
+    line-height: 1.35;
     color: var(--color-muted);
+    text-align: center;
+    text-wrap: balance;
+  }
+  /* En móvil no: tres o cuatro renglones centrados de prosa se leen peor que
+     alineados, y ahí no sobra ancho que repartir. */
+  @media (width < 52rem) {
+    .posicionamiento {
+      text-align: left;
+      text-wrap: pretty;
+    }
   }
   .superficie {
     margin-bottom: var(--spacing-xl);
@@ -713,6 +761,16 @@
     font-size: var(--text-sm);
     color: var(--color-neutral);
     margin: 0 0 var(--spacing-sm);
+  }
+  /* El deck que cuelga de una banda. Misma letra que `.nota`, pero equilibrado:
+     a 1800 px la nota se partía en dos líneas desiguales y la primera terminaba
+     justo en el borde de su caja ("…ignora por completo."), con lo que la frase
+     se leía cortada en una superficie que ocupaba un tercio de la página.
+     `balance` reparte las líneas; el ancho extra es de letra pequeña y
+     secundaria, no de prosa, así que la medida de § Typography sigue intacta. */
+  .nota-deck {
+    max-width: 72ch;
+    text-wrap: balance;
   }
 
   /* Apertura: la pieza mayor manda, las secundarias hacen de columna lateral. */
@@ -856,36 +914,72 @@
     font-size: var(--text-xs);
   }
 
+  /* Cobertura diferencial, a dos columnas: la izquierda a la izquierda y la
+     derecha a la derecha (2026-08-16). Antes era UNA lista de ocho filas
+     mezcladas, cada una con su chip `izquierda`/`derecha` repetido, y capada a
+     `--measure`: a 1800 px ocupaba 544 de 1584 px y el resto era papel en
+     blanco. Poner cada bloque en su lado no es un chiste visual — es el
+     argumento de la superficie dicho por la posición, que es más rápida de
+     leer que ocho etiquetas iguales. Por eso el chip desapareció: lo dice la
+     columna, y repetirlo era ruido. */
+  .huecos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-lg);
+  }
+  .huecos-bloque + .huecos-bloque {
+    border-left: var(--rule-hair) solid var(--color-rule);
+    padding-left: var(--spacing-lg);
+  }
+  /* Por debajo de md se apila, como la apertura: dos columnas de ~170 px
+     parten los titulares letra a letra. La izquierda sigue yendo primero. */
+  @media (width < 52rem) {
+    .huecos {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .huecos-bloque + .huecos-bloque {
+      border-left: 0;
+      padding-left: 0;
+      border-top: var(--rule-hair) solid var(--color-ink);
+      padding-top: var(--spacing-sm);
+    }
+    /* La fecha son diez caracteres de monoespaciada: en 358 px se come el 40 %
+       de la fila y deja el titular a ~28 caracteres por línea. En móvil manda
+       el titular; el "en 7 días" ya lo dice el rótulo de la banda. */
+    .huecos .lista-huecos .dato {
+      display: none;
+    }
+  }
+
   .lista-huecos {
     list-style: none;
     margin: 0;
     padding: 0;
-    max-width: var(--measure);
   }
   .lista-huecos li {
     display: flex;
-    gap: var(--spacing-2xs);
+    gap: var(--spacing-sm);
     align-items: baseline;
     padding: var(--spacing-3xs) 0;
     border-bottom: var(--rule-hair) solid var(--color-rule);
   }
+  /* El filete llega hasta el borde de la columna, el texto no: la medida manda
+     sobre el ancho disponible (§ Anchos). La fecha ancla a la derecha, como en
+     `.lista-titulares`, y de paso explica por qué una historia de hace cuatro
+     días sigue aquí. */
   .lista-huecos a {
     color: var(--color-ink);
     text-decoration: none;
+    max-width: var(--measure);
   }
   .lista-huecos a:hover {
     color: var(--color-accent);
     text-decoration: underline;
   }
-  .marca-bloque {
-    font-family: var(--font-outlier);
+  .lista-huecos .dato {
+    margin-left: auto;
     font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    border: var(--rule-hair) solid var(--color-rule);
-    padding: 0 var(--spacing-3xs);
     white-space: nowrap;
-    color: var(--color-muted);
   }
 
   /* ================================================== HISTORIA ======== */
@@ -941,10 +1035,16 @@
       grid-template-columns: minmax(0, 1fr);
       gap: 2px;
     }
+    /* En el margen la dirección baja un escalón: a `--text-lg` la
+       monoespaciada no cabe en 16 rem y parte el dominio por la mitad. */
+    .doc-aparato .correo {
+      font-size: var(--text-base);
+    }
   }
 
-  /* Un .doc sin aparato al margen (contacto). Sin esto, en xl la prosa se
-     queda pegada a la izquierda haciendo hueco a una columna que no existe. */
+  /* Un .doc sin aparato al margen (la página de error). Sin esto, en xl la
+     prosa se queda pegada a la izquierda haciendo hueco a una columna que no
+     existe. Contacto lo usó hasta el 2026-08-16; ahora tiene aparato. */
   @media (width >= 80rem) {
     .doc-solo {
       grid-template-columns: minmax(0, var(--measure));
@@ -1023,6 +1123,23 @@
     max-width: var(--measure);
     margin: 0 0 var(--spacing-sm);
     line-height: 1.7;
+  }
+
+  /* Para qué escribir, al margen de la página de contacto. Lista desnuda: el
+     Preflight de Tailwind ya le quitó las viñetas y aquí NO se recuperan (a
+     diferencia de `ul.hechos`), porque cada línea es un ítem de aparato y no
+     prosa enumerada. */
+  .motivos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+  .motivos li {
+    padding: var(--spacing-3xs) 0;
+    border-bottom: var(--rule-hair) dotted var(--color-rule);
   }
 
   /* La dirección de contacto es lo único accionable de su página: se compone

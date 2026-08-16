@@ -55,13 +55,67 @@ const secciones = digest.sections
 
 // Superficie 3: cobertura diferencial. Es un extra — si falla, la portada
 // sigue en pie. Lo que NO puede fallar en silencio es el digest (ver api.ts).
-type Hueco = { id: number; headline: string | null; covered_by: string };
+type Hueco = {
+  id: number;
+  headline: string | null;
+  covered_by: "izquierda" | "derecha";
+  digest_date: string;
+};
 let huecos: Hueco[] = [];
 try {
   huecos = await traer<Hueco[]>("/api/coverage-gap?days=7");
 } catch {
   huecos = [];
 }
+
+// El mismo suceso se vuelve a agrupar cada día de la ventana de 7, así que un
+// hueco duradero llega aquí hasta cinco veces con titulares casi iguales. Sin
+// filtrar, cinco de las ocho filas de la superficie eran DOS historias (la
+// venta de los Lakers, tres veces; el Pazo de Meirás, dos). Se comparan los
+// términos con peso: solapamiento sobre el titular más corto, porque las
+// variantes del mismo día se diferencian en que una añade cola ("…, menos de
+// un año después de su anterior compraventa") y Jaccard las separaría.
+const VACIAS = new Set(
+  "de del la el los las en y a por que un una con al para su sus se lo como más".split(" "),
+);
+const terminos = (t: string) =>
+  new Set(
+    t
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .split(" ")
+      .filter((p) => p.length > 2 && !VACIAS.has(p)),
+  );
+const mismaHistoria = (a: Set<string>, b: Set<string>) => {
+  const comunes = [...a].filter((p) => b.has(p)).length;
+  return comunes / Math.min(a.size, b.size) >= 0.6;
+};
+
+/** Las `n` primeras del bloque, sin repetir historia. La lista llega ordenada
+ *  por cobertura desde la API: quedarse con la primera de cada grupo conserva
+ *  la versión con más medios. */
+const primeras = (lista: Hueco[], n: number) => {
+  const vistas: Set<string>[] = [];
+  const out: Hueco[] = [];
+  for (const h of lista) {
+    const t = terminos(h.headline ?? "");
+    if (t.size === 0 || vistas.some((v) => mismaHistoria(t, v))) continue;
+    vistas.push(t);
+    out.push(h);
+    if (out.length === n) break;
+  }
+  return out;
+};
+
+// Un bloque por columna, y la columna de la izquierda es la de la izquierda.
+// La posición dice lo que antes decía un chip repetido en cada fila.
+const POR_BLOQUE = 6;
+const bloques = (["izquierda", "derecha"] as const).map((lado) => {
+  const suyas = huecos.filter((h) => h.covered_by === lado);
+  return { lado, total: suyas.length, huecos: primeras(suyas, POR_BLOQUE) };
+});
 ---
 
 <Base
@@ -69,9 +123,13 @@ try {
   seccion="hoy"
   edicion={`Edición del ${digest.date} · ${digest.n_clusters} historias`}
 >
+  <!-- El lema explica el nombre y lo que se pretende con él: doxa es la
+       opinión, lo que se cree saber, frente a episteme. El sitio no promete la
+       versión verdadera —no la tiene—, sino todas las versiones juntas para
+       que el criterio salga de compararlas. -->
   <p class="posicionamiento">
-    Cada historia, contada por todos los medios que la cuentan. Lo que coinciden,
-    lo que solo dice uno, y lo que ninguno aclara.
+    Doxa es la opinión, no el saber. Todas las versiones de una misma noticia,
+    juntas, para que el criterio sea tuyo.
   </p>
 
   <section class="superficie">
@@ -101,18 +159,32 @@ try {
     huecos.length > 0 && (
       <section class="superficie">
         <Banda i={2} titulo="Lo cuenta un solo bloque" cuenta={`${huecos.length} en 7 días`} />
-        <p class="nota">
+        <p class="nota nota-deck">
           Historias que un bloque editorial cubre y el otro ignora por completo. No es cómo lo
           cuentan: es qué existe para unos y no para otros.
         </p>
-        <ul class="lista-huecos">
-          {huecos.slice(0, 8).map((h) => (
-            <li>
-              <span class={`marca-bloque marca-${h.covered_by}`}>{h.covered_by}</span>
-              <a href={urlCluster(h.id)}>{h.headline ?? "Sin titular"}</a>
-            </li>
+        <div class="huecos">
+          {bloques.map(({ lado, total, huecos: suyas }) => (
+            <div class="huecos-bloque">
+              <h3 class="rotulo-seccion">
+                <span>Solo en medios de {lado}</span>
+                <span class="dato muted">{total}</span>
+              </h3>
+              {suyas.length === 0 ? (
+                <p class="nota">Ninguna en los últimos 7 días.</p>
+              ) : (
+                <ul class="lista-huecos">
+                  {suyas.map((h) => (
+                    <li>
+                      <a href={urlCluster(h.id)}>{h.headline ?? "Sin titular"}</a>
+                      <span class="dato muted">{h.digest_date}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
     )
   }

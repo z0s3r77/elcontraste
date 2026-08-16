@@ -28,8 +28,11 @@ const {
   title = "La Doxa",
   seccion = "",
   edicion = "Agregador de prensa contrastada",
-  descripcion = "Las versiones que distintos medios dan de la misma noticia, " +
-    "agrupadas para ver en qué coinciden y en qué divergen.",
+  // Alineada con el lema de la portada (`.posicionamiento`), que es lo que
+  // define al sitio. Lo descriptivo va primero: un buscador corta por el final.
+  descripcion = "Todas las versiones de una misma noticia, juntas: en qué " +
+    "coinciden los medios, en qué se contradicen y qué cuenta uno solo. " +
+    "Doxa es la opinión, no el saber.",
 } = Astro.props;
 
 // URL absoluta de ESTA página. Sale de `site` (SITE_URL en el workflow), así
@@ -155,20 +158,44 @@ const imagenSocial = Astro.site
       <slot />
     </main>
 
+    <!-- Colofón denso (design.md § Nav y footer), pero repartido en columnas
+         de periódico: hasta el 2026-08-16 era UN párrafo de 72ch centrado, y
+         en escritorio quedaban 518 px de letra pequeña en medio de 1584 —una
+         maqueta de móvil estirada—. La densidad y los parámetros reales del
+         sistema no cambian: lo que cambia es que cada dato lleva su rótulo y
+         ocupa el ancho de la página. -->
     <footer class="colofon">
-      <div class="marco">
-        <p>
-          La Doxa · agregador personal, sin ánimo de lucro · Las síntesis las
-          redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de los
-          medios enlazados; pueden contener errores. Lee siempre el original.
-          Agrupación por similitud coseno ≥ 0,75 sobre embeddings MiniLM
-          multilingüe, ventana de 48 h, mínimo 2 medios por historia. No se
-          republica el texto de los artículos ni se sortean muros de pago.
-          Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
-        </p>
-        <p class="colofon-contacto">
-          Contacto · <a href="mailto:contacto@noticiasdoxa.es">contacto@noticiasdoxa.es</a>
-        </p>
+      <div class="marco colofon-rejilla">
+        <section>
+          <p class="colofon-rotulo">La Doxa</p>
+          <p>
+            Agregador personal de noticias contrastadas. Sin ánimo de lucro y sin
+            publicidad. Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
+          </p>
+        </section>
+        <section>
+          <p class="colofon-rotulo">Las síntesis</p>
+          <p>
+            Las redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de
+            los medios enlazados; pueden contener errores. Lee siempre el original.
+          </p>
+        </section>
+        <section>
+          <p class="colofon-rotulo">La agrupación</p>
+          <p>
+            Similitud coseno ≥ 0,75 sobre embeddings MiniLM multilingüe, ventana de
+            48 h y mínimo 2 medios por historia.
+          </p>
+        </section>
+        <section>
+          <p class="colofon-rotulo">Los medios</p>
+          <p>
+            No se republica el texto de los artículos ni se sortean muros de pago.
+          </p>
+          <p class="colofon-contacto">
+            <a href="mailto:contacto@noticiasdoxa.es">contacto@noticiasdoxa.es</a>
+          </p>
+        </section>
       </div>
     </footer>
 
@@ -221,9 +248,15 @@ const imagenSocial = Astro.site
               vigia.unobserve(e.target);
             }
           },
-          // Un margen negativo abajo evita que algo se "revele" cuando aún
-          // asoma un píxel; rootMargin arriba deja pasar lo que ya está leído.
-          { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
+          // El margen de abajo es POSITIVO: la pieza empieza a entrar cuando
+          // aún le falta un 12 % de pantalla para asomar, así llega ya
+          // compuesta. Era -8 % ("que no se revele cuando solo asoma un
+          // píxel") y el efecto era el contrario del buscado: bajando rápido,
+          // la entrada de 520 ms arrancaba con la pieza ya en pantalla y
+          // durante medio segundo se veía un hueco en blanco donde debía
+          // haber texto. Justo encima del colofón eso se lee como una página
+          // cortada.
+          { rootMargin: "0px 0px 12% 0px", threshold: 0.01 },
         );
 
         // Lo que YA se ve al cargar no se esconde. Es deliberado: ocultar el
@@ -235,11 +268,51 @@ const imagenSocial = Astro.site
         piezas.forEach((pieza) => {
           if (pieza.getBoundingClientRect().top < innerHeight) return;
           pieza.classList.add("revelable");
-          // Escalonado por orden de aparición, con techo: en una portada de
-          // 88 fichas, sin tope la última entraría cinco segundos tarde.
-          pieza.style.setProperty("--retraso", Math.min(bajoElPliegue++, 4) * 60 + "ms");
+          // Escalonado SOLO para la primera cascada, la que se ve nada más
+          // empezar a bajar. Antes era `Math.min(bajoElPliegue++, 4) * 60`, y
+          // ese tope no acotaba la cascada: le clavaba 240 ms fijos de espera
+          // a TODA pieza a partir de la quinta. Sumados a los 520 ms de la
+          // entrada, cada sección nueva pasaba tres cuartos de segundo en
+          // blanco después de estar ya en pantalla.
+          if (bajoElPliegue < 5) {
+            pieza.style.setProperty("--retraso", bajoElPliegue * 60 + "ms");
+          }
+          bajoElPliegue++;
           vigia.observe(pieza);
         });
+
+        // ---- Red de seguridad ------------------------------------------
+        // ⚠️ Un IntersectionObserver solo avisa de CRUCES de umbral. Si un
+        // salto de scroll —tecla Fin, arrastrar la barra, un flick de
+        // trackpad— pasa una pieza de "debajo del pliegue" a "encima" sin
+        // que llegue a intersecar en ningún fotograma, no hay entrada, no
+        // hay clase `visible`, y esa pieza se queda en `opacity: 0` PARA
+        // SIEMPRE. Medido el 2026-08-16 en la portada: saltando al final
+        // quedaban 11 piezas invisibles y la última superficie era un hueco
+        // en blanco justo encima del colofón, que es lo que se reportó como
+        // "el pie está recortado".
+        //
+        // Tras cada scroll se barren las que ya han quedado por encima del
+        // pliegue. No se comprueba nada más: lo que sigue en pantalla o por
+        // debajo lo ve el vigía, y aquí solo se rescata lo que se saltó.
+        let pendiente = false;
+        const quedanOcultas = () => document.querySelectorAll(".revelable:not(.visible)");
+        const barrer = () => {
+          pendiente = false;
+          for (const pieza of quedanOcultas()) {
+            if (pieza.getBoundingClientRect().bottom >= 0) continue;
+            pieza.classList.add("visible");
+            vigia.unobserve(pieza);
+          }
+          // Cuando no queda nada escondido, el oyente sobra.
+          if (quedanOcultas().length === 0) removeEventListener("scroll", alHacerScroll);
+        };
+        const alHacerScroll = () => {
+          if (pendiente) return;
+          pendiente = true;
+          requestAnimationFrame(barrer);
+        };
+        addEventListener("scroll", alHacerScroll, { passive: true });
       }
     </script>
   </body>

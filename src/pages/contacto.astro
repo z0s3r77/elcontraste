@@ -2,15 +2,29 @@
 // Página estática: no llama a la API. Es la única del sitio sin datos —
 // por eso no importa `traer` ni recibe `edicion` calculada.
 //
-// Reutiliza el Long Document de design.md (.doc / .doc-cuerpo) sin aparato al
-// margen: aquí no hay atribución que enfrentar, solo prosa en su medida.
+// Reutiliza el Long Document de design.md (.doc / .doc-cuerpo) CON aparato al
+// margen, igual que la página de historia. Hasta el 2026-08-16 era un `.doc-solo`
+// —una sola columna centrada—, y en escritorio eso dejaba una cinta de 544 px en
+// medio de 1584 con la cabecera y el colofón cruzando la página de lado a lado:
+// la página se leía cortada. Lo que sube al margen es lo único accionable que
+// hay aquí (la dirección y para qué escribir), no un adorno de relleno — que es
+// la regla 4 de § Anchos.
 import Base from "../layouts/Base.astro";
 
 const CORREO = "contacto@noticiasdoxa.es";
+
+// Los motivos viven en el margen; el cuerpo ya no los enumera para no decir lo
+// mismo dos veces a dos palmos de distancia.
+const MOTIVOS = [
+  "Una corrección",
+  "Un medio que falta",
+  "Un agrupamiento que no tiene sentido",
+  "Una petición de retirada",
+];
 ---
 
 <Base title="Contacto — La Doxa" seccion="contacto" edicion="Quién hay detrás y cómo escribir">
-  <article class="doc doc-solo">
+  <article class="doc">
     <div class="doc-cuerpo">
       <header class="doc-cabecera">
         <p class="doc-seccion">La Doxa</p>
@@ -29,16 +43,10 @@ const CORREO = "contacto@noticiasdoxa.es";
           uno lee un solo periódico.
         </p>
         <p>
-          Para cualquier cosa —una corrección, un medio que falta, un agrupamiento que
-          no tiene sentido o una petición de retirada— escribe a la dirección de abajo.
-          Se lee todo.
+          Escribe para cualquier cosa que tenga que ver con esto. Se lee todo, y las
+          correcciones se aplican.
         </p>
       </div>
-
-      <p class="rotulo-doc">Escribir</p>
-      <p class="correo">
-        <a href={`mailto:${CORREO}`}>{CORREO}</a>
-      </p>
 
       <p class="rotulo-doc">Correcciones y retirada</p>
       <p class="prosa">
@@ -58,5 +66,17 @@ const CORREO = "contacto@noticiasdoxa.es";
         cada historia y son los que mandan.
       </p>
     </div>
+
+    <aside class="doc-aparato">
+      <p class="rotulo-doc">Escribir</p>
+      <p class="correo">
+        <a href={`mailto:${CORREO}`}>{CORREO}</a>
+      </p>
+
+      <p class="rotulo-doc">Para qué</p>
+      <ul class="motivos">
+        {MOTIVOS.map((m) => <li>{m}</li>)}
+      </ul>
+    </aside>
   </article>
 </Base>
