@@ -1,0 +1,58 @@
+---
+// «En qué te afecta a ti» — la lectura llana de una historia, en el margen.
+//
+// Cuatro filas rotuladas y en este orden, que es una cadena causal y no una
+// lista: **quién lo causa → qué efecto tiene → a quién le llega**, con el
+// resumen del hecho abriendo. Leídas de arriba abajo cuentan por qué la
+// noticia acaba en la nómina de alguien; barajadas, vuelven a ser cuatro
+// frases sueltas.
+//
+// El sello de alcance va ARRIBA y no al final: dice si esto le toca al lector
+// antes de que lea las cuatro filas, y para una noticia internacional esa es
+// la información más útil de todo el bloque. Es la misma regla del sello de
+// contraste de la portada — no se finge un efecto doméstico que no existe.
+import type { Explicacion } from "../lib/api";
+
+interface Props {
+  explicacion: Explicacion;
+}
+const { impacto, alcance } = Astro.props.explicacion;
+
+// Se arma la frase entera aquí, no en el JSX: dos interpolaciones contiguas
+// pierden el espacio entre ellas al hornear (`{n} {palabra}` sale pegado), y
+// eso no se ve en el editor sino en el HTML (design.md § Portada).
+const ALCANCE: Record<string, string> = {
+  general: "Le afecta a casi todo el mundo",
+  grupo: "Le afecta a un grupo concreto",
+  indirecto: "No cambia el día a día de casi nadie",
+};
+const sello = ALCANCE[alcance ?? ""] ?? null;
+
+const FILAS = [
+  ["Qué ha pasado", impacto.que_ha_pasado],
+  ["Quién lo causa", impacto.quien_lo_causa],
+  ["El efecto directo", impacto.efecto_directo],
+  ["Cómo te llega", impacto.repercusion],
+] as const;
+---
+
+<section class="impacto">
+  <h2 class="rotulo-doc">En qué te afecta a ti</h2>
+  {sello && <p class:list={["impacto-alcance", `alcance-${alcance}`]}>{sello}</p>}
+  <dl class="impacto-filas">
+    {
+      FILAS.map(([rotulo, texto]) =>
+        texto ? (
+          <>
+            <dt>{rotulo}</dt>
+            <dd>{texto}</dd>
+          </>
+        ) : null,
+      )
+    }
+  </dl>
+  <p class="firma-ia">
+    Explicación en lenguaje llano escrita por un modelo a partir de la síntesis. Los hechos
+    y las cifras salen de los medios enlazados; el resto de la página los detalla.
+  </p>
+</section>

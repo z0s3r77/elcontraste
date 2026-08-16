@@ -1,0 +1,41 @@
+---
+// `Parrafos` con glosario: mismo troceado en párrafos y líneas, pero pasando
+// cada línea por el marcador antes de pintarla.
+//
+// ⚠️ No hay `set:html` en ninguna parte, y es deliberado. La tentación al
+// marcar palabras dentro de un texto es construir el HTML a mano con
+// `<button>…</button>` y volcarlo; eso reabre el agujero de XSS que la regla 1
+// de design.md cierra —el pipeline ingiere texto de terceros—. Aquí el
+// marcador devuelve una LISTA de trozos y cada uno se interpola con `{}`, así
+// que Astro sigue escapando todo.
+import Termino from "./Termino.astro";
+import type { Marcador } from "../lib/glosario";
+import { parrafos } from "../lib/ui";
+
+interface Props {
+  texto: string;
+  /** Uno por página: la memoria de "ya marcado" cruza los párrafos. */
+  marcador: Marcador;
+}
+const { texto, marcador } = Astro.props;
+
+// Se trocea en el frontmatter y no dentro del JSX porque `trocear` muta el
+// marcador: hacerlo durante el render dejaría el orden de las marcas a merced
+// del orden de evaluación de Astro.
+const bloques = parrafos(texto).map((lineas) => lineas.map((linea) => marcador.trocear(linea)));
+---
+
+{
+  bloques.map((lineas) => (
+    <p>
+      {lineas.map((trozos, i) => (
+        <>
+          {i > 0 && <br />}
+          {trozos.map((t) =>
+            t.termino ? <Termino texto={t.texto} termino={t.termino} /> : t.texto,
+          )}
+        </>
+      ))}
+    </p>
+  ))
+}

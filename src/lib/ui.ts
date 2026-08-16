@@ -81,6 +81,8 @@ export const urlSeccion = (s: string, tema?: string | null) =>
 
 export const urlRadar = (s: string) => `${BASE}/radar/${s}/`;
 
+export const urlResumen = () => `${BASE}/resumen/`;
+
 export const urlFocos = () => `${BASE}/focos/`;
 
 export const urlTendencias = () => `${BASE}/tendencias/`;

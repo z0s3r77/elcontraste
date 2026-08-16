@@ -8,6 +8,7 @@ import "../styles/global.css";
 import Tema from "../components/Tema.astro";
 import {
   urlInicio,
+  urlResumen,
   urlSeccion,
   urlRadar,
   urlFocos,
@@ -133,6 +134,9 @@ const imagenSocial = Astro.site
       <nav class="mast-nav" aria-label="Principal">
         <ul>
           <li><a href={urlInicio()} class={seccion === "hoy" ? "activo" : ""}>Portada</a></li>
+          <li>
+            <a href={urlResumen()} class={seccion === "resumen" ? "activo" : ""}>Resumen</a>
+          </li>
           <li>
             <a href={urlSeccion("economico")} class={seccion === "seccion" ? "activo" : ""}>
               Secciones
@@ -318,6 +322,134 @@ const imagenSocial = Astro.site
           requestAnimationFrame(barrer);
         };
         addEventListener("scroll", alHacerScroll, { passive: true });
+      }
+
+      // ---- Glosario: cerrar el globo con Escape ---------------------------
+      // El globo se abre y se cierra con CSS (`:hover` y `:focus-within` sobre
+      // .termino-caja), así que con ratón y con el dedo no hace falta JS. Con
+      // teclado sí: el foco se queda en el botón hasta que tabulas fuera, y la
+      // convención de cualquier cosa que se despliega es que Escape la cierre.
+      addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        const activo = document.activeElement;
+        if (activo instanceof HTMLElement && activo.classList.contains("termino")) activo.blur();
+      });
+
+      // ---- Voz del resumen diario -----------------------------------------
+      // Lee EXACTAMENTE lo que está escrito en la página: el saludo, y luego
+      // cada punto tal y como se ve. Nada de un guion aparte — un texto hablado
+      // distinto del publicado sería una segunda versión que nadie revisa.
+      const voz = document.querySelector("[data-voz]");
+      if (voz && "speechSynthesis" in window) {
+        const sintesis = window.speechSynthesis;
+        const play = voz.querySelector("[data-voz-play]");
+        const parar = voz.querySelector("[data-voz-stop]");
+        const etiqueta = voz.querySelector("[data-voz-texto]");
+
+        // La lista de voces llega vacía en el primer tick en casi todos los
+        // navegadores y se rellena después, de forma asíncrona. Se resuelve en
+        // el momento de hablar, no al cargar.
+        const vozEspanola = () => {
+          const todas = sintesis.getVoices();
+          return (
+            todas.find((v) => v.lang === "es-ES") ||
+            todas.find((v) => v.lang.startsWith("es")) ||
+            null
+          );
+        };
+
+        const saludo = () => {
+          const h = new Date().getHours();
+          const momento = h < 6 ? "Buenas noches" : h < 14 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches";
+          return `${momento}. Bienvenido a La Doxa. Esto es lo que hay que saber hoy.`;
+        };
+
+        // El texto, leído del DOM ya horneado. Se recogen las frases enteras y
+        // se trocean por puntuación más abajo.
+        const guion = () => {
+          const partes = [saludo()];
+          const entradilla = document.querySelector(".resumen-entradilla");
+          if (entradilla?.textContent) partes.push(entradilla.textContent);
+          document.querySelectorAll(".resumen-punto").forEach((punto, i) => {
+            const titulo = punto.querySelector(".resumen-titulo")?.textContent ?? "";
+            const porque = punto.querySelector(".resumen-porque")?.textContent ?? "";
+            partes.push(`${i + 1}. ${titulo}. ${porque}`);
+          });
+          partes.push("Hasta aquí el resumen. Cada historia enlaza con las versiones originales.");
+          return partes;
+        };
+
+        // ⚠️ Se encola UNA frase por utterance, no el texto entero. Chrome
+        // corta cualquier locución que pase de ~15 segundos, y un resumen de
+        // seis puntos los pasa de largo: en una sola utterance se callaría a
+        // mitad del segundo punto, sin error ni evento. Troceado por frases
+        // ninguna llega al límite, y de paso la pausa entre ellas suena mejor.
+        const trocear = (partes) =>
+          partes
+            .flatMap((p) => p.split(/(?<=[.?!])\s+/))
+            .map((f) => f.trim())
+            .filter(Boolean);
+
+        let hablando = false;
+        const pintar = (estado) => {
+          if (etiqueta) etiqueta.textContent = estado;
+          if (parar) parar.hidden = !hablando;
+          voz.classList.toggle("voz-activa", hablando);
+        };
+
+        const detener = () => {
+          sintesis.cancel();
+          hablando = false;
+          pintar("Escuchar el resumen");
+        };
+
+        // ⚠️ El estado lo lleva `hablando`, NO `speechSynthesis.paused`.
+        // Chrome deja `paused` en `true` sin haber hablado nunca (queda así
+        // tras un `cancel()`), y preguntándole a él el PRIMER clic entraba en
+        // la rama de "reanudar": el botón cambiaba a «Pausar», no sonaba nada
+        // y no había forma de volver atrás. Nuestra bandera solo la mueven el
+        // clic y el final de la última frase, así que no puede mentir.
+        play?.addEventListener("click", () => {
+          if (hablando && !sintesis.paused) {
+            sintesis.pause();
+            pintar("Seguir escuchando");
+            return;
+          }
+          if (hablando && sintesis.paused) {
+            sintesis.resume();
+            pintar("Pausar");
+            return;
+          }
+          // Empezar de cero: `cancel()` limpia cualquier cola anterior, que es
+          // lo que deja el estado raro de arriba.
+          sintesis.cancel();
+          const elegida = vozEspanola();
+          const frases = trocear(guion());
+          hablando = true;
+          frases.forEach((frase, i) => {
+            const u = new SpeechSynthesisUtterance(frase);
+            u.lang = "es-ES";
+            if (elegida) u.voice = elegida;
+            u.rate = 1.0;
+            if (i === frases.length - 1) u.addEventListener("end", detener);
+            u.addEventListener("error", detener);
+            sintesis.speak(u);
+          });
+          pintar("Pausar");
+        });
+
+        parar?.addEventListener("click", detener);
+        // Salir de la página con la voz en marcha la dejaba sonando en Chrome:
+        // `speechSynthesis` vive en el navegador, no en el documento.
+        addEventListener("pagehide", () => sintesis.cancel());
+
+        // Se enseña solo si hay voz que lo lea. Sin ninguna instalada, un botón
+        // que no hace nada al pulsarlo es peor que no tener botón.
+        const mostrar = () => {
+          if (sintesis.getVoices().length > 0) voz.hidden = false;
+        };
+        mostrar();
+        sintesis.addEventListener("voiceschanged", mostrar);
       }
     </script>
   </body>

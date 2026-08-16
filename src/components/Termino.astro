@@ -1,0 +1,41 @@
+---
+// Una palabra del glosario dentro de la prosa, con su definición al pasar por
+// encima. Es lo que convierte un relato sobre el IPC en algo legible para quien
+// no sabe qué es el IPC.
+//
+// Por qué un <button> y no un <span>:
+//   1. En móvil no existe el hover. Un botón recibe el foco al tocarlo, así
+//      que `:focus-within` abre el globo con un toque y lo cierra al tocar
+//      fuera — sin una línea de JavaScript.
+//   2. Con teclado entra en el orden de tabulación y `Esc` lo cierra (el
+//      handler está en Base.astro, junto al resto del script).
+// El globo va FUERA del botón y enlazado con `aria-describedby`: dentro, su
+// texto pasaría a formar parte del nombre accesible del botón y un lector de
+// pantalla anunciaría la palabra y la definición pegadas.
+import type { Termino } from "../lib/glosario";
+
+interface Props {
+  texto: string;
+  termino: Termino;
+}
+const { texto, termino } = Astro.props;
+
+// Determinista y estable entre compilaciones: un contador global cambiaría con
+// el orden de horneado y ensuciaría el diff de cada despliegue.
+const id = `gl-${termino.termino.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+---
+
+<span class="termino-caja">
+  <button type="button" class="termino" aria-describedby={id}>{texto}</button>
+  <span class="termino-globo" id={id} role="tooltip">
+    <span class="termino-palabra">{termino.termino}</span>
+    <span class="termino-def">{termino.definicion}</span>
+    {
+      /* De dónde sale la definición. El diccionario del repo está escrito y
+         revisado a mano; lo del modelo, no. La regla 4 de design.md —el
+         original manda, y toda síntesis lleva visible que la hizo un modelo—
+         vale también para una definición de cuatro líneas. */
+      termino.delModelo && <span class="termino-origen">Definición generada por el modelo</span>
+    }
+  </span>
+</span>

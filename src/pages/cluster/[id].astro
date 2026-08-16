@@ -1,7 +1,17 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Parrafos from "../../components/Parrafos.astro";
-import { enLote, fechasHorneables, type Digest, type Historia } from "../../lib/api";
+import Glosado from "../../components/Glosado.astro";
+import Impacto from "../../components/Impacto.astro";
+import {
+  enLote,
+  fechasHorneables,
+  glosario,
+  type Digest,
+  type Historia,
+  type TerminoGlosario,
+} from "../../lib/api";
+import { combinar, Marcador } from "../../lib/glosario";
 import { rotula, urlSeccion } from "../../lib/ui";
 
 // Macrostructure: 02 · Long Document — el relato se lee de corrido y el
@@ -23,11 +33,20 @@ export async function getStaticPaths() {
 
   const historias = await enLote<Historia>(ids.map((id) => `/api/clusters/${id}`));
 
-  return historias.map((c) => ({ params: { id: String(c.id) }, props: { c } }));
+  // El diccionario se pide UNA vez para las ~500 páginas de historia y viaja
+  // como prop: `getStaticPaths` corre una sola vez por build, así que pedirlo
+  // aquí lo comparten todas sin repetir la petición por el túnel.
+  const diccionario = await glosario();
+
+  return historias.map((c) => ({ params: { id: String(c.id) }, props: { c, diccionario } }));
 }
 
-const { c } = Astro.props;
+const { c, diccionario } = Astro.props as { c: Historia; diccionario: TerminoGlosario[] };
 const s = c.synthesis;
+
+// Un marcador POR PÁGINA: su memoria de "ya marcado" tiene que cruzar los
+// párrafos del relato pero no filtrarse a la historia siguiente.
+const marcador = new Marcador(combinar(diccionario, c.explicacion?.glosario ?? []));
 
 // `hechos_divergentes` mezcla DOS cosas distintas, y llamarlas a las dos
 // "contradicciones" engaña: en la base hay ~200 exclusivas por cada ~31
@@ -120,7 +139,7 @@ const descripcion = arranque
           <>
             {s.relato && (
               <div class="relato">
-                <Parrafos texto={s.relato} />
+                <Glosado texto={s.relato} marcador={marcador} />
               </div>
             )}
 
@@ -174,8 +193,11 @@ const descripcion = arranque
       }
     </div>
 
-    {/* Aparato de atribución: quién la cuenta y qué cuenta solo uno. Las dos
-        cosas son "de quién sale cada dato", así que van juntas y al margen.
+    {/* Aparato del margen. Hasta el 2026-08-16 era solo atribución —quién la
+        cuenta y qué cuenta solo uno—; desde la Fase 12 lleva además la lectura
+        llana de la historia, por petición explícita del usuario ("debajo de
+        las columnas de la derecha"). Ver design.md § En qué te afecta.
+        Los dos bloques de atribución se pliegan, y el PRIMERO va abierto: una columna que
         Los dos bloques se pliegan, y el PRIMERO va abierto: una columna que
         empieza toda cerrada parece rota y esconde de qué va. Cuál es el primero
         depende del clúster —sin exclusivas, lo son las versiones—, así que el
@@ -261,6 +283,15 @@ const descripcion = arranque
           )
         }
       </details>
+
+      {
+        /* No se pliega, a diferencia de sus vecinos: es lo que más falta le
+           hace a quien no sigue la actualidad, y esconderlo tras un clic
+           contradice el motivo de escribirlo. Sin explicación no se pinta
+           nada — la etapa `explicar` solo pasa por las historias sintetizadas
+           en modo contraste, y un hueco es más honesto que un placeholder. */
+        c.explicacion && <Impacto explicacion={c.explicacion} />
+      }
     </aside>
   </article>
 </Base>

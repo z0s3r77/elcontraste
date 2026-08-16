@@ -154,11 +154,60 @@ export interface Sintesis {
   que_falta_por_saber?: string | null;
 }
 
+/**
+ * La capa llana de una historia (Fase 12), de `pipeline/explicar.py`.
+ *
+ * `null` mientras esa etapa no haya pasado por la historia, y siempre en modo
+ * agregación: la web no pinta el bloque en vez de inventárselo.
+ */
+export interface Explicacion {
+  impacto: {
+    que_ha_pasado: string;
+    quien_lo_causa: string;
+    efecto_directo: string;
+    repercusion: string;
+  };
+  /** `general` | `grupo` | `indirecto`. A cuánta gente le llega de verdad. */
+  alcance: string | null;
+  /** Tecnicismos de ESTA historia que no están en `config/glosario.yaml`. */
+  glosario: { termino: string; definicion: string }[];
+}
+
 export interface Historia extends FichaCluster {
   digest_date: string;
   section: string;
   synthesis: Sintesis | null;
+  explicacion: Explicacion | null;
   articles: { medio: string; url: string; title: string }[];
+}
+
+/** Una entrada del diccionario del sitio, servida por `/api/glosario`. */
+export interface TerminoGlosario {
+  termino: string;
+  definicion: string;
+  ambito: string | null;
+  /** Formas en que aparece escrito, ya de más larga a más corta. */
+  formas: string[];
+}
+
+/** El resumen diario, de `pipeline/briefing.py`. */
+export interface Resumen {
+  date: string;
+  titular_del_dia: string | null;
+  entradilla: string | null;
+  puntos: {
+    cluster_id: number;
+    titulo: string;
+    por_que_importa: string;
+    /** `ahora` | `pronto` | `fondo`. El orden del resumen ya viene dado. */
+    urgencia: string;
+    section: string | null;
+    headline: string | null;
+    n_sources: number;
+    n_articles: number;
+  }[];
+  model: string | null;
+  created_at: string | null;
 }
 
 export interface Radar {
@@ -201,6 +250,27 @@ export interface Tendencia {
 export const taxonomia = () => traer<{ section: string; topics: string[] }[]>("/api/topics");
 
 export const digests = () => traer<{ date: string; n_clusters: number }[]>("/api/digests");
+
+/** El diccionario del sitio. Viene por la API porque el repo público solo
+ *  tiene `web/`: `config/glosario.yaml` no viaja en el espejo. */
+export const glosario = () =>
+  traer<{ n: number; terminos: TerminoGlosario[] }>("/api/glosario").then((r) => r.terminos);
+
+/**
+ * El resumen del último día que tenga uno.
+ *
+ * A diferencia del digest, esto NO tumba el build si falta: el resumen es una
+ * etapa que puede caerse sola (`run_daily` es tolerante a fallos) y publicar el
+ * sitio sin la página de resumen es mucho mejor que no publicarlo. La página lo
+ * dice en palabras y sigue.
+ */
+export async function resumenUltimo(): Promise<Resumen | null> {
+  try {
+    return await traer<Resumen>("/api/briefing/latest");
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Digest más reciente, con guardarraíl.

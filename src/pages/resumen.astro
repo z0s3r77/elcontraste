@@ -1,0 +1,131 @@
+---
+// RESUMEN DIARIO — «lo que hay que saber hoy», y por qué te importa.
+//
+// Responde una pregunta que ninguna otra página del sitio responde. La portada
+// ordena por secciones, como un periódico: contesta «qué ha pasado». Esto
+// contesta «qué me toca a mí, y qué es urgente», y por eso el orden NO es el de
+// la portada — lo elige el modelo viendo el día entero, con lo inmediato y lo
+// práctico primero y España por delante (ver pipeline/briefing.py).
+//
+// Macroestructura: 02 · Long Document. Es prosa que se lee —y se escucha— de
+// arriba abajo, no una rejilla de descubrimiento.
+import Base from "../layouts/Base.astro";
+import { digestUltimo, resumenUltimo } from "../lib/api";
+import { numeral, rotula, urlCluster, urlInicio } from "../lib/ui";
+
+// El digest solo para la fecha de la cabecera. Si el resumen falta, la página
+// existe igual y lo dice: es una etapa que puede caerse sola sin tumbar la
+// pasada, y un sitio sin esta página sería peor que una página que se explica.
+const [digest, resumen] = await Promise.all([digestUltimo(), resumenUltimo()]);
+
+// Del día del resumen, no del digest: si la etapa falló hoy, lo que se está
+// leyendo es el de ayer y la fecha tiene que decirlo.
+const fecha = resumen?.date ?? digest.date;
+
+const URGENCIA: Record<string, string> = {
+  ahora: "Ya está pasando",
+  pronto: "Se decide estos días",
+  fondo: "Asunto de fondo",
+};
+---
+
+<Base
+  title="Resumen diario — La Doxa"
+  seccion="resumen"
+  edicion={`Resumen del día · ${fecha}`}
+  descripcion="Lo que ha pasado hoy en España y por qué te importa, en seis puntos. Se puede escuchar."
+>
+  <article class="doc">
+    <div class="doc-cuerpo">
+      <header class="doc-cabecera">
+        <p class="doc-seccion">Resumen diario</p>
+        <h1>{resumen?.titular_del_dia ?? "Lo que hay que saber hoy"}</h1>
+        <p class="doc-meta">
+          Lo inmediato y lo práctico primero · <span class="dato">{fecha}</span>
+        </p>
+      </header>
+
+      {
+        !resumen && (
+          <p class="aviso">
+            Todavía no hay resumen para hoy. Se escribe al final de cada pasada, sobre las
+            historias ya contrastadas del día; mientras tanto, la portada lleva el digest
+            completo. <a href={urlInicio()}>Ir a la portada →</a>
+          </p>
+        )
+      }
+
+      {
+        resumen && (
+          <>
+            {/* El botón vive fuera del <p> del texto y ANTES de él: es la
+                acción principal de la página, y el script lo esconde solo si
+                el navegador no trae voz (ver Base.astro). */}
+            <div class="voz" hidden data-voz>
+              <button type="button" class="voz-boton" data-voz-play>
+                <span class="voz-icono" aria-hidden="true">▶</span>
+                <span data-voz-texto>Escuchar el resumen</span>
+              </button>
+              <button type="button" class="voz-boton voz-parar" data-voz-stop hidden>
+                Parar
+              </button>
+              <p class="voz-nota">
+                Lee esta misma página con la voz del navegador. No se descarga nada.
+              </p>
+            </div>
+
+            {resumen.entradilla && <p class="resumen-entradilla">{resumen.entradilla}</p>}
+
+            <ol class="resumen-puntos">
+              {resumen.puntos.map((p, i) => (
+                <li class="resumen-punto">
+                  <p class="resumen-linea">
+                    <span class="banda-num">{numeral(i)}</span>
+                    <span class:list={["resumen-urgencia", `urg-${p.urgencia}`]}>
+                      {URGENCIA[p.urgencia] ?? p.urgencia}
+                    </span>
+                    {p.section && <span class="resumen-seccion">{rotula(p.section)}</span>}
+                  </p>
+                  <h2 class="resumen-titulo">{p.titulo}</h2>
+                  <p class="resumen-porque">{p.por_que_importa}</p>
+                  <p class="resumen-pie">
+                    <a class="enlace-accion" href={urlCluster(p.cluster_id)}>
+                      Ver el contraste →
+                    </a>
+                    <span class="dato">
+                      {`${p.n_sources} medios · ${p.n_articles} versiones`}
+                    </span>
+                  </p>
+                </li>
+              ))}
+            </ol>
+
+            <p class="firma-ia">
+              La selección y el orden los decide un modelo de lenguaje sobre las historias
+              contrastadas del día. No es todo lo que ha pasado: es lo que más cambia algo
+              hoy, según ese criterio. La portada lleva el digest completo.
+            </p>
+          </>
+        )
+      }
+    </div>
+
+    <aside class="doc-aparato">
+      <h2 class="rotulo-doc">Qué es esta página</h2>
+      <p class="aparato-texto">
+        La portada ordena el día por secciones, como un periódico. Esto responde otra
+        pregunta: de todo lo de hoy, qué cambia algo ya y a quién le llega.
+      </p>
+      <h2 class="rotulo-doc">De dónde sale</h2>
+      <p class="aparato-texto">
+        De las historias que han pasado por el contraste hoy — no de todo lo rastreado. Una
+        noticia que solo cuenta un medio no llega hasta aquí.
+      </p>
+      <h2 class="rotulo-doc">La voz</h2>
+      <p class="aparato-texto">
+        La pone el propio navegador y lee el texto que ves, sin cambiarlo. Puede que en tu
+        dispositivo no haya ninguna voz en español instalada; entonces el botón no aparece.
+      </p>
+    </aside>
+  </article>
+</Base>

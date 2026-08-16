@@ -1342,6 +1342,276 @@
     }
   }
 
+  /* ================================================== GLOSARIO ======== */
+  /* Una palabra explicada dentro de la prosa. La marca es lo MÁS discreto que
+     sigue siendo visible: el color de acento y un subrayado punteado, sin
+     fondo ni caja. Un relato con seis recuadros de color deja de ser prosa y
+     pasa a ser un formulario, y el acento del sistema tiene techo del 3 % del
+     viewport (design.md § Theme). */
+  .termino-caja {
+    position: relative;
+    display: inline;
+  }
+  .termino {
+    /* Preflight deja el botón desnudo; aquí se le devuelve la tipografía de la
+       prosa para que la palabra no cante dentro del párrafo. */
+    font: inherit;
+    color: var(--color-accent);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: help;
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+  .termino:hover {
+    text-decoration-style: solid;
+  }
+
+  /* El globo. `visibility` y no `display`: de `none` no se puede interpolar
+     nada, y esta entrada sí se anima (Motion regla 1 — confirma una acción del
+     lector, ≤ 180 ms). */
+  .termino-globo {
+    position: absolute;
+    top: calc(100% + 0.5em);
+    left: 0;
+    z-index: 20;
+    width: max-content;
+    max-width: min(26rem, 74vw);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xs);
+    padding: var(--spacing-2xs) var(--spacing-xs);
+    background: var(--color-paper-2);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-left: 3px solid var(--color-accent);
+    box-shadow: 0 2px 10px oklch(0% 0 0 / 0.12);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--color-ink);
+    text-align: left;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity var(--dur-corta) var(--curva),
+      visibility var(--dur-corta);
+  }
+  .termino-caja:hover .termino-globo,
+  .termino-caja:focus-within .termino-globo {
+    visibility: visible;
+    opacity: 1;
+  }
+  .termino-palabra {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  .termino-origen {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-neutral);
+  }
+  /* ⚠️ En móvil el globo NO cuelga de la palabra: se ancla al pie de la
+     pantalla, de lado a lado.
+     El motivo es que un globo colgado no cabe. A 390 px la columna mide ~358 y
+     el globo hasta 289: una palabra marcada en la mitad derecha de la línea lo
+     empuja fuera del viewport, y como `html, body` llevan `overflow-x: clip`,
+     lo que sobra no genera scroll — se pierde, que es peor. Medir la posición
+     en tiempo de ejecución lo arreglaría, pero exige JS para algo que en un
+     texto es puro CSS.
+     `fixed` no puede desbordar por definición, y de paso es el patrón que
+     cualquiera reconoce en un móvil. Se mantiene la verificación de 390 px sin
+     una sola línea de script. */
+  @media (width < 52rem) {
+    .termino-globo {
+      position: fixed;
+      inset: auto var(--page-gutter) var(--page-gutter) var(--page-gutter);
+      top: auto;
+      max-width: none;
+      width: auto;
+      border-left: 3px solid var(--color-accent);
+      box-shadow: 0 4px 24px oklch(0% 0 0 / 0.28);
+    }
+  }
+  /* En escritorio sí cuelga de la palabra, y ahí sobra sitio: la medida de
+     lectura son ~40 rem dentro de un marco de 90, así que un globo de 26 rem
+     que se salga por la derecha cae sobre el margen —visible y legible—, no
+     fuera de la página. */
+
+  /* ================================================== EN QUÉ TE AFECTA = */
+  /* La lectura llana, al margen (design.md § En qué te afecta). Lleva filete
+     de acento a la izquierda —no de alerta: no avisa de nada, orienta— y NO se
+     pliega, porque es justo lo que el lector que no sigue la actualidad viene
+     a buscar. */
+  .impacto {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+  }
+  .impacto .rotulo-doc {
+    margin-top: 0;
+    border-top: 0;
+    color: var(--color-accent);
+  }
+  /* El sello de alcance, en la monoespaciada: es una medida, el segundo papel
+     del outlier. Va ARRIBA porque decide si lo de debajo te toca. */
+  .impacto-alcance {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    margin: 0 0 var(--spacing-2xs);
+  }
+  .impacto-alcance.alcance-general {
+    color: var(--color-alerta);
+  }
+  /* «No cambia el día a día de casi nadie» es un hallazgo honesto, no un
+     defecto: se apaga, no se esconde. */
+  .impacto-alcance.alcance-indirecto {
+    color: var(--color-neutral);
+  }
+  .impacto-filas {
+    margin: 0 0 var(--spacing-sm);
+  }
+  .impacto-filas dt {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-neutral);
+    margin-top: var(--spacing-2xs);
+  }
+  .impacto-filas dd {
+    margin: 0 0 var(--spacing-2xs);
+    line-height: 1.6;
+  }
+  .impacto .firma-ia {
+    margin-bottom: 0;
+  }
+
+  /* ================================================== RESUMEN DIARIO === */
+  .resumen-entradilla {
+    font-size: var(--text-lg);
+    line-height: 1.5;
+    max-width: var(--measure);
+    text-wrap: pretty;
+    margin: 0 0 var(--spacing-lg);
+  }
+  .resumen-puntos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .resumen-punto {
+    border-top: var(--rule-hair) solid var(--color-rule);
+    padding: var(--spacing-sm) 0;
+  }
+  /* La fila de metadatos: numeral, urgencia y sección en una línea. */
+  .resumen-linea {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-2xs);
+    margin: 0 0 var(--spacing-3xs);
+  }
+  .resumen-urgencia,
+  .resumen-seccion {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-neutral);
+  }
+  /* Solo lo que ya está pasando se marca en alerta. Si se marcaran los tres
+     niveles, el color dejaría de decir nada — es el mismo criterio del sello
+     de contraste de la portada. */
+  .resumen-urgencia.urg-ahora {
+    color: var(--color-alerta);
+  }
+  .resumen-titulo {
+    font-size: var(--text-lg);
+    margin: 0 0 var(--spacing-3xs);
+    max-width: var(--measure);
+  }
+  .resumen-porque {
+    margin: 0 0 var(--spacing-2xs);
+    max-width: var(--measure);
+    line-height: 1.6;
+  }
+  .resumen-pie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-sm);
+    margin: 0;
+  }
+  .resumen-pie .dato {
+    font-size: var(--text-xs);
+    color: var(--color-neutral);
+  }
+
+  /* ---- El botón de voz ----
+     Chip perfilado, no botón sólido con gradiente: la voz de los enlaces de
+     acción del sistema es tipográfica (design.md § Voz de los enlaces). Se le
+     permite el borde porque es un control con estado —suena o no suena—, no
+     una navegación. */
+  .voz {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-2xs);
+    margin: 0 0 var(--spacing-lg);
+  }
+  .voz-boton {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-ink);
+    background: none;
+    border: var(--rule-hair) solid var(--color-rule);
+    padding: var(--spacing-3xs) var(--spacing-2xs);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-3xs);
+    transition:
+      border-color var(--dur-corta) var(--curva),
+      color var(--dur-corta) var(--curva);
+  }
+  .voz-boton:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .voz-activa .voz-boton {
+    border-color: var(--color-accent);
+  }
+  .voz-icono {
+    font-size: 0.9em;
+  }
+  .voz-nota {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-neutral);
+    margin: 0;
+    flex: 1 1 16rem;
+  }
+
+  /* Texto del aparato del margen: prosa corta, no monoespaciada — el colofón
+     ya usa mono y si se igualan se leen como el mismo bloque repetido
+     (design.md § Páginas de datos). */
+  .aparato-texto {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-muted);
+    margin: 0 0 var(--spacing-sm);
+  }
+
   /* ================================================== SECCIÓN ========= */
   .jornada {
     display: grid;
