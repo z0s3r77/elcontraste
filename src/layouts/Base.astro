@@ -10,6 +10,7 @@ import {
   urlInicio,
   urlSeccion,
   urlRadar,
+  urlFocos,
   urlTendencias,
   urlContacto,
   urlEstatico,
@@ -138,6 +139,9 @@ const imagenSocial = Astro.site
             </a>
           </li>
           <li>
+            <a href={urlFocos()} class={seccion === "focos" ? "activo" : ""}>Focos</a>
+          </li>
+          <li>
             <a href={urlRadar("economico")} class={seccion === "radar" ? "activo" : ""}>Radar</a>
           </li>
           <li>
@@ -238,7 +242,8 @@ const imagenSocial = Astro.site
       // efecto que deba repetirse cada vez que subes y bajas.
       if (matchMedia("(prefers-reduced-motion: no-preference)").matches) {
         const piezas = document.querySelectorAll(
-          ".ficha, .banda, .cifra-hero, .rotulo-doc, .tabla-envoltorio, .lista-huecos, .relato",
+          ".ficha, .banda, .cifra-hero, .rotulo-doc, .tabla-envoltorio, .lista-huecos, " +
+            ".relato, .filas-datos, .multiple, .lista-foco",
         );
         const vigia = new IntersectionObserver(
           (entradas) => {

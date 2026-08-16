@@ -166,13 +166,34 @@ export interface Radar {
   days: number;
   dias_de_historia: number;
   senal_fiable: boolean;
-  temas: { topic: string; n_clusters: number; n_articles: number; momentum: number | null }[];
+  /** Modo dominante de la sección. En `agregacion` no se buscan divergencias:
+   *  sus ceros no son ceros y el frontend no pinta el bloque de contraste. */
+  modo: string | null;
+  /** Sección entera, sin duplicar clústeres que tienen dos temas. */
+  totales: {
+    historias: number;
+    contrastadas: number;
+    contradicciones: number;
+    exclusivas: number;
+    articulos: number;
+  };
+  temas: {
+    topic: string;
+    historias: number;
+    /** Cuántas de esas historias tienen síntesis en modo contraste. El resto
+     *  no tiene NADA medido: la web pinta el hueco, no un cero. */
+    contrastadas: number;
+    contradicciones: number;
+    exclusivas: number;
+    momentum: number | null;
+  }[];
+  medios: { medio: string; leaning: string | null; articulos: number }[];
 }
 
 export interface Tendencia {
   topic: string;
   section: string;
-  points: { day: string; n_clusters: number }[];
+  points: { day: string; n_clusters: number; n_articles: number }[];
 }
 
 // ------------------------------------------------------------- consultas

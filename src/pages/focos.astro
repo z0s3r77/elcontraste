@@ -1,0 +1,186 @@
+---
+import Base from "../layouts/Base.astro";
+import { digestUltimo, type FichaCluster } from "../lib/api";
+import { rotula, urlCluster, urlSeccion } from "../lib/ui";
+
+// Macrostructure: 04 · Stat-Led. Página nueva del 2026-08-16, pedida por el
+// usuario: "un suceso muy importante fuera nos va a afectar a todos, pero aquí
+// el foco está puesto en otra parte". Eso, medido y sin editorializar:
+//
+//   01 — a qué mira la prensa hoy (el reparto de piezas por sección)
+//   02 — el machaqueo (historias con varias piezas POR MEDIO en un día)
+//   03 — la sombra (historias que muchos medios recogen y ninguno persigue)
+//
+// La medida clave es PIEZAS POR MEDIO (n_articles / n_sources). Verificado
+// sobre el digest del 2026-08-16: la Lotería Nacional iba a 2,7 piezas por
+// medio mientras un ataque con 11 muertos en Israel se quedaba en 5 piezas de
+// 3 medios. La página no dice qué es importante — enseña dónde caen las
+// piezas y deja el juicio al lector, que es la línea editorial del sitio.
+//
+// Todo sale del digest del día: no hay endpoint nuevo. Se filtra por
+// `relevancia > 0` (nada fresco en 24 h): la ventana de 48 h re-agrupa
+// historias de ayer, y señalar como "foco de hoy" algo sin una sola pieza
+// nueva sería mentir con datos verdaderos.
+
+const digest = await digestUltimo();
+const todas: FichaCluster[] = digest.sections.flatMap((s) =>
+  s.clusters.map((c) => ({ ...c, section: s.section })),
+);
+const frescas = todas.filter((c) => (c.relevancia ?? 0) > 0);
+
+const totalPiezas = todas.reduce((a, c) => a + c.n_articles, 0);
+const pct = (n: number) => Math.round((n / Math.max(1, totalPiezas)) * 100);
+const ratio = (c: FichaCluster) => c.n_articles / Math.max(1, c.n_sources);
+const ratioTexto = (c: FichaCluster) => ratio(c).toFixed(1).replace(".", ",");
+
+// El hero: cuánto se lleva la historia más cubierta del día.
+const top = [...todas].sort((a, b) => b.n_articles - a.n_articles)[0];
+
+// 01 · Reparto por sección, de más a menos piezas. Aquí el orden por volumen
+// no es un descuido: el ranking ES el dato.
+const reparto = digest.sections
+  .map((s) => ({
+    section: s.section,
+    historias: s.clusters.length,
+    piezas: s.clusters.reduce((a, c) => a + c.n_articles, 0),
+  }))
+  .sort((a, b) => b.piezas - a.piezas);
+const maxPiezas = Math.max(1, ...reparto.map((s) => s.piezas));
+
+// 02 · El machaqueo: 1,5+ piezas por medio y volumen suficiente para que la
+// ratio no sea anécdota (con 4 piezas, "2 por medio" no dice nada).
+const machaqueo = frescas
+  .filter((c) => c.n_articles >= 6 && ratio(c) >= 1.5)
+  .sort((a, b) => ratio(b) - ratio(a))
+  .slice(0, 6);
+const enMachaqueo = new Set(machaqueo.map((c) => c.id));
+
+// 03 · La sombra: secciones de fondo, 3+ medios coinciden en que es noticia,
+// pero nadie pasa de una pieza (ratio ≈ 1) — cobertura sin seguimiento.
+const FONDO = new Set(["politica-nacional", "geopolitica", "economico", "ciencia", "tecnologia"]);
+const sombra = frescas
+  .filter(
+    (c) =>
+      FONDO.has(c.section ?? "") &&
+      c.n_sources >= 3 &&
+      ratio(c) <= 1.34 &&
+      !enMachaqueo.has(c.id),
+  )
+  .sort((a, b) => b.n_sources - a.n_sources || a.n_articles - b.n_articles)
+  .slice(0, 6);
+---
+
+<Base
+  title="La Doxa — focos"
+  seccion="focos"
+  edicion={`Focos · edición del ${digest.date}`}
+  descripcion="Dónde pone el foco la prensa hoy: qué historias reciben pieza tras pieza y cuáles se recogen una vez y se sueltan."
+>
+  {
+    top && (
+      <section class="cifra-hero">
+        <p class="cifra dato">{pct(top.n_articles)}%</p>
+        <p class="cifra-frase">
+          de las <span class="dato">{totalPiezas}</span> piezas de hoy fueron para una sola
+          historia: <a href={urlCluster(top.id)}>{top.headline ?? "sin titular"}</a>.
+        </p>
+      </section>
+    )
+  }
+
+  <div class="banda">
+    <span class="banda-num">01</span>
+    <h2>A qué mira la prensa hoy</h2>
+    <span class="cuenta">{totalPiezas} piezas · {todas.length} historias</span>
+  </div>
+  <p class="nota nota-deck">
+    El reparto del día por secciones. El foco no es la importancia: es dónde caen las piezas
+    — y verlo repartido ya es la mitad del criterio.
+  </p>
+  <ul class="filas-datos">
+    {
+      reparto.map((s) => (
+        <li>
+          <span class="fila-etiqueta">
+            <a href={urlSeccion(s.section)}>{rotula(s.section)}</a>
+          </span>
+          <span class="fila-dato">
+            <strong>{s.piezas}</strong> piezas · {s.historias} hist. · {pct(s.piezas)}%
+          </span>
+          <span class="celda-barra">
+            <span class="barra" style={`inline-size: ${Math.round((s.piezas / maxPiezas) * 100)}%`} />
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="banda">
+    <span class="banda-num">02</span>
+    <h2>El machaqueo</h2>
+    <span class="cuenta">2+ piezas por medio y día</span>
+  </div>
+  <p class="nota nota-deck">
+    Historias que hoy reciben varias piezas del mismo medio: directos, ampliaciones,
+    despieces. El volumen les da presencia en portada; no siempre hay más noticia dentro.
+  </p>
+  {
+    machaqueo.length === 0 ? (
+      <p class="nota">Hoy ninguna historia concentra varias piezas por medio.</p>
+    ) : (
+      <ul class="lista-foco">
+        {machaqueo.map((c) => (
+          <li>
+            <a href={urlCluster(c.id)}>{c.headline ?? "Sin titular"}</a>
+            <p class="foco-metrica">
+              <strong>{ratioTexto(c)} piezas por medio</strong>
+              <span>
+                {c.n_articles} piezas de {c.n_sources} medios
+              </span>
+              <span>{pct(c.n_articles)}% del día</span>
+              <span>{rotula(c.section ?? "")}</span>
+            </p>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <div class="banda">
+    <span class="banda-num">03</span>
+    <h2>La sombra</h2>
+    <span class="cuenta">muchos medios, una pieza cada uno</span>
+  </div>
+  <p class="nota nota-deck">
+    Historias de fondo que varios medios recogen — coinciden en que son noticia — pero
+    ninguno persigue: una pieza por cabecera y a otra cosa. Es donde el foco no se detiene,
+    y donde más conviene leer el contraste.
+  </p>
+  {
+    sombra.length === 0 ? (
+      <p class="nota">Hoy no hay historias de fondo en esta situación.</p>
+    ) : (
+      <ul class="lista-foco">
+        {sombra.map((c) => (
+          <li>
+            <a href={urlCluster(c.id)}>{c.headline ?? "Sin titular"}</a>
+            <p class="foco-metrica">
+              <strong>
+                {c.n_sources} medios, {c.n_articles === c.n_sources ? "una pieza cada uno" : `${c.n_articles} piezas`}
+              </strong>
+              <span>{pct(c.n_articles)}% del día</span>
+              <span>{rotula(c.section ?? "")}</span>
+            </p>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <p class="descargo">
+    Las cifras cuentan lo que los medios rastreados publican en sus feeds, y no todos exponen
+    lo mismo: la comparación es orientativa, no un censo. Esta página no dice qué es
+    importante — enseña dónde se concentran las piezas y dónde no, para que el criterio sea
+    tuyo.
+  </p>
+</Base>

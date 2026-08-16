@@ -1,34 +1,125 @@
 ---
 import Base from "../layouts/Base.astro";
 import { traer, type Tendencia } from "../lib/api";
-import { rotula, urlSeccion } from "../lib/ui";
+import { pesoSeccion, rotula, urlSeccion } from "../lib/ui";
 
-// Familia datos (04 · Stat-Led). La cobertura diferencial se ha movido a la
-// portada (superficie 03 del Ecosystem Index): aquí sobraba duplicada y allí
-// es lo que engancha. Esta página se queda con la serie temporal, que es lo
-// único que necesita histórico.
+// Familia datos (04 · Stat-Led). Rehecha el 2026-08-16 a petición del usuario:
+// la gráfica anterior era un uPlot con 8 líneas de temas sueltos — espagueti
+// que no transmitía nada — y una tabla "Todos los temas" de recuentos crudos.
+// Ahora la unidad es la SECCIÓN: un múltiplo por sección con su serie diaria
+// de artículos, todos a la MISMA escala para que comparar tenga sentido, y
+// debajo los temas que concentran esa atención. Sin uPlot: las barras son
+// divs horneados en el build, siguen al tema claro/oscuro por CSS y no
+// dependen de que corra ningún script.
 //
-// La tabla se hornea; la gráfica NO puede: uPlot dibuja en canvas y necesita
-// el navegador. Los datos viajan en un <script type="application/json"> y el
-// cliente solo pinta — no vuelve a llamar a la API.
+// Lo que esta página mide es la AGENDA: cuánto espacio da la prensa a cada
+// cosa y cómo se desplaza. Qué se dispara y qué se calla — la segunda mitad
+// necesita ~14 días de historia y hasta entonces se dice en palabras.
 
-const [trends, accel] = await Promise.all([
-  traer<Tendencia[]>("/api/trends?days=180"),
+type SerieSeccion = {
+  section: string;
+  points: { day: string; n_clusters: number; n_articles: number }[];
+};
+const [porSeccionApi, trends, accel] = await Promise.all([
+  // La serie por sección sale de su endpoint propio y NO de sumar los temas:
+  // un clúster con dos temas contaría sus artículos dos veces (medido el
+  // 2026-08-16: `social` pasaba de ~550 a 1.107 "artículos" en 6 días).
+  traer<SerieSeccion[]>("/api/trends/sections?days=30"),
+  traer<Tendencia[]>("/api/trends?days=30"),
   traer<{ section: string; topic: string; avg_7d: number; avg_90d: number }[]>(
     "/api/trends/accelerating",
   ),
 ]);
 
-const dias = new Set(trends.flatMap((t) => t.points.map((p) => p.day))).size;
+const dias = new Set(porSeccionApi.flatMap((s) => s.points.map((p) => p.day))).size;
+const fiable = dias >= 14;
 
-// Los 8 temas con más días de datos.
-const top = trends.slice(0, 8);
-const ejeDias = [...new Set(top.flatMap((t) => t.points.map((p) => p.day)))].sort();
-const series = top.map((t) => {
-  const by = Object.fromEntries(t.points.map((p) => [p.day, p.n_clusters]));
-  return ejeDias.map((d) => by[d] ?? 0);
-});
-const datosGrafica = { etiquetas: top.map((t) => t.topic), dias: ejeDias, series };
+// Eje temporal común: todos los días con datos, en orden. Los múltiplos
+// comparten eje y escala; un día sin datos en una sección es un cero real
+// (el pipeline corrió y no hubo nada), no un hueco.
+const ejeDias = [...new Set(porSeccionApi.flatMap((s) => s.points.map((p) => p.day)))].sort();
+
+// Los temas que concentran la atención de cada sección. Aquí sí vale
+// `daily_topic_counts`: el recuento POR TEMA es exacto — la inflación
+// aparecía solo al sumarlos como si fueran disjuntos.
+const temasPorSeccion = new Map<string, Map<string, number>>();
+for (const t of trends) {
+  const temas = temasPorSeccion.get(t.section) ?? new Map();
+  temas.set(
+    t.topic,
+    (temas.get(t.topic) ?? 0) + t.points.reduce((a, p) => a + p.n_articles, 0),
+  );
+  temasPorSeccion.set(t.section, temas);
+}
+
+type Seccion = {
+  section: string;
+  total: number;
+  porDia: number[];
+  temas: { topic: string; total: number }[];
+};
+const secciones: Seccion[] = porSeccionApi
+  .map((s) => {
+    const porDia = new Map(s.points.map((p) => [p.day, p.n_articles]));
+    return {
+      section: s.section,
+      total: s.points.reduce((a, p) => a + p.n_articles, 0),
+      porDia: ejeDias.map((d) => porDia.get(d) ?? 0),
+      temas: [...(temasPorSeccion.get(s.section) ?? new Map()).entries()]
+        .map(([topic, total]) => ({ topic, total: total as number }))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 3),
+    };
+  })
+  // Orden editorial fijo, como la portada: en un periódico las secciones no
+  // se recolocan según el volumen del día.
+  .sort((a, b) => pesoSeccion(a.section) - pesoSeccion(b.section));
+
+// Escala COMPARTIDA: el máximo día de la sección más cargada. Normalizar cada
+// múltiplo a su propio máximo haría que Deportes pareciera tan grande como
+// Social, y comparar es el único motivo de dibujarlos juntos.
+const maximo = Math.max(1, ...secciones.flatMap((s) => s.porDia));
+
+// Qué se calla: temas cuya última semana cae por debajo de la mitad de la
+// anterior, con una base mínima para no señalar ruido. Solo se calcula con
+// historia suficiente; hasta entonces el aviso lo dice en palabras.
+type Caida = { section: string; topic: string; ahora: number; antes: number };
+let caidas: Caida[] = [];
+if (fiable && ejeDias.length >= 14) {
+  const corte7 = ejeDias[ejeDias.length - 7];
+  const corte14 = ejeDias[ejeDias.length - 14];
+  for (const t of trends) {
+    const suma = (desde: string, hasta: string) =>
+      t.points
+        .filter((p) => p.day >= desde && p.day < hasta)
+        .reduce((a, p) => a + p.n_articles, 0);
+    const antes = suma(corte14, corte7);
+    const ahora = suma(corte7, "9999");
+    if (antes >= 14 && ahora < antes * 0.5) {
+      caidas.push({ section: t.section, topic: t.topic, ahora, antes });
+    }
+  }
+  caidas.sort((a, b) => b.antes - a.antes);
+  caidas = caidas.slice(0, 8);
+}
+
+const rangoEje = ejeDias.length
+  ? { desde: ejeDias[0].slice(5), hasta: ejeDias[ejeDias.length - 1].slice(5) }
+  : null;
+
+// La gráfica grande: el TOTAL del día, todas las secciones juntas. Es el
+// ancla visual de la página y la primera respuesta ("¿cuánto ruido hubo?");
+// los múltiplos de abajo la descomponen. Una tinta, como todo (design.md).
+const totalPorDia = ejeDias.map((_, i) =>
+  secciones.reduce((a, s) => a + s.porDia[i], 0),
+);
+const maxTotal = Math.max(1, ...totalPorDia);
+// La cifra sobre cada columna solo cabe mientras haya pocas: con más de 14
+// días se quita y quedan el eje y los `title`. Lo mismo con la fecha de cada
+// columna: a 30 días se rotula una de cada varias, no las 30.
+const conCifras = ejeDias.length <= 14;
+const pasoDias = Math.max(1, Math.ceil(ejeDias.length / 10));
+const rotulaDia = (i: number) => i % pasoDias === 0 || i === ejeDias.length - 1;
 ---
 
 <Base
@@ -39,8 +130,9 @@ const datosGrafica = { etiquetas: top.map((t) => t.topic), dias: ejeDias, series
   <section class="cifra-hero">
     <p class="cifra dato">{dias}</p>
     <p class="cifra-frase">
-      {dias === 1 ? "día registrado" : "días registrados"} desde que el pipeline empezó a
-      contar temas. La serie gana sentido a partir de dos o tres semanas.
+      {dias === 1 ? "día registrado" : "días registrados"} de agenda mediática. Esta página
+      mide cuánto espacio da la prensa a cada cosa — y la señal gana sentido a partir de dos
+      o tres semanas.
     </p>
   </section>
 
@@ -68,108 +160,134 @@ const datosGrafica = { etiquetas: top.map((t) => t.topic), dias: ejeDias, series
 
   <div class="banda">
     <span class="banda-num">01</span>
-    <h2>Historias por tema y día</h2>
-    <span class="cuenta">8 temas con más histórico</span>
+    <h2>La agenda, día a día</h2>
+    <span class="cuenta">artículos agrupados por día · todas las secciones</span>
   </div>
-
   {
-    trends.length === 0 ? (
+    ejeDias.length === 0 ? (
       <p class="aviso">
-        Todavía no hay días suficientes. El cron los va acumulando en cada pasada.
+        Todavía no hay días suficientes. El histórico se acumula en cada pasada.
       </p>
     ) : (
-      <>
-        <div id="grafica" class="grafica" />
-        <script type="application/json" id="datos-grafica" set:html={JSON.stringify(datosGrafica)} />
-
-        <div class="banda">
-          <span class="banda-num">02</span>
-          <h2>Todos los temas</h2>
-          <span class="cuenta">{trends.length} con datos</span>
+      <div class="gran-grafica">
+        <div
+          class="gran-barras"
+          role="img"
+          aria-label={`Artículos agrupados por día: ${totalPorDia.join(", ")}`}
+        >
+          {totalPorDia.map((n, i) => (
+            <div class="gran-col" title={`${ejeDias[i]} · ${n} artículos`}>
+              <span
+                class="gran-bar"
+                style={`block-size: ${Math.max(2, Math.round((n / maxTotal) * 100))}%`}
+              >
+                {conCifras && <span class="gran-num dato">{n}</span>}
+              </span>
+              <span class="gran-dia dato" aria-hidden="true">
+                {rotulaDia(i) ? ejeDias[i].slice(8) : ""}
+              </span>
+            </div>
+          ))}
         </div>
-        <div class="tabla-envoltorio">
-          <table class="tabla-radar">
-            <thead>
-              <tr>
-                <th scope="col">Tema</th>
-                <th scope="col">Sección</th>
-                <th scope="col">Días</th>
-                <th scope="col">Historias</th>
-              </tr>
-            </thead>
-            <tbody>
-              {trends.map((t) => (
-                <tr>
-                  <th scope="row">
-                    <a href={urlSeccion(t.section, t.topic)}>{t.topic}</a>
-                  </th>
-                  <td>{rotula(t.section)}</td>
-                  <td class="dato">{t.points.length}</td>
-                  <td class="dato">{t.points.reduce((acc, p) => acc + p.n_clusters, 0)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </>
+      </div>
     )
   }
-</Base>
 
-<script>
-  import uPlot from "uplot";
-  import "uplot/dist/uPlot.min.css";
+  <div class="banda">
+    <span class="banda-num">02</span>
+    <h2>La atención, sección a sección</h2>
+    <span class="cuenta">artículos por día · misma escala</span>
+  </div>
+  <p class="nota nota-deck">
+    Cada bloque es una sección con su serie diaria de artículos agrupados. Todas las barras
+    van a la misma escala: lo que aquí se compara es cuánto pesa cada sección en la agenda,
+    no su forma. La ventana de agrupación es de 48 h, así que una misma pieza puede contar
+    en dos días seguidos.
+  </p>
 
-  const crudo = document.getElementById("datos-grafica")?.textContent;
-  const contenedor = document.getElementById("grafica");
-
-  if (crudo && contenedor) {
-    const { etiquetas, dias, series } = JSON.parse(crudo) as {
-      etiquetas: string[];
-      dias: string[];
-      series: number[][];
-    };
-
-    // Los colores de serie salen de tokens, no de hex sueltos (design.md).
-    const token = (n: string) =>
-      getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-    const colores = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => token(`--serie-${i}`));
-
-    const x = dias.map((d) => new Date(d + "T00:00:00Z").getTime() / 1000);
-    // Un mínimo por día para que la serie no se aplaste; por encima de eso,
-    // manda el ancho real del contenedor.
-    const ancho = () => Math.max(contenedor.clientWidth || 640, dias.length * 44);
-
-    const grafica = new uPlot(
-      {
-        width: ancho(),
-        height: 300,
-        series: [
-          {},
-          ...etiquetas.map((label, i) => ({
-            label,
-            stroke: colores[i % colores.length],
-            width: 2,
-          })),
-        ],
-        axes: [
-          { stroke: token("--color-neutral"), grid: { stroke: token("--color-rule") } },
-          {
-            label: "historias",
-            stroke: token("--color-neutral"),
-            grid: { stroke: token("--color-rule") },
-          },
-        ],
-      },
-      [x, ...series] as any,
-      contenedor,
-    );
-
-    // uPlot NO es responsive por su cuenta: fija el tamaño al construirse y se
-    // queda con él. Sin esto, la gráfica ignora cualquier cambio de ventana.
-    new ResizeObserver(() => grafica.setSize({ width: ancho(), height: 300 })).observe(
-      contenedor,
-    );
+  {
+    secciones.length === 0 ? (
+      <p class="aviso">
+        Todavía no hay días suficientes. El histórico se acumula en cada pasada.
+      </p>
+    ) : (
+      <div class="multiples">
+        {secciones.map((s) => (
+          <section class="multiple">
+            <h3 class="rotulo-seccion">
+              <a href={urlSeccion(s.section)}>{rotula(s.section)}</a>
+              <span class="dato muted">{s.total} art.</span>
+            </h3>
+            <div
+              class="mini-barras"
+              role="img"
+              aria-label={`${rotula(s.section)}: ${s.total} artículos en ${ejeDias.length} días`}
+            >
+              {s.porDia.map((n, i) => (
+                <span
+                  class="mini-bar"
+                  style={`block-size: ${Math.max(3, Math.round((n / maximo) * 100))}%`}
+                  title={`${ejeDias[i]} · ${n} ${n === 1 ? "artículo" : "artículos"}`}
+                />
+              ))}
+            </div>
+            {rangoEje && (
+              <div class="mini-eje" aria-hidden="true">
+                <span>{rangoEje.desde}</span>
+                <span>{rangoEje.hasta}</span>
+              </div>
+            )}
+            <ul class="multiple-temas">
+              {s.temas.map((tema) => (
+                <li>
+                  <a href={urlSeccion(s.section, tema.topic)}>{tema.topic}</a>
+                  <span class="dato muted">{tema.total}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    )
   }
-</script>
 
+  <div class="banda">
+    <span class="banda-num">03</span>
+    <h2>Qué se calla</h2>
+    <span class="cuenta">última semana &lt; ½ de la anterior</span>
+  </div>
+  <p class="nota nota-deck">
+    Un tema que ardía y desaparece de la agenda es tan revelador como uno que se dispara: las
+    historias incómodas no siempre se desmienten, a veces solo se dejan de contar.
+  </p>
+
+  {
+    !fiable ? (
+      <p class="aviso">
+        <strong>Señal todavía débil.</strong> Detectar un silencio exige comparar dos semanas
+        completas y el histórico lleva <span class="dato">{dias}</span>
+        {dias === 1 ? " día" : " días"}. Esta superficie se enciende sola cuando haya base:
+        antes de eso, cualquier "caída" sería ruido de calendario.
+      </p>
+    ) : caidas.length === 0 ? (
+      <p class="nota">Ningún tema con caída clara esta semana.</p>
+    ) : (
+      <ul class="lista-acelera">
+        {caidas.map((c) => (
+          <li>
+            <a href={urlSeccion(c.section, c.topic)}>{c.topic}</a>
+            <span class="dato muted">
+              {c.ahora} vs {c.antes}
+            </span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <p class="descargo">
+    Esto mide <strong>cobertura mediática</strong> sobre los feeds que el proyecto rastrea:
+    cuánto se habla de un asunto, no su importancia. Un tema se dispara igual por una
+    oportunidad que por una crisis, y la serie no distingue entre las dos.
+  </p>
+</Base>

@@ -5,8 +5,15 @@ import { taxonomia, traer, type Radar } from "../../lib/api";
 import { rotula, urlRadar, urlSeccion } from "../../lib/ui";
 
 // Macrostructure: 04 · Stat-Led — la cifra manda y el texto la cualifica.
-// La cifra es real (artículos rastreados). Gate 46: nunca un número inventado,
-// y nunca un número solo: siempre emparejado con lo que significa.
+//
+// Rehecho el 2026-08-16 a petición del usuario: la versión anterior era una
+// tabla de recuentos (259 artículos, N historias) que medía el trabajo del
+// pipeline, no algo que un lector pueda usar. El radar responde ahora, en este
+// orden, a "¿de qué fiarse menos esta semana en esta sección?":
+//   01 — dónde NO cuadran las versiones (contradicciones por tema)
+//   02 — quién cuenta la sección (composición de medios, con su sesgo confesado)
+// El momentum sigue oculto hasta los 14 días de historia, como siempre: con
+// menos, la página lo dice en palabras en vez de dibujar una flecha que miente.
 
 export async function getStaticPaths() {
   const tax = await taxonomia();
@@ -19,97 +26,185 @@ const DIAS = 30;
 const tax = await taxonomia();
 const d = await traer<Radar>(`/api/radar/${encodeURIComponent(seccion!)}?days=${DIAS}`);
 
-const total = d.temas.reduce((a, t) => a + (t.n_articles ?? 0), 0);
-const maximo = Math.max(1, ...d.temas.map((t) => t.n_articles ?? 0));
+// En modo agregación (deportes, arte, gaming…) el prompt barato ni analiza
+// divergencias: el bloque de contraste no se pinta y la página lo dice. Un
+// cero de donde no se miró no es un cero (design.md § Sello de contraste).
+const analizada = d.modo !== "agregacion";
+const t = d.totales;
 
-const chips = tax.map((t) => ({
-  etiqueta: rotula(t.section),
-  href: urlRadar(t.section),
-  activo: t.section === seccion,
+const maxContr = Math.max(1, ...d.temas.map((x) => x.contradicciones));
+const maxArts = Math.max(1, ...d.medios.map((m) => m.articulos));
+
+const chips = tax.map((x) => ({
+  etiqueta: rotula(x.section),
+  href: urlRadar(x.section),
+  activo: x.section === seccion,
 }));
+
+// La frase del hero se arma entera en el frontmatter: Astro se come el espacio
+// entre dos interpolaciones contiguas (visto en el sello de contraste).
+const fraseContrastadas = `${t.contrastadas} de ${t.historias}`;
 ---
 
 <Base
   title={`Radar de ${rotula(seccion!)} — La Doxa`}
   seccion="radar"
-  edicion={`Radar de ${rotula(seccion!)} · ${d.dias_de_historia} días de historia`}
+  edicion={`Radar de ${rotula(seccion!)} · últimos ${DIAS} días`}
 >
   <Conmutador opciones={chips} etiquetaAria="Secciones del radar" />
 
-  <section class="cifra-hero">
-    <p class="cifra dato">{total}</p>
-    <p class="cifra-frase">
-      artículos de {rotula(seccion!)} rastreados en {DIAS} días, repartidos en
-      <span class="dato">{d.temas.length}</span> temas de la taxonomía cerrada.
-    </p>
-  </section>
+  {
+    analizada ? (
+      <section class="cifra-hero">
+        <p class="cifra dato">{t.contradicciones}</p>
+        <p class="cifra-frase">
+          {t.contradicciones === 1 ? "contradicción documentada" : "contradicciones documentadas"}
+          en las <span class="dato">{fraseContrastadas}</span> historias de {rotula(seccion!)}
+          contrastadas en {DIAS} días.
+        </p>
+      </section>
+    ) : (
+      <section class="cifra-hero">
+        <p class="cifra dato">{t.historias}</p>
+        <p class="cifra-frase">
+          historias de {rotula(seccion!)} agrupadas en {DIAS} días. Esta sección se
+          sintetiza en modo agregación: no se buscan divergencias, así que aquí no
+          hay contraste que medir.
+        </p>
+      </section>
+    )
+  }
 
   {
-    /* El aviso NO es decorativo: con poca historia el momentum es ruido y la
-       página lo dice en palabras en vez de dibujar una flecha que miente. */
-    !d.senal_fiable && (
-      <p class="aviso">
-        <strong>Señal todavía débil.</strong> El radar lleva
-        <span class="dato">{d.dias_de_historia}</span>
-        {d.dias_de_historia === 1 ? " día" : " días"} de historia acumulada y hacen falta unos
-        14 para que el momentum signifique algo. Lo de abajo es un recuento honesto, no una
-        tendencia: la columna de momentum queda oculta hasta que haya base para calcularla.
-      </p>
+    analizada && (
+      <>
+        <div class="banda">
+          <span class="banda-num">01</span>
+          <h2>Dónde no cuadran las versiones</h2>
+          <span class="cuenta">ventana de {DIAS} días</span>
+        </div>
+        <p class="nota nota-deck">
+          Contradicciones: dos o más medios dan versiones distintas del mismo hecho. Solo se
+          analizan las historias sintetizadas — las de más peso de cada día —, así que esto es
+          una muestra ({fraseContrastadas} en esta ventana), no el total.
+        </p>
+
+        {d.temas.length === 0 ? (
+          <p class="aviso">Todavía no hay nada clasificado en esta sección.</p>
+        ) : (
+          <div class="tabla-envoltorio">
+            <table class="tabla-radar">
+              <thead>
+                <tr>
+                  <th scope="col">Tema</th>
+                  <th scope="col">Contrastadas</th>
+                  <th scope="col">Contradicciones</th>
+                  <th scope="col">
+                    <span class="visualmente-oculto">Proporción de contradicciones</span>
+                  </th>
+                  <th scope="col">Solo un medio</th>
+                  {d.senal_fiable && <th scope="col">Momentum</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {d.temas.map((tema) => (
+                  <tr>
+                    <th scope="row">
+                      <a href={urlSeccion(seccion!, tema.topic)}>{tema.topic}</a>
+                    </th>
+                    <td class="dato">
+                      {tema.contrastadas} de {tema.historias}
+                    </td>
+                    {tema.contrastadas === 0 ? (
+                      <>
+                        {/* Sin síntesis no hay NADA medido: se pinta el hueco,
+                            no un cero (regla 2 de design.md). */}
+                        <td class="dato muted" title="Sin historias contrastadas: no hay nada medido">
+                          —
+                        </td>
+                        <td class="celda-barra" />
+                        <td class="dato muted">—</td>
+                      </>
+                    ) : (
+                      <>
+                        <td class="dato">{tema.contradicciones}</td>
+                        <td class="celda-barra">
+                          <span
+                            class="barra"
+                            style={`inline-size: ${Math.round((tema.contradicciones / maxContr) * 100)}%`}
+                          />
+                        </td>
+                        <td class="dato">{tema.exclusivas}</td>
+                      </>
+                    )}
+                    {d.senal_fiable && (
+                      <td class:list={["dato", { sube: tema.momentum && tema.momentum > 1.2 }]}>
+                        {tema.momentum ? `×${tema.momentum}` : "—"}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </>
     )
   }
 
   <div class="banda">
-    <span class="banda-num">01</span>
-    <h2>Atención por tema</h2>
-    <span class="cuenta">ventana de {DIAS} días</span>
+    <span class="banda-num">{analizada ? "02" : "01"}</span>
+    <h2>Quién cuenta esta sección</h2>
+    <span class="cuenta">{t.articulos} artículos / {DIAS} días</span>
   </div>
+  <p class="nota nota-deck">
+    De qué medios sale lo que lees aquí. Si una sección la narran dos cabeceras, su encuadre
+    es el de esas dos: saberlo es la mitad de contrastarlo.
+  </p>
 
   {
-    d.temas.length === 0 ? (
-      <p class="aviso">Todavía no hay nada clasificado en esta sección.</p>
+    d.medios.length === 0 ? (
+      <p class="aviso">Ningún artículo agrupado en esta sección en la ventana.</p>
     ) : (
-      <div class="tabla-envoltorio">
-        <table class="tabla-radar">
-          <thead>
-            <tr>
-              <th scope="col">Tema</th>
-              <th scope="col">Artículos</th>
-              <th scope="col">Historias</th>
-              <th scope="col"><span class="visualmente-oculto">Proporción</span></th>
-              {d.senal_fiable && <th scope="col">Momentum</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {d.temas.map((t) => (
-              <tr>
-                <th scope="row">
-                  <a href={urlSeccion(seccion!, t.topic)}>{t.topic}</a>
-                </th>
-                <td class="dato">{t.n_articles}</td>
-                <td class="dato">{t.n_clusters}</td>
-                <td class="celda-barra">
-                  <span
-                    class="barra"
-                    style={`inline-size: ${Math.round(((t.n_articles ?? 0) / maximo) * 100)}%`}
-                  />
-                </td>
-                {d.senal_fiable && (
-                  <td class:list={["dato", { sube: t.momentum && t.momentum > 1.2 }]}>
-                    {t.momentum ? `×${t.momentum}` : "—"}
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ul class="filas-datos">
+        {d.medios.map((m) => (
+          <li>
+            {/* Solo el nombre y el volumen: en el sitio público no se etiqueta
+                políticamente a ninguna cabecera (decisión del 2026-08-16). La
+                concentración —cuántos medios narran la sección— es el dato. */}
+            <span class="fila-etiqueta">{m.medio}</span>
+            <span class="fila-dato">
+              <strong>{m.articulos}</strong> art. · {Math.round((m.articulos / t.articulos) * 100)}%
+            </span>
+            <span class="celda-barra">
+              <span
+                class="barra"
+                style={`inline-size: ${Math.round((m.articulos / maxArts) * 100)}%`}
+              />
+            </span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    !d.senal_fiable && (
+      <p class="aviso">
+        <strong>Momentum todavía oculto.</strong> El radar lleva
+        <span class="dato">{d.dias_de_historia}</span>
+        {d.dias_de_historia === 1 ? " día" : " días"} de historia acumulada y hacen falta unos
+        14 para que una tendencia por tema signifique algo. Hasta entonces, esta página mide lo
+        que sí se puede medir ya: las contradicciones y quién publica.
+      </p>
     )
   }
 
   <p class="descargo">
-    Esto mide <strong>cobertura mediática</strong>, no mercado: cuánto se habla de un asunto,
-    no si conviene invertir en él. Un tema se dispara igual por una oportunidad que por una
-    crisis, y el radar no distingue entre las dos.
+    El reparto de medios refleja lo que cada cabecera expone en sus feeds, y no todas exponen
+    lo mismo: algunas publican ventanas de ~25 titulares y otras el día entero, así que la
+    comparación entre medios es orientativa. Y las contradicciones se cuentan sobre las
+    historias sintetizadas, no sobre todo lo agrupado: es una muestra sesgada hacia lo más
+    cubierto. Esto mide <strong>cobertura y desacuerdo</strong>, no importancia ni mercado.
   </p>
 </Base>
-
