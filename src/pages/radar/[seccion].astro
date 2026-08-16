@@ -188,23 +188,41 @@ const fraseContrastadas = `${t.contrastadas} de ${t.historias}`;
     )
   }
 
-  {
-    !d.senal_fiable && (
-      <p class="aviso">
-        <strong>Momentum todavía oculto.</strong> El radar lleva
-        <span class="dato">{d.dias_de_historia}</span>
-        {d.dias_de_historia === 1 ? " día" : " días"} de historia acumulada y hacen falta unos
-        14 para que una tendencia por tema signifique algo. Hasta entonces, esta página mide lo
-        que sí se puede medir ya: las contradicciones y quién publica.
+  {/* El aviso de momentum es aparato, no contenido: dice qué NO puede medir
+      todavía la página. Va con los descargos, en la misma retícula. */}
+  <aside class:list={["aparato", d.senal_fiable ? "aparato-3" : "aparato-4"]}>
+    {!d.senal_fiable && (
+      <section class="aparato-alerta">
+        <p class="aparato-rotulo">Momentum oculto</p>
+        <p>
+          El radar lleva <span class="dato">{d.dias_de_historia}</span>
+          {d.dias_de_historia === 1 ? " día" : " días"} de historia acumulada y hacen falta
+          unos 14 para que una tendencia por tema signifique algo. Hasta entonces se mide lo
+          que sí se puede ya.
+        </p>
+      </section>
+    )}
+    <section>
+      <p class="aparato-rotulo">El reparto de medios</p>
+      <p>
+        Refleja lo que cada cabecera expone en su feed, y no todas exponen lo mismo: unas
+        publican ventanas de ~25 titulares y otras el día entero. La comparación entre medios
+        es orientativa, no un censo.
       </p>
-    )
-  }
-
-  <p class="descargo">
-    El reparto de medios refleja lo que cada cabecera expone en sus feeds, y no todas exponen
-    lo mismo: algunas publican ventanas de ~25 titulares y otras el día entero, así que la
-    comparación entre medios es orientativa. Y las contradicciones se cuentan sobre las
-    historias sintetizadas, no sobre todo lo agrupado: es una muestra sesgada hacia lo más
-    cubierto. Esto mide <strong>cobertura y desacuerdo</strong>, no importancia ni mercado.
-  </p>
+    </section>
+    <section>
+      <p class="aparato-rotulo">Las contradicciones</p>
+      <p>
+        Se cuentan sobre las historias sintetizadas —las de más peso de cada día—, no sobre
+        todo lo agrupado. Es una muestra sesgada hacia lo más cubierto.
+      </p>
+    </section>
+    <section>
+      <p class="aparato-rotulo">Qué mide esto</p>
+      <p>
+        <strong>Cobertura y desacuerdo.</strong> No importancia, no calidad y no mercado: de
+        que dos medios discrepen no se sigue que uno tenga razón.
+      </p>
+    </section>
+  </aside>
 </Base>

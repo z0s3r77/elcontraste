@@ -471,13 +471,18 @@
   }
 
   /* Aviso de señal débil: el proyecto prefiere decirlo a dibujar una flecha. */
+  /* Aviso de estado dentro de una banda: sustituye al contenido que todavía no
+     se puede pintar. Va a la medida del deck (88ch) y no a `--measure`: cuelga
+     de una banda que cruza el marco entero, igual que el deck, y a 448 px era
+     el bloque más estrecho de la página. Los descargos del pie NO son esto —
+     eso es `.aparato`. */
   .aviso {
     border-left: 3px solid var(--color-alerta);
     padding: var(--spacing-2xs) var(--spacing-sm);
     margin: var(--spacing-sm) 0;
     font-size: var(--text-sm);
     color: var(--color-muted);
-    max-width: var(--measure);
+    max-width: 88ch;
   }
 
   .enlace-accion {
@@ -622,12 +627,19 @@
     color: var(--color-paper);
   }
 
-  /* ---- Cifra de apertura (radar, tendencias) ---- */
+  /* ---- Cifra de apertura (radar, tendencias, focos) ----
+     ⚠️ `start`, NO `baseline`. `baseline` alinea la cifra con la PRIMERA línea
+     de la frase, y la frase siempre tiene 3-4: la cifra quedaba flotando 88 px
+     por encima del bloque de texto, que a su vez colgaba 100 px por debajo de
+     ella. Con `start` los dos bloques arrancan arriba y se leen como un solo
+     conjunto. Que además coincidan las alturas de mayúscula no es casualidad
+     estirada: el `line-height: 0.82` de `.cifra` come justo el medio interlineado
+     que la sobresalía, y la relación se mantiene en todo el rango del clamp. */
   .cifra-hero {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: var(--spacing-md);
-    align-items: baseline;
+    align-items: start;
     border-bottom: var(--rule-hair) solid var(--color-ink);
     padding-bottom: var(--spacing-md);
     margin: var(--spacing-sm) 0 var(--spacing-lg);
@@ -743,15 +755,27 @@
     color: var(--color-neutral);
     margin: 0 0 var(--spacing-sm);
   }
-  /* El deck que cuelga de una banda. Misma letra que `.nota`, pero equilibrado:
-     a 1800 px la nota se partía en dos líneas desiguales y la primera terminaba
-     justo en el borde de su caja ("…ignora por completo."), con lo que la frase
-     se leía cortada en una superficie que ocupaba un tercio de la página.
-     `balance` reparte las líneas; el ancho extra es de letra pequeña y
-     secundaria, no de prosa, así que la medida de § Typography sigue intacta. */
+  /* El deck que cuelga de una banda. Misma letra que `.nota`, pero más ancha:
+     el ancho extra es de letra pequeña y secundaria, no de prosa, así que la
+     medida de § Typography sigue intacta.
+
+     ⚠️ `pretty`, NO `balance` (2026-08-16). `balance` iguala las líneas
+     MINIMIZANDO la más larga, así que un deck de 3-4 líneas se encogía muy por
+     debajo de su propia caja —el del radar medía 464 px de tinta dentro de una
+     caja de 672— y quedaba un ladrillo de líneas cortas sin ningún borde
+     alineado con nada, flotando en 1584 px de página. Es lo que el usuario vio
+     como «encapsulado». `pretty` llena la medida y deja corta solo la última:
+     vuelve a leerse como un párrafo. De paso bajan las líneas (el deck de
+     tendencias, 296 caracteres, pasa de 4 a 3).
+
+     `balance` entró para un caso real que sigue vivo: si la primera línea
+     termina justo en el borde con un punto ("…ignora por completo."), la frase
+     se lee cortada. Con 88ch ese punto cae a mitad de línea; si algún día un
+     deck vuelve a partirse así, se arregla redactando, no volviendo a
+     `balance`. */
   .nota-deck {
-    max-width: 72ch;
-    text-wrap: balance;
+    max-width: 88ch;
+    text-wrap: pretty;
   }
 
   /* Apertura: la pieza mayor manda, las secundarias hacen de columna lateral. */
@@ -1365,13 +1389,73 @@
   }
 
   /* ================================================== RADAR/TENDENCIAS  */
-  .descargo {
-    max-width: var(--measure);
+  /* El aparato de una página de datos: los descargos y los avisos de muestra
+     insuficiente. Antes era un `.descargo`, un solo párrafo capado a
+     `--measure`: 448 px de letra pequeña al pie de 1584, o sea la página
+     terminaba en una cinta pegada al margen izquierdo (reportado por el
+     usuario el 2026-08-16). Es el mismo diagnóstico y el mismo remedio que el
+     colofón: repartirlo en columnas rotuladas que ocupen el marco. El texto es
+     el mismo; lo que cambia es que cada advertencia dice de qué habla en vez de
+     ir encadenada detrás de un punto. */
+  .aparato {
     margin: var(--spacing-xl) 0 0;
-    padding-top: var(--spacing-2xs);
-    border-top: var(--rule-hair) solid var(--color-rule);
+    padding-top: var(--spacing-sm);
+    border-top: var(--rule-hair) solid var(--color-ink);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-md) var(--spacing-lg);
+  }
+  @media (width >= 52rem) {
+    .aparato {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* A partir de xl el aparato abre a tres o cuatro columnas según lo que haya
+     que decir. NO se deja en dos: a 1800 px serían 780 px por columna, o sea
+     111 caracteres por línea — arreglar el margen izquierdo reventando la
+     medida no es arreglarlo. Con tres son ~500 px. */
+  @media (width >= 80rem) {
+    .aparato-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .aparato-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .aparato p {
+    margin: 0;
     font-size: var(--text-sm);
     color: var(--color-neutral);
+  }
+  /* El rótulo de cada columna: es lo que permite repartir sin perder densidad,
+     porque cada advertencia dice de qué habla.
+     ⚠️ SIN filete y en tinta plena, al revés que `.colofon-rotulo` (apagado y
+     sobre filete). El aparato cae justo encima del colofón y los dos son
+     rejillas de columnas rotuladas: con el mismo rótulo se leían como el mismo
+     bloque repetido dos veces. Se distinguen por peso, y el cuerpo por familia
+     —aquí prosa, allí monoespaciada—, no por una tercera retícula. */
+  /* ⚠️ `p.` obligatorio: el rótulo es un <p> y `.aparato p` (0,1,1) le gana a
+     `.aparato-rotulo` (0,1,0). Sin esto el color se lo come la regla del
+     cuerpo y el rótulo sale igual de apagado que el párrafo. El colofón lleva
+     la misma cautela por la misma razón. */
+  .aparato p.aparato-rotulo {
+    margin: 0 0 var(--spacing-3xs);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-ink);
+  }
+  /* Una columna del aparato puede ser una advertencia de estado (la muestra no
+     da todavía). Lleva el filete de alerta que tenía como `.aviso`, para que no
+     se lea como una nota metodológica más. */
+  .aparato-alerta {
+    border-left: 3px solid var(--color-alerta);
+    padding-left: var(--spacing-sm);
+  }
+  .aparato-alerta p.aparato-rotulo {
+    color: var(--color-alerta);
   }
 
   /* ---- Filas de datos con barra (radar: medios; focos: secciones) ----
@@ -1426,60 +1510,13 @@
     }
   }
 
-  /* ---- La gráfica grande (tendencias) ----
-     El total del día a lo ancho de la página: es el ancla visual y la primera
-     respuesta; los múltiplos de abajo la descomponen. Misma tinta que todas
-     las barras del sitio. La cifra vive DENTRO de la estructura de su columna
-     (absoluta sobre la barra) para que no haya dos escalas que sincronizar. */
-  .gran-grafica {
-    margin-bottom: var(--spacing-lg);
-  }
-  .gran-barras {
-    display: flex;
-    gap: 2px;
-    block-size: 14rem;
-    /* Techo para la cifra de la columna más alta. */
-    padding-top: 1.5rem;
-  }
-  .gran-col {
-    flex: 1;
-    min-width: 0;
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) auto;
-    align-items: end;
-  }
-  .gran-bar {
-    display: block;
-    inline-size: 100%;
-    /* La misma tinta que `.barra` PERO sin `opacity`: la cifra vive dentro de
-       la barra y la opacidad de un padre se aplica a todo su subárbol — un
-       `opacity: 1` en el hijo no la desharía. `color-mix` da el mismo tono
-       resultante sobre el papel sin atenuar a los hijos. */
-    background: color-mix(in oklab, var(--color-accent) 55%, var(--color-paper));
-    min-block-size: 2px;
-    position: relative;
-  }
-  .gran-num {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding-bottom: 2px;
-    font-size: var(--text-xs);
-    color: var(--color-muted);
-  }
-  .gran-dia {
-    font-size: var(--text-xs);
-    color: var(--color-neutral);
-    text-align: center;
-    padding-top: var(--spacing-3xs);
-    white-space: nowrap;
-  }
-  @media (width < 52rem) {
-    .gran-barras {
-      block-size: 9rem;
-    }
-  }
+  /* La gráfica grande del total por día se retiró el 2026-08-16: medía
+     artículos RASTREADOS, o sea el pipeline y no la prensa. Con los feeds
+     especializados añadidos el día 12, el salto de 133 a 429 contaba cuántos
+     feeds tenía el rastreador; y el último día siempre iba a media asta por
+     estar en curso. Es la regla que ya traía § Páginas de datos: la cifra que
+     manda es del lector, nunca del pipeline. Con ella se fueron los
+     `.gran-*`. */
 
   /* ---- Múltiplos por sección (tendencias) ----
      Una mini-gráfica de columnas por sección, todas a la MISMA escala: si cada
