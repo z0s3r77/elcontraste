@@ -1,0 +1,41 @@
+web/package-lock.json
+  s_c57ef589004aa9::t_ceda7b68ef634d 12
+web/package.json
+  s_c57ef589004aa9::t_2681154a66773e 14
+api/main.py
+  s_c57ef589004aa9::t_3ad6bb62d2074f 332-357,420-442,444,447-485,493,495-524,531-543
+web/src/layouts/Base.astro
+  s_c57ef589004aa9::t_ab61826f0f5ad1 13,141-143,245-246
+web/src/lib/api.ts
+  s_c57ef589004aa9::t_49ff6b937d5292 169-190,196
+web/src/pages/focos.astro
+  s_c57ef589004aa9::t_07c3c48b9c9224 1-186
+CLAUDE.md
+  s_c57ef589004aa9::t_ee67996b9cdd60 569-617
+design.md
+  s_c57ef589004aa9::t_acfd48e7392829 29-32,293-345
+web/src/lib/ui.ts
+  s_c57ef589004aa9::t_03a2287d453c9c 84-85
+web/src/pages/radar/[seccion].astro
+  s_c57ef589004aa9::t_d8e46c0cf01794 8-16,29-33,35-41,43-46,52,56-76,79-151,156-158,160-163,166-167,169-199,204-208
+web/src/pages/tendencias.astro
+  s_c57ef589004aa9::t_d405a594f2ca77 4,6-13,15-17,19-28,34-35,37-122,133-135,163-164,167,169,172-190,192,196-206,208-252,254-262,264-285,288-293
+web/src/styles/global.css
+  s_c57ef589004aa9::t_283f4cff46d50b 91-97,111-115,1377-1434,1437-1511,1514-1515,1517-1602
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "8dfa7cdc8c49a6fee1ac2a27ad80e7b9a3c7d68b",
+  "prompts": {},
+  "sessions": {
+    "s_c57ef589004aa9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0150720-9d78-43c8-ae41-965eb5bb69f9",
+        "model": "claude-fable-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
