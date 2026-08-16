@@ -1,0 +1,29 @@
+CLAUDE.md
+  s_60d4bee38f00ad::t_7f0c431b6380ac 309-312,509-568
+design.md
+  s_60d4bee38f00ad::t_a1d3db19775f7a 115-121,164-175,181-190,229-238,251-271
+web/src/pages/contacto.astro
+  s_60d4bee38f00ad::t_0641c0605b3971 5-11,15-23,27,46-47,69-80
+web/src/pages/index.astro
+  s_60d4bee38f00ad::t_c7f2b9cc473ff1 58-63,70-118,126-129,131-132,162,166-185,187
+web/src/styles/global.css
+  s_60d4bee38f00ad::t_4120525abf2af3 408,414-446,449,730-737,739-741,743,745-754,765-774,917-953,961,966-969,973,979-980,1038-1042,1045-1047,1128-1144
+web/src/layouts/Base.astro
+  s_60d4bee38f00ad::t_365808b2752196 31-35,161-166,168-198,251-259,271-280,283-315
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "2fbd673edb4c554a0f5b379200974b03c571589f",
+  "prompts": {},
+  "sessions": {
+    "s_60d4bee38f00ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31643db8-3a39-4dce-88f3-c56b4830f503",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
