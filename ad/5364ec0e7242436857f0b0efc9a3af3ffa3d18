@@ -1,0 +1,33 @@
+web/src/pages/tendencias.astro
+  s_6f4ab5109787e3::t_496dc92b29361d 18-23,116-125,146,165,169-171,175,224-229,231-257,261-295
+web/src/styles/global.css
+  s_f266bc5c56210b::t_61b19f63fdfe8d 474-478,485,630-637,642,758-775,777-778,1392-1400,1402-1426,1430-1459,1513-1519
+web/src/pages/focos.astro
+  s_6f4ab5109787e3::t_dc6a2b1cb3be61 180-203
+web/src/pages/radar/[seccion].astro
+  s_6f4ab5109787e3::t_7dda3dc7659666 191-210,212-227
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ad5364ec0e7242436857f0b0efc9a3af3ffa3d18",
+  "prompts": {},
+  "sessions": {
+    "s_6f4ab5109787e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f3496fac-568c-463f-8111-fa46354f69dd",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    },
+    "s_f266bc5c56210b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "89023d2a-3be8-4feb-8526-5ad5c9bf3bac",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
