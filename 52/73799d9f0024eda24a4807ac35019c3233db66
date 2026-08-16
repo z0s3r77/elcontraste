@@ -1,0 +1,59 @@
+api/ejecutar.py
+  s_f266bc5c56210b::t_cb469b3f25deab 309
+config/glosario.yaml
+  s_f266bc5c56210b::t_fb0594cf57ee8e 1-529
+web/src/styles/global.css
+  s_f266bc5c56210b::t_74a5c472cd88ec 1345-1614
+CLAUDE.md
+  s_f266bc5c56210b::t_c9c2f22413555b 31-34,611-615,619-694
+api/main.py
+  s_f266bc5c56210b::t_f4e54dde33330e 23-24,39-44,48,302-310,315-387
+db/schema.sql
+  s_f266bc5c56210b::t_b61b6e730b7f31 60-68,106-115
+design.md
+  s_f266bc5c56210b::t_cb8929c088dc6e 114-116,269-279,317-338,347-356,369-387,400-493
+pipeline/briefing.py
+  s_f266bc5c56210b::t_cad72fd017b97b 1-296
+pipeline/explicar.py
+  s_f266bc5c56210b::t_c7845825cfc432 1-365
+pipeline/glosario.py
+  s_f266bc5c56210b::t_73af321eeba6f3 1-76
+pipeline/migraciones.py
+  s_f266bc5c56210b::t_fc5877d5e3cfac 1-69
+pipeline/run_daily.py
+  s_f266bc5c56210b::t_5f73fa96b094c7 3,21-32,52-63,78-84,95-101
+web/src/components/Glosado.astro
+  s_f266bc5c56210b::t_17715083a85990 1-41
+web/src/components/Impacto.astro
+  s_f266bc5c56210b::t_91f395c4e26929 1-58
+web/src/components/Termino.astro
+  s_f266bc5c56210b::t_18f03d3449fa56 1-41
+web/src/layouts/Base.astro
+  s_f266bc5c56210b::t_b8b9cdaec1f620 11,137-139,326-453
+web/src/lib/api.ts
+  s_f266bc5c56210b::t_ed2aa40a79ceae 157-175,180,184-212,254-274
+web/src/lib/glosario.ts
+  s_f266bc5c56210b::t_e39a06ac641630 1-124
+web/src/lib/ui.ts
+  s_f266bc5c56210b::t_7415e2086be4ea 84-85
+web/src/pages/cluster/[id].astro
+  s_f266bc5c56210b::t_dfea2eec88ca8c 4-14,36-41,44,47-50,142,196-200,286-294
+web/src/pages/resumen.astro
+  s_f266bc5c56210b::t_5ff6ea59470133 1-131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "5273799d9f0024eda24a4807ac35019c3233db66",
+  "prompts": {},
+  "sessions": {
+    "s_f266bc5c56210b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "89023d2a-3be8-4feb-8526-5ad5c9bf3bac",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
