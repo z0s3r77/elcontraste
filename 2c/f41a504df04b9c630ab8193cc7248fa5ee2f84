@@ -1,0 +1,43 @@
+web/src/components/BloqueSeccion.astro
+  s_5dafd11141fc6b::t_6561925bd48f27 1-81
+web/src/pages/index.astro
+  s_5dafd11141fc6b::t_8efd81397352ac 5,7,12-16,25,35-54,78,90-91,93-94
+api/main.py
+  s_5dafd11141fc6b::t_9fb41e0b241f90 87-125,149,151-152,155,184-192,253-264,266,293
+config/taxonomy.yaml
+  s_5dafd11141fc6b::t_a5c3f2a91a3207 7-16,40-60,62
+design.md
+  s_5dafd11141fc6b::t_bc30b41c8f633e 19-20,24-26,101,190-233
+pipeline/classify.py
+  s_5dafd11141fc6b::t_751a936479b018 38-70,74-76
+pipeline/relevancia.py
+  s_5dafd11141fc6b::t_aa2635c2ecfbb8 39-57,66-78,80-84
+web/src/components/Contraste.astro
+  s_5dafd11141fc6b::t_15b42ef118eb52 1-51
+web/src/components/Ficha.astro
+  s_5dafd11141fc6b::t_abbbc46d913aa9 6,30-32
+web/src/lib/api.ts
+  s_5dafd11141fc6b::t_4265d514c7f30b 116-133
+web/src/lib/ui.ts
+  s_5dafd11141fc6b::t_1af704ca583586 7-9,12,15-16,25-53
+web/src/styles/global.css
+  s_5dafd11141fc6b::t_16a686216eb430 520-555,784-790,792-793,796-797,800-811
+CLAUDE.md
+  s_5dafd11141fc6b::t_94ef2812925a94 420-466,473-476
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "2cf41a504df04b9c630ab8193cc7248fa5ee2f84",
+  "prompts": {},
+  "sessions": {
+    "s_5dafd11141fc6b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5c1f174-28f3-4ba8-9407-ba5d1fb21c97",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
