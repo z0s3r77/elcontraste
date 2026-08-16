@@ -3,6 +3,7 @@
 // lib/ui.ts; ahora es marcado real, así que el escapado lo hace Astro.
 import type { FichaCluster } from "../lib/api";
 import { urlCluster } from "../lib/ui";
+import Contraste from "./Contraste.astro";
 
 interface Props {
   c: FichaCluster;
@@ -25,6 +26,9 @@ const prestado = !c.has_synthesis && c.titular_de;
   </a>
 
   {c.entradilla && <p class="ficha-entradilla">{c.entradilla}</p>}
+
+  <Contraste c={c} />
+
 
   <p class="ficha-pie">
     {

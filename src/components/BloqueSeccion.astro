@@ -1,0 +1,81 @@
+---
+// Una sección de la portada: su historia principal con texto real y el resto
+// como titulares. Sustituye a la columna de titulares pelados que había hasta
+// el 2026-08-16, donde todas las secciones pesaban lo mismo y ninguna se leía.
+//
+// Qué historia abre la sección: **la primera que tenga síntesis**, no la
+// primera a secas. Una apertura sin síntesis sale con titular prestado de un
+// medio y sin entradilla — o sea, un titular a pelo con hueco debajo. Solo se
+// sintetizan SYNTH_LIMIT=18 de ~80 historias al día, así que esto pasa a
+// menudo en las secciones de abajo. Si ninguna tiene síntesis, se abre con la
+// primera igualmente: es mejor que dejar la sección coja.
+//
+// ⚠️ El orden DENTRO de la sección llega dado por la API (relevancia con
+// novedad, `pipeline/relevancia.py`) y aquí no se recalcula: elegir apertura es
+// escoger de una lista ya ordenada, no reordenarla.
+import type { FichaCluster } from "../lib/api";
+import Ficha from "./Ficha.astro";
+import { rotula, urlCluster, urlSeccion } from "../lib/ui";
+
+interface Props {
+  seccion: string;
+  clusters: FichaCluster[];
+  /**
+   * Historias que tiene la sección EN EL DIGEST, que no es lo mismo que las
+   * que llegan aquí: la portada le quita las que subieron a la apertura. Sin
+   * este dato, Política decía "5" teniendo 6 y el enlace prometía menos de lo
+   * que hay detrás.
+   */
+  total?: number;
+  /** Cuántos titulares acompañan a la apertura. */
+  resto?: number;
+}
+const { seccion, clusters, total = clusters.length, resto = 4 } = Astro.props;
+
+const iApertura = Math.max(
+  0,
+  clusters.findIndex((c) => c.has_synthesis),
+);
+const apertura = clusters[iApertura];
+const secundarias = clusters.filter((_, i) => i !== iApertura).slice(0, resto);
+---
+
+<section class="bloque-seccion">
+  <h3 class="rotulo-seccion">
+    <a href={urlSeccion(seccion)}>{rotula(seccion)}</a>
+    <span class="dato muted">{total}</span>
+  </h3>
+
+  {apertura && <Ficha c={apertura} />}
+
+  {
+    secundarias.length > 0 && (
+      <ul class="lista-titulares">
+        {secundarias.map((c) => (
+          <li>
+            <a
+              href={urlCluster(c.id)}
+              class:list={{ prestado: !c.has_synthesis && c.titular_de }}
+              title={
+                !c.has_synthesis && c.titular_de
+                  ? `Titular de ${c.titular_de} — esta historia todavía no tiene síntesis`
+                  : undefined
+              }
+            >
+              {c.headline ?? "Sin titular"}
+            </a>
+            <span class="dato muted">{c.n_sources}m</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    total > secundarias.length + 1 && (
+      <a class="enlace-accion" href={urlSeccion(seccion)}>
+        Las {total} de {rotula(seccion).toLowerCase()} →
+      </a>
+    )
+  }
+</section>

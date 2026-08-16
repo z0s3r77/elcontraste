@@ -2,12 +2,18 @@
 import Base from "../layouts/Base.astro";
 import Banda from "../components/Banda.astro";
 import Ficha from "../components/Ficha.astro";
+import BloqueSeccion from "../components/BloqueSeccion.astro";
 import { digestUltimo, traer, type FichaCluster } from "../lib/api";
-import { rotula, urlCluster, urlSeccion } from "../lib/ui";
+import { pesoSeccion, urlCluster } from "../lib/ui";
 
 // Macrostructure: 20 · Ecosystem Index — varias superficies de descubrimiento.
 // Sin thumbnails: el proyecto no almacena imágenes (higiene legal). El índice
 // es tipográfico y la densidad la da la retícula.
+//
+// Rehecha el 2026-08-16. Antes eran dos superficies planas —una apertura de 9
+// historias y una rejilla de titulares pelados— y las dos tenían el mismo
+// problema: la portada no decía de qué iba cada cosa ni cuánto contraste tenía.
+// Ahora la sección es la unidad de lectura, con su propia apertura escrita.
 
 const digest = await digestUltimo();
 
@@ -16,7 +22,7 @@ const todas: FichaCluster[] = digest.sections.flatMap((s) =>
 );
 
 // Superficie 1: manda la RELEVANCIA que calcula la API — cobertura ponderada
-// por la edad media de los artículos (ver `pipeline/relevancia.py`). Aquí se
+// por la edad media Y por la novedad (ver `pipeline/relevancia.py`). Aquí se
 // reordena porque la portada mezcla secciones y la API solo ordena dentro de
 // cada una; el criterio, en cambio, no se reinventa.
 //
@@ -26,14 +32,26 @@ const todas: FichaCluster[] = digest.sections.flatMap((s) =>
 // —una API vieja— se cae a `n_sources`, que es el comportamiento anterior.
 const peso = (c: FichaCluster) => c.relevancia ?? c.n_sources;
 const portada = [...todas].sort((a, b) => peso(b) - peso(a));
-const lead = portada[0];
-// Seis, no cuatro: a partir de xl la columna lateral se parte en dos, y con
-// cuatro fichas quedaban dos columnas cortas al lado de una apertura alta.
-const secundarias = portada.slice(1, 7);
-// La apertura es alta pero no tanto como dos columnas de seis fichas, así que
-// la columna 1 sigue con piezas menores en vez de dejar un hueco. Es lo que
-// hace un periódico: bajo la apertura no hay papel en blanco.
-const continuacion = portada.slice(7, 9);
+
+// Tres, no nueve: la apertura responde "¿qué ha pasado hoy?" y el resto del
+// día se lee por secciones, que es lo que el lector pidió. Una apertura larga
+// vuelve a ser la lista plana que se acaba de quitar.
+const apertura = portada.slice(0, 3);
+const lead = apertura[0];
+const secundarias = apertura.slice(1);
+
+// Superficie 2: las secciones, en orden EDITORIAL fijo (ui.ts) y no por
+// volumen. Las historias de la apertura se quitan de sus bloques: repetirlas a
+// dos pantallas de distancia se lee como un fallo, no como una portada.
+const enApertura = new Set(apertura.map((c) => c.id));
+const secciones = digest.sections
+  .map((s) => ({
+    section: s.section,
+    clusters: s.clusters.filter((c) => !enApertura.has(c.id)),
+    total: s.clusters.length,
+  }))
+  .filter((s) => s.clusters.length > 0)
+  .sort((a, b) => pesoSeccion(a.section) - pesoSeccion(b.section));
 
 // Superficie 3: cobertura diferencial. Es un extra — si falla, la portada
 // sigue en pie. Lo que NO puede fallar en silencio es el digest (ver api.ts).
@@ -57,11 +75,10 @@ try {
   </p>
 
   <section class="superficie">
-    <Banda i={0} titulo="Lo más contrastado" cuenta={`${todas.length} historias del día`} />
+    <Banda i={0} titulo="Lo más importante del día" cuenta={`${todas.length} historias`} />
     <div class="apertura">
       <div class="apertura-principal">
         <Ficha c={lead} destacada />
-        {continuacion.map((c) => <Ficha c={c} />)}
       </div>
       <div class="apertura-lateral">
         {secundarias.map((c) => <Ficha c={c} />)}
@@ -70,32 +87,11 @@ try {
   </section>
 
   <section class="superficie">
-    <Banda i={1} titulo="Por sección" cuenta={`${digest.sections.length} bloques`} />
-    <div class="rejilla-secciones">
+    <Banda i={1} titulo="Por sección" cuenta={`${secciones.length} bloques`} />
+    <div class="rejilla-bloques">
       {
-        digest.sections.map((s) => (
-          <div class="columna-seccion">
-            <h3 class="rotulo-seccion">
-              <a href={urlSeccion(s.section)}>{rotula(s.section)}</a>
-              <span class="dato muted">{s.clusters.length}</span>
-            </h3>
-            <ul class="lista-titulares">
-              {s.clusters.slice(0, 6).map((c) => (
-                <li>
-                  <a
-                    href={urlCluster(c.id)}
-                    class:list={{ prestado: !c.has_synthesis && c.titular_de }}
-                    title={!c.has_synthesis && c.titular_de
-                      ? `Titular de ${c.titular_de} — esta historia todavía no tiene síntesis`
-                      : undefined}
-                  >
-                    {c.headline ?? "Sin titular"}
-                  </a>
-                  <span class="dato muted">{c.n_sources}m</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        secciones.map((s) => (
+          <BloqueSeccion seccion={s.section} clusters={s.clusters} total={s.total} />
         ))
       }
     </div>
@@ -121,4 +117,3 @@ try {
     )
   }
 </Base>
-

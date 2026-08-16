@@ -114,6 +114,24 @@ export interface FichaCluster {
   digest_date?: string;
   section?: string;
   /**
+   * Contraste medido sobre la síntesis (ver `_contraste` en api/main.py).
+   * `null` o ausente = no hay síntesis, así que no hay NADA medido: la web
+   * pinta el hueco, no un cero (regla 2 de design.md).
+   */
+  contraste?: {
+    /** Dos o más medios dan versiones distintas del mismo hecho. */
+    contradicciones: number;
+    /** Un solo medio lo cuenta. Cobertura diferencial, no desacuerdo. */
+    exclusivas: number;
+    encuadre: boolean;
+  } | null;
+  /**
+   * `contraste` | `agregacion`. Hace falta para leer los ceros: en agregación
+   * (deportes, arte…) el prompt barato ni analiza divergencias, así que
+   * `contradicciones: 0` significa "no se buscó", no "coinciden".
+   */
+  mode?: string | null;
+  /**
    * Cobertura ponderada por la edad media de los artículos, calculada en la API
    * (`pipeline/relevancia.py`). Es el orden en el que vienen los clústeres; la
    * portada lo necesita como número porque mezcla secciones y tiene que

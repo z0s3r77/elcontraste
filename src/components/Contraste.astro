@@ -1,0 +1,51 @@
+---
+// El sello de contraste de una historia. Es la promesa del sitio hecha dato:
+// hasta el 2026-08-16 la portada ordenaba por cobertura y nunca decía cuánto
+// contraste había de verdad. Medido ese día: el eclipse, 8 medios y UNA
+// contradicción; el terremoto de Alhendín, 7 medios y SEIS.
+//
+// Tres estados, y el tercero es el que evita mentir:
+//   1. hay contradicciones -> se dicen, es lo que el lector viene a buscar
+//   2. solo exclusivas     -> se dicen como lo que son (un medio lo cuenta),
+//                             NUNCA como divergencia: el 2026-08-14 se midió
+//                             que son el 74 % y la página las mezclaba
+//   3. cero y modo contraste -> "los medios coinciden" ES un hallazgo
+//
+// Y el caso mudo: en modo `agregacion` (deportes, arte, gaming…) el prompt
+// barato ni siquiera analiza divergencias, así que un cero no significa nada.
+// Ahí no se pinta sello. Sin síntesis, tampoco.
+import type { FichaCluster } from "../lib/api";
+
+interface Props {
+  c: FichaCluster;
+}
+const { c } = Astro.props;
+
+const ct = c.contraste;
+const analizado = !!ct && c.mode !== "agregacion";
+
+const contradicciones = ct?.contradicciones ?? 0;
+const exclusivas = ct?.exclusivas ?? 0;
+
+// ⚠️ La frase se arma ENTERA aquí, no con `{n} {palabra}` en el marcado: Astro
+// se come el espacio entre dos interpolaciones contiguas y salía
+// «6contradicciones». Se vio en el HTML horneado, no en el editor.
+const choque =
+  contradicciones === 1 ? "1 contradicción" : `${contradicciones} contradicciones`;
+const exclusiva =
+  exclusivas === 1
+    ? "1 dato que solo cuenta un medio"
+    : `${exclusivas} datos que solo cuenta un medio`;
+---
+
+{
+  analizado && (
+    <p class="contraste">
+      {contradicciones > 0 && <span class="contraste-marca contraste-choque">{choque}</span>}
+      {contradicciones === 0 && exclusivas === 0 && (
+        <span class="contraste-marca contraste-acuerdo">coinciden en todo</span>
+      )}
+      {exclusivas > 0 && <span class="contraste-marca contraste-exclusiva">{exclusiva}</span>}
+    </p>
+  )
+}

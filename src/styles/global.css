@@ -517,6 +517,42 @@
     font-size: var(--text-xs);
     color: var(--color-neutral);
   }
+
+  /* Sello de contraste (2026-08-16). Es un dato, así que va en la
+     monoespaciada: es el segundo de los dos papeles del outlier.
+     Va ANTES del pie —medios, versiones, temas— a propósito: el pie dice
+     cuánto se ha cubierto la historia y esto dice cuánto discrepan, que es lo
+     que el sitio promete y lo que la portada nunca enseñaba. */
+  .contraste {
+    margin: var(--spacing-2xs) 0 0;
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px var(--spacing-2xs);
+  }
+  .contraste-marca {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-neutral);
+  }
+  /* El filete de divergencia, el mismo `3px solid var(--color-alerta)` que ya
+     marca los hechos divergentes en la página de historia: la portada y el
+     detalle señalan lo mismo con el mismo signo. Se lo lleva la contradicción
+     y nada más — si lo llevaran los tres estados, dejaría de señalar.
+     El texto va en `ink` (17,9:1, ya medido en design.md § Theme) y no en un
+     color nuevo: aquí no hay ningún ratio que volver a medir. */
+  .contraste-choque {
+    color: var(--color-ink);
+    border-left: 3px solid var(--color-alerta);
+    padding-left: var(--spacing-3xs);
+  }
+  /* "Coinciden en todo" es un hallazgo, no un vacío: se dice, sin acento. */
+  .contraste-acuerdo,
+  .contraste-exclusiva {
+    color: var(--color-neutral);
+  }
   .ficha-medios {
     display: block;
     margin-top: 2px;
@@ -745,18 +781,33 @@
     }
   }
 
-  /* Rejilla de secciones: columnas de periódico, no tarjetas. */
-  .rejilla-secciones {
+  /* Rejilla de secciones: columnas de periódico, no tarjetas.
+     Sustituye a `.rejilla-secciones` (2026-08-16). La de antes iba a 4
+     columnas porque cada una era una lista de titulares pelados; ahora cada
+     bloque abre con una historia escrita —entradilla y sello de contraste— y a
+     4 columnas la prosa cae a ~25 caracteres por línea. Dos columnas hasta xl
+     y tres a partir de ahí. */
+  .rejilla-bloques {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-    gap: var(--spacing-lg);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--spacing-xl) var(--spacing-lg);
   }
-  /* Tope de 4: con auto-fill puro, a 104rem salen seis columnas de dos
-     titulares cada una, que se lee como una tabla rota. */
   @media (width >= 80rem) {
-    .rejilla-secciones {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    .rejilla-bloques {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+  }
+  /* El bloque no lleva caja ni fondo: lo que lo separa del vecino es el filete
+     de su rótulo y el aire de la rejilla. Newsprint no tiene tarjetas. */
+  .bloque-seccion > .ficha {
+    margin-bottom: var(--spacing-2xs);
+  }
+  .bloque-seccion .lista-titulares {
+    border-top: var(--rule-hair) solid var(--color-rule);
+  }
+  .bloque-seccion .enlace-accion {
+    margin-top: var(--spacing-2xs);
+    font-size: var(--text-xs);
   }
   .rotulo-seccion {
     font-family: var(--font-outlier);
