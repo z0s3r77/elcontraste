@@ -1,0 +1,21 @@
+design.md
+  s_f266bc5c56210b::t_f0d3208c7dda17 180-193
+web/src/layouts/Base.astro
+  s_f266bc5c56210b::t_fad77e6c09c825 248-257,259,335-355
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "d3b7e44ec01c2f00368adee3180d36a106a8791d",
+  "prompts": {},
+  "sessions": {
+    "s_f266bc5c56210b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "89023d2a-3be8-4feb-8526-5ad5c9bf3bac",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
