@@ -245,8 +245,18 @@ const imagenSocial = Astro.site
       // Se deja de observar en cuanto algo aparece — es una entrada, no un
       // efecto que deba repetirse cada vez que subes y bajas.
       if (matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+        // ⚠️ `.rotulo-doc` NO está aquí, y no es un olvido (2026-08-17).
+        // Todas estas piezas se valen solas: si una llega tarde, llega tarde
+        // entera. Un rótulo no — ETIQUETA a un contenido que no se revela con
+        // él, así que mientras se funde (520 ms, más el escalonado) el lector
+        // ve los bloques sin su título. En /cluster/497/ eso eran cinco
+        // contradicciones flotando sin el rótulo «Dónde no cuadran las
+        // versiones», y era imposible saber qué se estaba leyendo. Si el
+        // revelado además falla, se queda así para siempre.
+        // Un titular de 23 px no gana nada con un fundido y lo pierde todo si
+        // no llega: se pinta y ya.
         const piezas = document.querySelectorAll(
-          ".ficha, .banda, .cifra-hero, .rotulo-doc, .tabla-envoltorio, .lista-huecos, " +
+          ".ficha, .banda, .cifra-hero, .tabla-envoltorio, .lista-huecos, " +
             ".relato, .filas-datos, .multiple, .lista-foco",
         );
         const vigia = new IntersectionObserver(
@@ -322,6 +332,27 @@ const imagenSocial = Astro.site
           requestAnimationFrame(barrer);
         };
         addEventListener("scroll", alHacerScroll, { passive: true });
+
+        // ---- Segunda red: volver a una pestaña de fondo --------------------
+        // ⚠️ En una pestaña oculta Chrome PARA `requestAnimationFrame` y no
+        // entrega notificaciones del IntersectionObserver. Y abrir un enlace
+        // en segundo plano (cmd+clic, "abrir en pestaña nueva") es la mitad de
+        // las visitas: el script marca las piezas como `revelable`, la página
+        // se queda congelada a `opacity: 0` y el vigía puede no ponerse al día
+        // hasta que haya un scroll — que quizá no llega, porque lo primero que
+        // hace el lector es mirar lo que ya tiene delante.
+        // Al volver a la pestaña se revela TODO lo que ya está en pantalla o
+        // por encima. No es lo mismo que `barrer`, que solo rescata lo que
+        // quedó por arriba: aquí lo que importa es justo lo que se está
+        // mirando.
+        addEventListener("visibilitychange", () => {
+          if (document.visibilityState !== "visible") return;
+          for (const pieza of quedanOcultas()) {
+            if (pieza.getBoundingClientRect().top >= innerHeight) continue;
+            pieza.classList.add("visible");
+            vigia.unobserve(pieza);
+          }
+        });
       }
 
       // ---- Glosario: cerrar el globo con Escape ---------------------------
