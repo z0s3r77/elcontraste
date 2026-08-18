@@ -1,0 +1,51 @@
+CLAUDE.md
+  s_bb23a0b33ffbcb::t_8a5c79b45ead97 31-36,698-811,814-817
+ESTADO.md
+  s_bb23a0b33ffbcb::t_69d2b517b33639 3,92-93,96,115-116,152-158,255-261,263-264
+api/main.py
+  s_bb23a0b33ffbcb::t_ca0be4833bdc87 24,133-202,222-241,247-248,253-256,262,275-282,286,289-293,302,307-311,364-395,399-403,416,438-469,475,480-481,506,670,702-704,798-802,824,854-975
+pipeline/hilos.py
+  s_bb23a0b33ffbcb::t_28fbef13a10d6c 1-288
+pipeline/synthesize.py
+  s_bb23a0b33ffbcb::t_a19deda65db7b5 45-97,148-153,251-253,292,298-307,330-332,362-366,375-379,393-395
+web/src/layouts/Base.astro
+  s_bb23a0b33ffbcb::t_b0d7e0fe02d3ae 138,258-263,266
+web/src/pages/tendencias.astro
+  s_bb23a0b33ffbcb::t_56feee4cd2af50 3-4,6,8-9,11-64,66-71,73,75,77-78,80-82,84-86,92-93,96,98-99,104,107-109,111-116,118-129,139-163,168,171-173,176-177,179-197,202-208,210-211,213-214,217-218,220-221,224-225,227-228
+web/src/styles/global.css
+  s_bb23a0b33ffbcb::t_27e95821cb709c 519-524,527,1758-1780,1963-2306
+db/schema.sql
+  s_bb23a0b33ffbcb::t_b398856d9b7c17 52-56,85-89,126-151
+design.md
+  s_bb23a0b33ffbcb::t_59c146af2845ab 235-247,252-286,291-294,298,305-315,346-354,356-383
+pipeline/migraciones.py
+  s_bb23a0b33ffbcb::t_e0e01b2b27cac2 36-40,55-70,73-85,103-109
+pipeline/run_daily.py
+  s_bb23a0b33ffbcb::t_95b10069b59344 28,50-70,98-102
+web/src/components/Contraste.astro
+  s_bb23a0b33ffbcb::t_584554e15103a2 2,4-9,11-24,26,38-41,46-71,74-82,91
+web/src/lib/api.ts
+  s_bb23a0b33ffbcb::t_16a729b913d462 103-122,136-150,181-184,188-212
+web/src/lib/ui.ts
+  s_bb23a0b33ffbcb::t_312803e8378445 84-134
+web/src/pages/asunto/[id].astro
+  s_bb23a0b33ffbcb::t_0193130c36e1a1 1-155
+web/src/pages/index.astro
+  s_bb23a0b33ffbcb::t_00c92af0722754 6-21,27-50,55,57,59-97,99-112,114-124,135-138,141-145,155,157-174,182-213,216-261,264-292,294,307
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c80d71e40fb9133deb372b070d00bbc4c440efd4",
+  "prompts": {},
+  "sessions": {
+    "s_bb23a0b33ffbcb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "147edc8c-1e55-4403-9f9b-3547117a0800",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
