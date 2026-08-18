@@ -3,61 +3,125 @@ import Base from "../layouts/Base.astro";
 import Banda from "../components/Banda.astro";
 import Ficha from "../components/Ficha.astro";
 import BloqueSeccion from "../components/BloqueSeccion.astro";
-import { digestUltimo, traer, type FichaCluster } from "../lib/api";
-import { pesoSeccion, urlCluster } from "../lib/ui";
+import {
+  digestUltimo,
+  resumenUltimo,
+  traer,
+  type Asunto,
+  type FichaCluster,
+} from "../lib/api";
+import {
+  fraseAusentes,
+  numeral,
+  pesoSeccion,
+  rotula,
+  urlAsunto,
+  urlCluster,
+  urlResumen,
+} from "../lib/ui";
 
 // Macrostructure: 20 · Ecosystem Index — varias superficies de descubrimiento.
 // Sin thumbnails: el proyecto no almacena imágenes (higiene legal). El índice
 // es tipográfico y la densidad la da la retícula.
 //
-// Rehecha el 2026-08-16. Antes eran dos superficies planas —una apertura de 9
-// historias y una rejilla de titulares pelados— y las dos tenían el mismo
-// problema: la portada no decía de qué iba cada cosa ni cuánto contraste tenía.
-// Ahora la sección es la unidad de lectura, con su propia apertura escrita.
-
-const digest = await digestUltimo();
+// ── Rehecha en la Fase 13 (2026-08-18) ───────────────────────────────────────
+// Diagnóstico del usuario: «entras y nada te llama la atención», «simplemente se
+// toman las noticias y ya». Tres cosas medidas sobre el digest de ese día antes
+// de tocar nada:
+//
+//   1. La página abría con un párrafo centrado sobre el nombre del sitio y nada
+//      más. NADA decía qué día era hoy.
+//   2. La apertura la elegía la relevancia, que es COBERTURA ponderada. El
+//      resultado abría con «El juez Pedraz ordena un nuevo volcado del teléfono
+//      de Juanma Serrano» mientras el resumen del día —en otra página— abría con
+//      «Ola de calor extremo con avisos rojos y 44 grados… evita salir entre las
+//      13:00 y las 21:00». El sitio escondía lo mejor que tenía.
+//   3. El sello no podía decir casi nunca nada: de 18 síntesis, CERO tenían
+//      contradicciones.
+//
+// De ahí las cinco superficies de ahora, y el orden no es negociable
+// (§ Portada de design.md):
+//
+//   00  Estado del día     — cifras de asuntos + el titular del resumen
+//   01  Lo que te toca hoy — los puntos del resumen, con su «por qué importa»
+//   02  Asuntos vivos      — lo que se sigue, con el día que va
+//   03  Por sección        — el día entero, en orden editorial fijo
+//   04  Lo cuenta un solo bloque — la cobertura diferencial
+const [digest, resumen] = await Promise.all([digestUltimo(), resumenUltimo()]);
 
 const todas: FichaCluster[] = digest.sections.flatMap((s) =>
   s.clusters.map((c) => ({ ...c, section: s.section })),
 );
+const porId = new Map(todas.map((c) => [c.id, c]));
 
-// Superficie 1: manda la RELEVANCIA que calcula la API — cobertura ponderada
-// por la edad media Y por la novedad (ver `pipeline/relevancia.py`). Aquí se
-// reordena porque la portada mezcla secciones y la API solo ordena dentro de
-// cada una; el criterio, en cambio, no se reinventa.
+// --- 00 · Estado del día -----------------------------------------------------
 //
-// ⚠️ Hasta el 2026-08-14 esta línea ordenaba por `n_sources`, y con eso el
-// clúster del eclipse abrió el sitio tres días seguidos: daba igual lo que
-// hiciera el backend, la portada lo deshacía. Si `relevancia` llegara nula
-// —una API vieja— se cae a `n_sources`, que es el comportamiento anterior.
+// Las cifras son de ASUNTOS, no de artículos rastreados. Es la misma regla que
+// ya obligó a retirar la gráfica de totales de Tendencias el 2026-08-16: la
+// cifra que manda tiene que ser del lector, y «429 artículos rastreados» habla
+// del rastreador. «6 asuntos nuevos, 14 que siguen» habla del día.
+const a = digest.asuntos;
+// ⚠️ Frases enteras: Astro se come el espacio entre dos interpolaciones
+// contiguas y saldría «6nuevos» (visto en el HTML horneado, no en el editor).
+const cifras = a
+  ? [
+      { n: a.nuevos, texto: a.nuevos === 1 ? "asunto nuevo" : "asuntos nuevos" },
+      { n: a.siguen, texto: a.siguen === 1 ? "viene de antes" : "vienen de antes" },
+      {
+        n: a.apagados,
+        texto: a.apagados === 1 ? "dejó de contarse" : "dejaron de contarse",
+      },
+    ]
+  : [];
+
+// --- 01 · Lo que te toca hoy -------------------------------------------------
+//
+// El orden lo elige el modelo viendo el día entero, con lo inmediato y lo
+// práctico primero (ver pipeline/briefing.py). NO es el orden de la portada
+// anterior, que era cobertura ponderada.
+//
+// Si el resumen falta —es una etapa que puede caerse sola sin tumbar la pasada—
+// la portada NO se queda sin apertura: cae a las tres de más relevancia, que es
+// exactamente lo que hacía antes. Una etapa caída no puede dejar la página sin
+// primera pantalla.
+const URGENCIA: Record<string, string> = {
+  ahora: "Ya está pasando",
+  pronto: "Se decide estos días",
+  fondo: "Asunto de fondo",
+};
+
+const puntos = (resumen?.puntos ?? []).map((p) => ({
+  ...p,
+  ficha: porId.get(p.cluster_id) ?? null,
+}));
+
 const peso = (c: FichaCluster) => c.relevancia ?? c.n_sources;
-const portada = [...todas].sort((a, b) => peso(b) - peso(a));
+const respaldo = puntos.length === 0 ? [...todas].sort((x, y) => peso(y) - peso(x)).slice(0, 3) : [];
 
-// Tres, no nueve: la apertura responde "¿qué ha pasado hoy?" y el resto del
-// día se lee por secciones, que es lo que el lector pidió. Una apertura larga
-// vuelve a ser la lista plana que se acaba de quitar.
-const apertura = portada.slice(0, 3);
-const lead = apertura[0];
-const secundarias = apertura.slice(1);
+// --- 02 · Asuntos vivos ------------------------------------------------------
+//
+// Lo que el sitio no podía enseñar hasta la Fase 13: qué se está siguiendo y
+// desde cuándo. `min_dias=2` porque un asunto de un solo día no se «sigue».
+// Es un extra: si falla, la portada sigue en pie (lo que NO puede fallar en
+// silencio es el digest — ver `digestUltimo` en lib/api.ts).
+let vivos: Asunto[] = [];
+try {
+  vivos = await traer<Asunto[]>("/api/asuntos?estado=sigue&min_dias=2&limit=6");
+} catch {
+  vivos = [];
+}
 
-// Superficie 2: las secciones, en orden EDITORIAL fijo (ui.ts) y no por
-// volumen. Las historias de la apertura se quitan de sus bloques: repetirlas a
-// dos pantallas de distancia se lee como un fallo, no como una portada.
-const enApertura = new Set(apertura.map((c) => c.id));
-const secciones = digest.sections
-  .map((s) => ({
-    section: s.section,
-    clusters: s.clusters.filter((c) => !enApertura.has(c.id)),
-    total: s.clusters.length,
-  }))
-  .filter((s) => s.clusters.length > 0)
-  .sort((a, b) => pesoSeccion(a.section) - pesoSeccion(b.section));
-
-// Superficie 3: cobertura diferencial. Es un extra — si falla, la portada
-// sigue en pie. Lo que NO puede fallar en silencio es el digest (ver api.ts).
-type Hueco = {
-  id: number;
-  headline: string | null;
+// --- 04 · Lo cuenta un solo bloque ------------------------------------------
+//
+// 🔑 Aquí vivían ~35 líneas de parche (`VACIAS`, `terminos`, `mismaHistoria`,
+// `primeras`) que descartaban variantes del mismo suceso comparando el solape de
+// términos del titular. Existían por una sola razón: la ventana es de 7 días, el
+// mismo suceso se reagrupaba cada día y sin memoria cinco de las ocho filas eran
+// DOS historias (los Lakers tres veces, el Pazo de Meirás dos).
+//
+// Con los asuntos eso se agrupa por `hilo.id`, que es EXACTO y no una heurística
+// con un 0,6 dentro. El rediseño borra código.
+type Hueco = FichaCluster & {
   covered_by: "izquierda" | "derecha";
   digest_date: string;
 };
@@ -68,54 +132,46 @@ try {
   huecos = [];
 }
 
-// El mismo suceso se vuelve a agrupar cada día de la ventana de 7, así que un
-// hueco duradero llega aquí hasta cinco veces con titulares casi iguales. Sin
-// filtrar, cinco de las ocho filas de la superficie eran DOS historias (la
-// venta de los Lakers, tres veces; el Pazo de Meirás, dos). Se comparan los
-// términos con peso: solapamiento sobre el titular más corto, porque las
-// variantes del mismo día se diferencian en que una añade cola ("…, menos de
-// un año después de su anterior compraventa") y Jaccard las separaría.
-const VACIAS = new Set(
-  "de del la el los las en y a por que un una con al para su sus se lo como más".split(" "),
-);
-const terminos = (t: string) =>
-  new Set(
-    t
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, " ")
-      .split(" ")
-      .filter((p) => p.length > 2 && !VACIAS.has(p)),
-  );
-const mismaHistoria = (a: Set<string>, b: Set<string>) => {
-  const comunes = [...a].filter((p) => b.has(p)).length;
-  return comunes / Math.min(a.size, b.size) >= 0.6;
-};
-
-/** Las `n` primeras del bloque, sin repetir historia. La lista llega ordenada
- *  por cobertura desde la API: quedarse con la primera de cada grupo conserva
- *  la versión con más medios. */
-const primeras = (lista: Hueco[], n: number) => {
-  const vistas: Set<string>[] = [];
+/** Una fila por asunto. La lista llega ordenada por cobertura desde la API, así
+ *  que la primera de cada asunto es la versión con más medios. */
+const unaPorAsunto = (lista: Hueco[], n: number) => {
+  const vistos = new Set<string>();
   const out: Hueco[] = [];
   for (const h of lista) {
-    const t = terminos(h.headline ?? "");
-    if (t.size === 0 || vistas.some((v) => mismaHistoria(t, v))) continue;
-    vistas.push(t);
+    // Sin asunto (la etapa de hilos aún no ha pasado por él) cae a su propio id:
+    // no se agrupa, pero tampoco se pierde.
+    const clave = h.hilo ? `h${h.hilo.id}` : `c${h.id}`;
+    if (vistos.has(clave)) continue;
+    vistos.add(clave);
     out.push(h);
     if (out.length === n) break;
   }
   return out;
 };
 
-// Un bloque por columna, y la columna de la izquierda es la de la izquierda.
-// La posición dice lo que antes decía un chip repetido en cada fila.
 const POR_BLOQUE = 6;
 const bloques = (["izquierda", "derecha"] as const).map((lado) => {
   const suyas = huecos.filter((h) => h.covered_by === lado);
-  return { lado, total: suyas.length, huecos: primeras(suyas, POR_BLOQUE) };
+  return { lado, total: suyas.length, huecos: unaPorAsunto(suyas, POR_BLOQUE) };
 });
+
+// --- 03 · Por sección --------------------------------------------------------
+//
+// Nada se repite entre superficies: lo que ha subido a la apertura no vuelve a
+// salir en su bloque. A dos pantallas de distancia, la repetición se lee como un
+// fallo y no como una portada.
+const enApertura = new Set<number>([
+  ...puntos.map((p) => p.cluster_id),
+  ...respaldo.map((c) => c.id),
+]);
+const secciones = digest.sections
+  .map((s) => ({
+    section: s.section,
+    clusters: s.clusters.filter((c) => !enApertura.has(c.id)),
+    total: s.clusters.length,
+  }))
+  .filter((s) => s.clusters.length > 0)
+  .sort((x, y) => pesoSeccion(x.section) - pesoSeccion(y.section));
 ---
 
 <Base
@@ -123,29 +179,119 @@ const bloques = (["izquierda", "derecha"] as const).map((lado) => {
   seccion="hoy"
   edicion={`Edición del ${digest.date} · ${digest.n_clusters} historias`}
 >
-  <!-- El lema explica el nombre y lo que se pretende con él: doxa es la
-       opinión, lo que se cree saber, frente a episteme. El sitio no promete la
-       versión verdadera —no la tiene—, sino todas las versiones juntas para
-       que el criterio salga de compararlas. -->
-  <p class="posicionamiento">
-    Doxa es la opinión, no el saber. Todas las versiones de una misma noticia,
-    juntas, para que el criterio sea tuyo.
-  </p>
-
-  <section class="superficie">
-    <Banda i={0} titulo="Lo más importante del día" cuenta={`${todas.length} historias`} />
-    <div class="apertura">
-      <div class="apertura-principal">
-        <Ficha c={lead} destacada />
-      </div>
-      <div class="apertura-lateral">
-        {secundarias.map((c) => <Ficha c={c} />)}
-      </div>
-    </div>
+  {/* 00 · Estado del día. Va sobre el pliegue, así que entra por CSS y NO
+      entra en el revelado por scroll: ocultar la primera pantalla hasta que
+      corra un script retrasa el LCP y deja la portada en blanco si el JS falla
+      (§ Motion de design.md). */}
+  <section class="estado">
+    {
+      cifras.length > 0 && (
+        <ul class="estado-cifras">
+          {cifras.map((c) => (
+            <li>
+              <span class="estado-n">{c.n}</span>
+              <span class="estado-que">{c.texto}</span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    {
+      resumen?.titular_del_dia && (
+        <div class="estado-lede">
+          <h2>{resumen.titular_del_dia}</h2>
+          {resumen.entradilla && <p class="nota-deck">{resumen.entradilla}</p>}
+        </div>
+      )
+    }
+    {/* El lema explica el nombre —doxa es la opinión, lo que se cree saber,
+        frente a episteme— y va DEBAJO del estado: explica el sitio, no el día. */}
+    <p class="posicionamiento">
+      Doxa es la opinión, no el saber. Todas las versiones de una misma noticia, juntas, para
+      que el criterio sea tuyo.
+    </p>
   </section>
 
   <section class="superficie">
-    <Banda i={1} titulo="Por sección" cuenta={`${secciones.length} bloques`} />
+    <Banda
+      i={0}
+      titulo={puntos.length > 0 ? "Lo que te toca hoy" : "Lo más importante del día"}
+      cuenta={`${todas.length} historias`}
+    />
+    {
+      puntos.length > 0 ? (
+        <>
+          <p class="nota nota-deck">
+            De todo lo de hoy, lo que cambia algo ya y a quién le llega. Lo inmediato primero, no
+            lo más cubierto. <a href={urlResumen()}>Se puede escuchar →</a>
+          </p>
+          <ol class="toca">
+            {puntos.map((p, i) => (
+              <li class="toca-punto">
+                <p class="toca-linea">
+                  <span class="banda-num">{numeral(i)}</span>
+                  <span class:list={["resumen-urgencia", `urg-${p.urgencia}`]}>
+                    {URGENCIA[p.urgencia] ?? p.urgencia}
+                  </span>
+                  {p.section && <span class="resumen-seccion">{rotula(p.section)}</span>}
+                  {p.ficha?.hilo && p.ficha.hilo.n_dias >= 2 && (
+                    <a class="toca-dia" href={urlAsunto(p.ficha.hilo.id)}>
+                      {`Día ${p.ficha.hilo.dia} de este asunto`}
+                    </a>
+                  )}
+                </p>
+                <h3 class="toca-titulo">
+                  <a href={urlCluster(p.cluster_id)}>{p.titulo}</a>
+                </h3>
+                <p class="toca-porque">{p.por_que_importa}</p>
+              </li>
+            ))}
+          </ol>
+        </>
+      ) : (
+        <div class="apertura">
+          <div class="apertura-principal">{respaldo[0] && <Ficha c={respaldo[0]} destacada />}</div>
+          <div class="apertura-lateral">
+            {respaldo.slice(1).map((c) => (
+              <Ficha c={c} />
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </section>
+
+  {
+    vivos.length > 0 && (
+      <section class="superficie">
+        <Banda i={1} titulo="Asuntos que siguen" cuenta={`${vivos.length} en curso`} />
+        <p class="nota nota-deck">
+          Historias que no se acaban en un día. Aquí se ven enteras: desde cuándo vienen, cuántos
+          medios las cuentan y quién ha dejado de hacerlo.
+        </p>
+        <ul class="asuntos-vivos">
+          {vivos.map((v) => (
+            <li class="asunto-fila">
+              <a class="asunto-titular" href={urlAsunto(v.id)}>
+                {v.titular ?? "Asunto sin titular contrastado"}
+              </a>
+              <p class="asunto-cifras">
+                <span class="dato asunto-dias">{`${v.n_dias} días`}</span>
+                <span class="dato">{`${v.n_medios} medios`}</span>
+                <span class="dato">{`${v.n_articulos} piezas`}</span>
+                {fraseAusentes(v.no_lo_cuentan) && (
+                  <span class="dato muted">{fraseAusentes(v.no_lo_cuentan)}</span>
+                )}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="superficie">
+    <Banda i={2} titulo="Por sección" cuenta={`${secciones.length} bloques`} />
     <div class="rejilla-bloques">
       {
         secciones.map((s) => (
@@ -158,7 +304,7 @@ const bloques = (["izquierda", "derecha"] as const).map((lado) => {
   {
     huecos.length > 0 && (
       <section class="superficie">
-        <Banda i={2} titulo="Lo cuenta un solo bloque" cuenta={`${huecos.length} en 7 días`} />
+        <Banda i={3} titulo="Lo cuenta un solo bloque" cuenta={`${huecos.length} en 7 días`} />
         <p class="nota nota-deck">
           Historias que un bloque editorial cubre y el otro ignora por completo. No es cómo lo
           cuentan: es qué existe para unos y no para otros.

@@ -516,9 +516,15 @@
   .ficha-destacada .ficha-titular {
     font-size: clamp(1.75rem, 4vw, 2.75rem);
   }
+  /* El deck de la destacada va a la medida del sistema, no a una propia.
+     Con 46ch se paraba en 414 px dentro de una columna de 724 —titular y pie
+     cruzándola entera— y dejaba 310 px de hueco a la derecha: el mismo defecto
+     que § Anchos regla 5 corrigió en Contacto, en pequeño. `--measure` a
+     18 px son ~576 px, que llena la columna sin pasarse de los 60-65ch que
+     manda § Anchos. */
   .ficha-destacada .ficha-entradilla {
     font-size: 1.125rem;
-    max-width: 46ch;
+    max-width: var(--measure);
   }
   .ficha-entradilla {
     margin: var(--spacing-2xs) 0 0;
@@ -1749,6 +1755,29 @@
     min-width: 0;
     overflow-wrap: anywhere;
   }
+  /* Cuando la etiqueta es un TITULAR y no el nombre de una sección, la columna
+     de 16rem lo parte en cinco líneas y la fila se vuelve un bloque. Con la
+     medida de lectura cabe en una o dos, que es lo que hace comparable una lista
+     de asuntos (Tendencias, Fase 13). La barra pasa debajo, a todo el ancho:
+     compitiendo por el sitio con un titular no quedaba ninguna de las dos. */
+  .filas-datos-titular li {
+    grid-template-columns: minmax(0, var(--measure)) auto;
+  }
+  .filas-datos-titular .fila-etiqueta {
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    line-height: 1.25;
+    overflow-wrap: normal;
+  }
+  /* ⚠️ `width: 100%` obligatorio: la base pone `.celda-barra { width: 40% }`
+     porque ahí la barra es la tercera columna de una fila corta. Aquí ocupa toda
+     la fila, y sin esto se quedaba en el 40 % del ancho —midiendo 6 días con la
+     misma longitud con la que la fila de al lado mide 4— o sea comparando mal,
+     que es peor que no dibujarla. */
+  .filas-datos-titular .celda-barra {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
   .fila-etiqueta a {
     color: var(--color-ink);
     text-decoration: none;
@@ -1930,6 +1959,350 @@
   }
   .lista-acelera a:hover {
     text-decoration: underline;
+  }
+
+  /* ============================================ ASUNTOS (Fase 13) === */
+
+  /* ---- 00 · Estado del día (portada) ----
+     Lo que la portada no tenía: algo que en cinco segundos diga qué es hoy.
+     Antes abría con el lema centrado y nada más, y el usuario lo describió
+     como «entras y nada te llama la atención».
+
+     Es Stat-Led entrando en una página índice, y las cifras son de ASUNTOS,
+     nunca de artículos rastreados: la misma regla que obligó a retirar la
+     gráfica de totales de Tendencias (§ Páginas de datos).
+
+     ⚠️ Vive sobre el pliegue, así que NO entra en el revelado por scroll: su
+     entrada la hace el CSS de la cabecera, que no depende de ningún script
+     (§ Motion). */
+  .estado {
+    /* Filete en tinta plena: el estado del día es el divisor mayor de la
+       portada. El doble se reserva a la cabecera (`.rule-double`), que es el
+       único sitio del sistema donde va. */
+    border-bottom: var(--rule-hair) solid var(--color-ink);
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  /* A partir de md la banda se reparte: el titular del día a la izquierda, a su
+     medida, y las cifras como «oreja» a la derecha. Apilado dejaba el lede
+     capado a 34ch con media página en blanco al lado —el defecto que § Anchos
+     regla 5 ya corrigió en Contacto y en el pie de las páginas de datos—, y en
+     la superficie de apertura se notaba el doble. */
+  .estado-cifras {
+    list-style: none;
+    margin: 0 0 var(--spacing-md);
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm) var(--spacing-lg);
+  }
+  @media (width >= 52rem) {
+    .estado {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--spacing-lg) var(--spacing-xl);
+      align-items: start;
+    }
+    /* El lede primero en la retícula pero segundo en el DOM: en móvil las
+       cifras abren (son el vistazo) y en escritorio manda el titular. */
+    .estado-lede {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .estado-cifras {
+      grid-column: 2;
+      grid-row: 1;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+      margin: 0;
+      text-align: right;
+    }
+    .estado-cifras li {
+      justify-content: flex-end;
+    }
+    /* El lema va en la columna del lede y alineado a la izquierda, NO centrado
+       cruzando las dos. Centrado caía justo en el hueco entre el titular y las
+       cifras y se leía como un bloque suelto, sin colgar de nada. Aquí cierra
+       la banda: primero qué pasa hoy, y debajo qué es este sitio. */
+    .posicionamiento {
+      grid-column: 1;
+      margin-inline: 0;
+      text-align: left;
+    }
+  }
+  .estado-cifras li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-3xs);
+  }
+  /* Aquí `baseline` SÍ es correcto, al contrario que en `.cifra-hero`: la
+     etiqueta es de una línea, así que no hay texto colgando por debajo de la
+     cifra (§ Páginas de datos, la nota de `.cifra-hero`). */
+  .estado-n {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+  .estado-que {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-neutral);
+    max-width: 12ch;
+  }
+  /* El titular del día, del resumen. Es lo que el sitio tenía escondido en una
+     página secundaria mientras la portada abría por lo más cubierto. */
+  .estado-lede h2 {
+    font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+    line-height: 1.15;
+    margin: 0 0 var(--spacing-2xs);
+    max-width: 34ch;
+    text-wrap: balance;
+  }
+
+  /* ---- 01 · Lo que te toca hoy (portada) ----
+     Los puntos del resumen diario, con su «por qué importa» en lenguaje llano.
+     Reutiliza `.resumen-urgencia` y `.resumen-seccion`: es el mismo dato con el
+     mismo significado, y darle otro aspecto en otra página rompería el sistema.
+     Solo `ahora` va en alerta (§ Resumen diario). */
+  .toca {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .toca-punto {
+    border-top: var(--rule-hair) solid var(--color-rule);
+    padding: var(--spacing-sm) 0;
+  }
+  .toca-linea {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-2xs);
+    margin: 0 0 var(--spacing-3xs);
+  }
+  /* El día del asunto es un ENLACE al seguimiento: es el único sitio de la
+     apertura desde el que se llega a la historia completa. Va en acento porque
+     es navegación, no un dato más. */
+  .toca-dia {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .toca-dia:hover {
+    text-decoration: underline;
+  }
+  .toca-titulo {
+    font-size: var(--text-lg);
+    line-height: 1.2;
+    margin: 0 0 var(--spacing-3xs);
+    max-width: var(--measure);
+  }
+  .toca-titulo a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .toca-titulo a:hover {
+    color: var(--color-accent);
+  }
+  .toca-porque {
+    margin: 0;
+    max-width: var(--measure);
+    line-height: 1.6;
+  }
+  /* El primer punto abre más grande: es el titular del día. La jerarquía la da
+     el tamaño, no una caja ni un fondo — Newsprint no tiene tarjetas. */
+  .toca-punto:first-child .toca-titulo {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  /* ---- 02 · Asuntos que siguen (portada) ----
+     Fila de ancho completo: titular a la izquierda, cifras ancladas a la
+     derecha y el filete cruzando entero. Es el patrón de `.lista-foco` y de
+     «Lo cuenta un solo bloque», y por el mismo motivo: apiladas dejaban dos
+     tercios de página en blanco a 1800 px (§ Focos). */
+  .asuntos-vivos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .asunto-fila {
+    border-top: var(--rule-hair) solid var(--color-rule);
+    padding: var(--spacing-2xs) 0;
+  }
+  .asunto-titular {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    line-height: 1.25;
+    max-width: var(--measure);
+    color: inherit;
+    text-decoration: none;
+  }
+  .asunto-fila:hover .asunto-titular {
+    color: var(--color-accent);
+  }
+  .asunto-cifras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-3xs) var(--spacing-sm);
+    margin: var(--spacing-3xs) 0 0;
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-neutral);
+  }
+  /* Los días son la cifra que da sentido a la superficie: en tinta plena. */
+  .asunto-dias {
+    color: var(--color-ink);
+  }
+  @media (width >= 48rem) {
+    .asunto-fila {
+      display: grid;
+      grid-template-columns: minmax(0, var(--measure)) auto;
+      gap: var(--spacing-md);
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .asunto-cifras {
+      margin: 0;
+      justify-content: flex-end;
+    }
+  }
+
+  /* ---- Seguimiento en la ficha ----
+     La línea que hace que el sello SIEMPRE diga algo. Medido el 2026-08-18: de
+     18 síntesis, cero tenían contradicciones, así que un sello que solo hable de
+     contraste se queda mudo en la mayoría de las historias. El día del asunto y
+     quién no lo ha contado están siempre.
+
+     Va ANTES de `.contraste` y en la misma monoespaciada: son los dos datos del
+     mismo bloque, ordenados de más disponible a más excepcional. */
+  .seguimiento {
+    margin: var(--spacing-2xs) 0 0;
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px var(--spacing-2xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-neutral);
+  }
+  .seguimiento-dia {
+    color: var(--color-ink);
+  }
+  /* Sin acento y sin filete: no es una alerta ni un enlace. Es contexto, y el
+     acento tiene techo del 3 % del viewport (§ Theme). */
+  .seguimiento-silencio {
+    color: var(--color-neutral);
+  }
+  /* De qué día viene una síntesis heredada. Apagado a propósito: es una
+     salvedad, no un titular. */
+  .contraste-heredado {
+    color: var(--color-neutral);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* ---- Página de asunto: la cronología ----
+     El cuerpo de un Long Document. Un bloque por día, del más antiguo al más
+     reciente, con filete a la izquierda: se lee como una línea de tiempo sin
+     dibujar una. */
+  .asunto-sello {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-neutral);
+  }
+  /* Solo el asunto que se apagó se marca, y en alerta: es el hallazgo. Que un
+     asunto siga vivo es lo normal y no necesita color — mismo criterio que la
+     urgencia del resumen y que el sello de contraste. */
+  .asunto-sello.sello-apagado {
+    color: var(--color-alerta);
+  }
+  .cronologia {
+    list-style: none;
+    margin: 0 0 var(--spacing-lg);
+    padding: 0;
+  }
+  .crono-dia {
+    border-left: var(--rule-hair) solid var(--color-rule);
+    padding: 0 0 var(--spacing-md) var(--spacing-sm);
+  }
+  /* El día más reciente lleva el filete en tinta: es donde está el asunto
+     ahora, y es lo que el lector busca al entrar. */
+  .crono-ultimo {
+    border-left-color: var(--color-ink);
+  }
+  .crono-fecha {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-2xs);
+    margin: 0 0 var(--spacing-3xs);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+  .crono-n {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-ink);
+  }
+  .crono-historia + .crono-historia {
+    margin-top: var(--spacing-sm);
+  }
+  .crono-historia h3 {
+    font-size: var(--text-md);
+    line-height: 1.25;
+    margin: 0 0 var(--spacing-3xs);
+    max-width: var(--measure);
+  }
+  .crono-historia h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .crono-historia h3 a:hover {
+    color: var(--color-accent);
+  }
+  .crono-entradilla {
+    margin: 0 0 var(--spacing-3xs);
+    max-width: var(--measure);
+    line-height: 1.6;
+  }
+  .crono-pie {
+    margin: 0;
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-neutral);
+  }
+
+  /* ---- Página de asunto: el aparato al margen ---- */
+  .aparato-medios {
+    list-style: none;
+    margin: 0 0 var(--spacing-sm);
+    padding: 0;
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+  /* Los ausentes, tachados: dice «esto falta» sin necesitar una palabra más, y
+     sin acusar a nadie. La nota de debajo explica por qué puede faltar. */
+  .aparato-ausentes li {
+    text-decoration: line-through;
+    color: var(--color-neutral);
+  }
+  .aparato-descargo {
+    color: var(--color-neutral);
+    font-size: var(--text-xs);
   }
 }
 

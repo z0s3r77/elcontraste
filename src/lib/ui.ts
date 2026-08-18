@@ -81,6 +81,57 @@ export const urlSeccion = (s: string, tema?: string | null) =>
 
 export const urlRadar = (s: string) => `${BASE}/radar/${s}/`;
 
+/** URL de un ASUNTO: el mismo suceso a lo largo de los días (Fase 13). */
+export const urlAsunto = (id: number | string) => `${BASE}/asunto/${id}/`;
+
+/**
+ * «No lo han contado ABC · El Mundo y otros 3».
+ *
+ * Una sola redacción para un dato que sale en la ficha, en la portada y en el
+ * aparato del asunto: si cada sitio lo escribe a su manera, el mismo hecho se
+ * lee como tres hechos distintos.
+ *
+ * 🚫 **Nunca «lo ignoran».** Las ventanas RSS son de ~25 ítems y El País
+ * devuelve 403 en el 86 % de sus artículos: la ausencia en la base no prueba
+ * silencio editorial (§ Sello de una historia). El sesgo de captura se confiesa
+ * en el aparato de la página que use el dato.
+ *
+ * ⚠️ Con exactamente tres se nombran los tres. Cortar a dos daría «y otros 1»,
+ * que no es castellano, y bajar el corte a «y otro» añade una forma más para
+ * ahorrar un nombre que ya cabía.
+ */
+export const fraseAusentes = (medios: string[] | undefined | null): string | null => {
+  const m = medios ?? [];
+  if (m.length === 0) return null;
+  if (m.length <= 3) return `no lo han contado ${m.join(" · ")}`;
+  return `no lo han contado ${m.slice(0, 2).join(" · ")} y otros ${m.length - 2}`;
+};
+
+/**
+ * Cómo se dice el estado de un asunto. Es copy, no un dato: el mismo `estado`
+ * se lee distinto según lo que lleve el asunto, y de aquí sale el sello.
+ *
+ * ⚠️ `apagado` NO dice «lo han silenciado». Dice que dejó de haber piezas, que
+ * es lo único que el proyecto puede demostrar con 12 medios y ventanas RSS de
+ * ~25 ítems (mismo cuidado que con `no_lo_cuentan`).
+ */
+export const rotulaEstado = (estado: string | null | undefined, nDias: number): string | null => {
+  switch (estado) {
+    case "nuevo":
+      return "empieza hoy";
+    case "sigue":
+      return `sigue · día ${nDias}`;
+    case "pausa":
+      return "sin piezas nuevas hoy";
+    case "apagado":
+      // Solo es un hallazgo si tuvo vida: un asunto de un día que no continúa
+      // es lo normal, no un silencio.
+      return nDias >= 2 ? `${nDias} días y dejó de contarse` : null;
+    default:
+      return null;
+  }
+};
+
 export const urlResumen = () => `${BASE}/resumen/`;
 
 export const urlFocos = () => `${BASE}/focos/`;

@@ -100,6 +100,26 @@ export async function enLote<T>(rutas: string[], enParalelo = EN_PARALELO): Prom
 
 // ---------------------------------------------------------------- tipos
 
+/**
+ * El ASUNTO de una historia (Fase 13): el mismo suceso a lo largo de los días.
+ *
+ * Es lo que convierte una noticia suelta en algo que se sigue. `dia` es el día
+ * que va ESTA historia dentro del asunto (1 = el día en que empezó) y `n_dias`
+ * lo que lleva el asunto entero.
+ */
+export interface Hilo {
+  id: number;
+  dia: number;
+  n_dias: number;
+  n_clusters: number;
+  n_articulos: number;
+  n_medios: number;
+  /** `nuevo` | `sigue` | `pausa` | `apagado`. Ver `_estado()` en pipeline/hilos.py. */
+  estado: string | null;
+  primer_dia: string;
+  ultimo_dia: string;
+}
+
 export interface FichaCluster {
   id: number;
   headline: string | null;
@@ -113,6 +133,21 @@ export interface FichaCluster {
   has_synthesis?: boolean;
   digest_date?: string;
   section?: string;
+  /** El asunto al que pertenece. `null` si la etapa de hilos no ha pasado. */
+  hilo?: Hilo | null;
+  /**
+   * Día del que viene la síntesis cuando NO es de esta historia sino de otra
+   * del mismo asunto. La web lo DECLARA: una síntesis de anteayer sobre algo que
+   * sigue vivo es justo lo que hay que saber para juzgarla.
+   */
+  sintesis_del_dia?: string | null;
+  /**
+   * Generalistas activos que no aparecen en la historia.
+   * ⚠️ Se dice «no lo ha contado», NUNCA «lo ignora»: las ventanas RSS son de
+   * ~25 ítems y El País da 403 en el 86 % de sus artículos, así que la ausencia
+   * en la base no prueba silencio editorial.
+   */
+  no_lo_cuentan?: string[];
   /**
    * Contraste medido sobre la síntesis (ver `_contraste` en api/main.py).
    * `null` o ausente = no hay síntesis, así que no hay NADA medido: la web
@@ -143,7 +178,36 @@ export interface FichaCluster {
 export interface Digest {
   date: string;
   n_clusters: number;
+  /** Reparto de los asuntos del día. Es una cifra del lector, no del pipeline:
+   *  cuánto de hoy es nuevo, cuánto viene de antes y cuánto se quedó sin
+   *  continuación. Alimenta la banda de apertura de la portada. */
+  asuntos?: { nuevos: number; siguen: number; apagados: number };
   sections: { section: string; clusters: FichaCluster[] }[];
+}
+
+/** Un asunto tal y como lo devuelve `/api/asuntos` (la lista). */
+export interface Asunto {
+  id: number;
+  titular: string | null;
+  seccion: string | null;
+  primer_dia: string;
+  ultimo_dia: string;
+  n_dias: number;
+  n_clusters: number;
+  n_articulos: number;
+  n_medios: number;
+  estado: string | null;
+  medios: string[];
+  no_lo_cuentan: string[];
+  /** El clúster más reciente: es por donde se entra al asunto. */
+  ultimo_cluster: number | null;
+}
+
+/** Un asunto con su cronología, de `/api/asunto/{id}`. */
+export interface AsuntoDetalle extends Omit<Asunto, "ultimo_cluster"> {
+  cronologia: { dia: string; clusters: FichaCluster[] }[];
+  explicacion: Explicacion | null;
+  explicacion_del_dia: string | null;
 }
 
 export interface Sintesis {

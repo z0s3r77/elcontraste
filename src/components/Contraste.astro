@@ -1,20 +1,29 @@
 ---
-// El sello de contraste de una historia. Es la promesa del sitio hecha dato:
-// hasta el 2026-08-16 la portada ordenaba por cobertura y nunca decía cuánto
-// contraste había de verdad. Medido ese día: el eclipse, 8 medios y UNA
-// contradicción; el terremoto de Alhendín, 7 medios y SEIS.
+// El sello de una historia. Dos líneas y un principio: **siempre dice algo**.
 //
-// Tres estados, y el tercero es el que evita mentir:
-//   1. hay contradicciones -> se dicen, es lo que el lector viene a buscar
-//   2. solo exclusivas     -> se dicen como lo que son (un medio lo cuenta),
-//                             NUNCA como divergencia: el 2026-08-14 se midió
-//                             que son el 74 % y la página las mezclaba
-//   3. cero y modo contraste -> "los medios coinciden" ES un hallazgo
+// Hasta la Fase 13 el sello solo hablaba de contraste, y ahí estaba el problema
+// que reportó el usuario («unas sí, otras no y ya»): medido sobre 8 días y 143
+// síntesis, solo el 44 % tenía alguna contradicción, y el 2026-08-18 fueron
+// CERO de 18. En la mayoría de las historias el sello acababa diciendo
+// «coinciden en todo» o «8 datos que solo cuenta un medio», y ninguna de las dos
+// es un motivo para entrar.
 //
-// Y el caso mudo: en modo `agregacion` (deportes, arte, gaming…) el prompt
-// barato ni siquiera analiza divergencias, así que un cero no significa nada.
-// Ahí no se pinta sello. Sin síntesis, tampoco.
+// Lo que sí está siempre disponible es el SEGUIMIENTO —qué día va este asunto—
+// y el SILENCIO —quién no lo ha contado—, así que esos suben a la primera línea
+// y el contraste pasa a ser lo que es: un hallazgo, cuando lo hay.
+//
+//   Día 5 · no lo han contado ABC · El Mundo
+//   2 contradicciones
+//
+// Reglas heredadas que siguen mandando (§ Sello de contraste de design.md):
+//   - en modo `agregacion` NO se pinta contraste: el prompt barato ni analiza
+//     divergencias, así que su cero significa «no se buscó» y pintarlo como
+//     acuerdo sería inventarse un dato;
+//   - sin síntesis, tampoco;
+//   - el filete de alerta es SOLO para las contradicciones. Si lo llevara todo,
+//     dejaría de significar nada.
 import type { FichaCluster } from "../lib/api";
+import { fraseAusentes } from "../lib/ui";
 
 interface Props {
   c: FichaCluster;
@@ -23,20 +32,53 @@ const { c } = Astro.props;
 
 const ct = c.contraste;
 const analizado = !!ct && c.mode !== "agregacion";
-
 const contradicciones = ct?.contradicciones ?? 0;
 const exclusivas = ct?.exclusivas ?? 0;
 
-// ⚠️ La frase se arma ENTERA aquí, no con `{n} {palabra}` en el marcado: Astro
-// se come el espacio entre dos interpolaciones contiguas y salía
-// «6contradicciones». Se vio en el HTML horneado, no en el editor.
-const choque =
-  contradicciones === 1 ? "1 contradicción" : `${contradicciones} contradicciones`;
+// ⚠️ Las frases con número se arman ENTERAS aquí, nunca como `{n} {palabra}` en
+// el marcado: Astro se come el espacio entre dos interpolaciones contiguas y
+// salía «6contradicciones». Se ve en el HTML horneado, no en el editor.
+const choque = contradicciones === 1 ? "1 contradicción" : `${contradicciones} contradicciones`;
 const exclusiva =
   exclusivas === 1
     ? "1 dato que solo cuenta un medio"
     : `${exclusivas} datos que solo cuenta un medio`;
+
+// --- Seguimiento: qué día va el asunto -----------------------------------
+//
+// Solo a partir del segundo día. «Día 1» en un asunto que empieza hoy es ruido:
+// no informa de nada que el lector no dé por supuesto al entrar en un diario.
+const hilo = c.hilo;
+const dia = hilo && hilo.n_dias >= 2 ? `Día ${hilo.dia}` : null;
+
+// --- Silencio: quién no lo ha contado ------------------------------------
+//
+// Se NOMBRAN los medios en vez de contarlos, y no es un capricho: `n_sources`
+// incluye a los especializados y `no_lo_cuentan` solo mira a los generalistas,
+// así que un «5 de 8» mezclaría dos bases distintas y sería un número falso.
+// Nombrar dos medios informa más que cualquier fracción y no tiene ese problema.
+//
+// La frase la arma `fraseAusentes` y no se escribe aquí: el mismo dato sale en
+// la portada y en el aparato del asunto, y con tres redacciones se leería como
+// tres hechos distintos. Ahí está también la cautela obligatoria sobre qué
+// significa una ausencia.
+const silencio = fraseAusentes(c.no_lo_cuentan);
+
+// De qué día viene la síntesis cuando no es de hoy. Se declara: es la mitad
+// honesta de haber dejado de pagar la re-síntesis de un asunto vivo.
+const heredada = c.sintesis_del_dia ? `contraste medido el ${c.sintesis_del_dia}` : null;
+
+const haySeguimiento = dia || silencio;
 ---
+
+{
+  haySeguimiento && (
+    <p class="seguimiento">
+      {dia && <span class="seguimiento-dia">{dia}</span>}
+      {silencio && <span class="seguimiento-silencio">{silencio}</span>}
+    </p>
+  )
+}
 
 {
   analizado && (
@@ -46,6 +88,7 @@ const exclusiva =
         <span class="contraste-marca contraste-acuerdo">coinciden en todo</span>
       )}
       {exclusivas > 0 && <span class="contraste-marca contraste-exclusiva">{exclusiva}</span>}
+      {heredada && <span class="contraste-heredado">{heredada}</span>}
     </p>
   )
 }

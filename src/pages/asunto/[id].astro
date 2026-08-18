@@ -1,0 +1,155 @@
+---
+import Base from "../../layouts/Base.astro";
+import Impacto from "../../components/Impacto.astro";
+import { enLote, traer, type Asunto, type AsuntoDetalle } from "../../lib/api";
+import { rotula, rotulaEstado, urlCluster, urlSeccion } from "../../lib/ui";
+
+// ASUNTO — el mismo suceso a lo largo de los días (Fase 13).
+//
+// La página que el sitio no podía tener. Hasta ahora cada día producía una
+// «historia» nueva del mismo suceso: el eclipse del 12 de agosto salió 7 días
+// como 7 noticias sueltas, y quien entraba el día 5 no tenía forma de saber qué
+// había pasado los cuatro anteriores.
+//
+// Macrostructure: 02 · Long Document con aparato al margen, igual que
+// /cluster/. La cronología es el cuerpo —se lee de corrido, de lo más antiguo a
+// lo más reciente, porque es una historia que avanza— y al margen cuelga quién
+// la cuenta, quién la ha dejado y en qué te afecta.
+
+export async function getStaticPaths() {
+  // Solo los asuntos con vida real: 2+ días. Uno de un solo día no es un
+  // «asunto», es la historia que ya tiene su propia página en /cluster/, y
+  // hornear ~260 páginas para duplicar contenido no le sirve a nadie.
+  //
+  // ⚠️ `enLote` y NUNCA `Promise.all`: son ~100 peticiones por el túnel y
+  // abrirlas todas a la vez tumbó un build con 429 el 2026-08-13.
+  const lista = await traer<Asunto[]>("/api/asuntos?min_dias=2&days=60&limit=400");
+  const detalles = await enLote<AsuntoDetalle>(lista.map((a) => `/api/asunto/${a.id}`));
+  return detalles.map((a) => ({ params: { id: String(a.id) }, props: { a } }));
+}
+
+const { a } = Astro.props as { a: AsuntoDetalle };
+
+// De lo más antiguo a lo más reciente: la API ya lo devuelve así. Se lee como lo
+// que es, una historia que avanza, no como un feed.
+const cronologia = a.cronologia;
+const titular = a.titular ?? "Asunto sin titular contrastado";
+const estado = rotulaEstado(a.estado, a.n_dias);
+
+// El día que se enseña como «hoy» del asunto es su último, no la fecha del
+// navegador: el sitio es estático y se hornea una vez.
+const ultimo = cronologia[cronologia.length - 1];
+
+// ⚠️ Frases con número armadas enteras: Astro se come el espacio entre dos
+// interpolaciones contiguas y saldría «6días».
+const resumenCifras = [
+  `${a.n_dias} días`,
+  `${a.n_articulos} piezas`,
+  `${a.n_medios} medios`,
+].join(" · ");
+
+const descripcion =
+  `${titular}. Seguimiento día a día: ${a.n_dias} días, ${a.n_articulos} piezas de ` +
+  `${a.n_medios} medios.`;
+---
+
+<Base
+  title={`${titular} — La Doxa`}
+  seccion="hoy"
+  edicion={`Asunto · ${a.primer_dia} → ${a.ultimo_dia}`}
+  descripcion={descripcion}
+>
+  <article class="doc">
+    <div class="doc-cuerpo">
+      <header class="doc-cabecera">
+        <p class="doc-seccion">
+          {a.seccion ? <a href={urlSeccion(a.seccion)}>{rotula(a.seccion)}</a> : "Asunto"}
+        </p>
+        <h1>{titular}</h1>
+        <p class="doc-meta">
+          <span class="dato">{resumenCifras}</span>
+          {estado && <span class:list={["asunto-sello", `sello-${a.estado}`]}>{estado}</span>}
+        </p>
+      </header>
+
+      <h2 class="rotulo-doc">Cómo ha ido, día a día</h2>
+      <ol class="cronologia">
+        {
+          cronologia.map((punto, i) => (
+            <li class:list={["crono-dia", { "crono-ultimo": punto === ultimo }]}>
+              <p class="crono-fecha">
+                <span class="dato crono-n">{`Día ${i + 1}`}</span>
+                <span class="dato muted">{punto.dia}</span>
+              </p>
+              {punto.clusters.map((c) => (
+                <div class="crono-historia">
+                  <h3>
+                    <a href={urlCluster(c.id)}>{c.headline ?? "Sin titular"}</a>
+                  </h3>
+                  {c.entradilla && <p class="crono-entradilla">{c.entradilla}</p>}
+                  <p class="crono-pie">
+                    {/* Sin síntesis el titular es el de UN medio, con su
+                        encuadre: hay que decirlo o se lee como neutral. */}
+                    {!c.has_synthesis && c.titular_de && (
+                      <span class="ficha-prestamo">{`titular de ${c.titular_de} · sin contrastar`}</span>
+                    )}
+                    <span class="dato">{`${c.n_sources} medios · ${c.n_articles} versiones`}</span>
+                    {c.media && <span class="ficha-medios">{c.media.join(" · ")}</span>}
+                  </p>
+                </div>
+              ))}
+            </li>
+          ))
+        }
+      </ol>
+
+      <p class="firma-ia">
+        Las historias de cada día se agrupan en un asunto comparando los artículos que tienen en
+        común, no por criterio editorial. Los titulares neutros los redacta un modelo de lenguaje
+        a partir de todas las versiones; cada uno enlaza sus originales.
+      </p>
+    </div>
+
+    <aside class="doc-aparato">
+      <h2 class="rotulo-doc">Quién lo cuenta</h2>
+      <ul class="aparato-medios">
+        {a.medios.map((m) => <li>{m}</li>)}
+      </ul>
+
+      {
+        a.no_lo_cuentan.length > 0 && (
+          <>
+            <h2 class="rotulo-doc">No lo han contado</h2>
+            <ul class="aparato-medios aparato-ausentes">
+              {a.no_lo_cuentan.map((m) => (
+                <li>{m}</li>
+              ))}
+            </ul>
+            {/* ⚠️ El sesgo de captura se confiesa donde se usa el dato. Sin
+                esta nota, «no lo han contado» se leería como una acusación de
+                silencio editorial, y con 12 medios y ventanas RSS de ~25 ítems
+                el proyecto no puede demostrar eso. */}
+            <p class="aparato-texto aparato-descargo">
+              Quiere decir que no ha aparecido en lo que este sitio ha podido leer de ellos. Los
+              feeds solo exponen sus últimas piezas y algunos medios bloquean la lectura del texto,
+              así que una ausencia aquí no prueba una decisión editorial.
+            </p>
+          </>
+        )
+      }
+
+      {
+        a.explicacion && (
+          <>
+            <Impacto explicacion={a.explicacion} />
+            {a.explicacion_del_dia && a.explicacion_del_dia !== a.ultimo_dia && (
+              <p class="aparato-texto aparato-descargo">
+                {`Escrito el ${a.explicacion_del_dia}, sobre la versión de ese día.`}
+              </p>
+            )}
+          </>
+        )
+      }
+    </aside>
+  </article>
+</Base>

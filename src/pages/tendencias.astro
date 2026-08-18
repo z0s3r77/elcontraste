@@ -1,158 +1,132 @@
 ---
 import Base from "../layouts/Base.astro";
-import { traer, type Tendencia } from "../lib/api";
-import { pesoSeccion, rotula, urlSeccion } from "../lib/ui";
+import { traer, type Asunto } from "../lib/api";
+import { pesoSeccion, rotula, urlAsunto, urlSeccion } from "../lib/ui";
 
-// Familia datos (04 · Stat-Led). Rehecha el 2026-08-16 a petición del usuario:
-// la gráfica anterior era un uPlot con 8 líneas de temas sueltos — espagueti
-// que no transmitía nada — y una tabla "Todos los temas" de recuentos crudos.
-// Ahora la unidad es la SECCIÓN: un múltiplo por sección con su serie diaria
-// de artículos, todos a la MISMA escala para que comparar tenga sentido, y
-// debajo los temas que concentran esa atención. Sin uPlot: las barras son
-// divs horneados en el build, siguen al tema claro/oscuro por CSS y no
-// dependen de que corra ningún script.
+// TENDENCIAS — «¿qué asuntos siguen vivos, y cuáles se apagaron sin cerrarse?»
 //
-// Lo que esta página mide es la AGENDA: cuánto espacio da la prensa a cada
-// cosa y cómo se desplaza. Qué se dispara y qué se calla — la segunda mitad
-// necesita ~14 días de historia y hasta entonces se dice en palabras.
+// Familia datos (04 · Stat-Led). Rehecha en la Fase 13 (2026-08-18) porque el
+// usuario la señaló con razón: «es TENDENCIAS, no dice nada».
 //
-// 2026-08-16: se retiró la gráfica grande de totales por día. El total de
-// artículos rastreados es una cifra del pipeline, no de la prensa: subía
-// cuando se añadían feeds (el día 12) y el último día siempre estaba a medias
-// por estar en curso. Los múltiplos por sección dicen lo mismo desglosado y
-// además COMPARAN, que es el único motivo de dibujarlos juntos.
+// Lo que había era una rejilla de múltiplos con la serie diaria de ARTÍCULOS por
+// sección: «SOCIAL 1127 art.». Dos problemas, y el segundo es el grave:
+//
+//   1. Con 8 días de histórico no hay tendencia que dibujar, y la propia página
+//      lo confesaba en su cifra de apertura. Media pantalla para decir que aún
+//      no se puede decir nada.
+//   2. **Contaba artículos rastreados, o sea el pipeline y no la prensa.** Es
+//      exactamente el fallo por el que ya se retiró la gráfica grande de totales
+//      el 2026-08-16 (§ Páginas de datos: «la cifra que manda tiene que ser una
+//      del LECTOR»), y había sobrevivido dentro de los múltiplos.
+//
+// Con los asuntos (Fase 13) la página puede medir algo que sí es de la prensa y
+// que sí se sostiene con 8 días: **cuánto dura la atención**. Un asunto es el
+// mismo suceso a lo largo de los días, así que su duración es un hecho sobre
+// cómo cubre la prensa, no sobre cuántos feeds se leyeron.
+//
+// Y trae la señal que no da nadie: los asuntos que **dejaron de contarse** con
+// varios días de vida. Eso no es un recuento, es un hallazgo.
 
-type SerieSeccion = {
-  section: string;
-  points: { day: string; n_clusters: number; n_articles: number }[];
-};
-const [porSeccionApi, trends, accel] = await Promise.all([
-  // La serie por sección sale de su endpoint propio y NO de sumar los temas:
-  // un clúster con dos temas contaría sus artículos dos veces (medido el
-  // 2026-08-16: `social` pasaba de ~550 a 1.107 "artículos" en 6 días).
-  traer<SerieSeccion[]>("/api/trends/sections?days=30"),
-  traer<Tendencia[]>("/api/trends?days=30"),
-  traer<{ section: string; topic: string; avg_7d: number; avg_90d: number }[]>(
-    "/api/trends/accelerating",
-  ),
-]);
+// 60 días para que la página no dependa de la ventana de horneado. `min_dias` se
+// filtra aquí y no en la API porque las dos superficies quieren cortes distintos.
+const asuntos = await traer<Asunto[]>("/api/asuntos?days=60&limit=400");
 
-const dias = new Set(porSeccionApi.flatMap((s) => s.points.map((p) => p.day))).size;
-const fiable = dias >= 14;
+const abiertos = asuntos.filter((a) => a.estado === "sigue" || a.estado === "nuevo");
 
-// Eje temporal común: todos los días con datos, en orden. Los múltiplos
-// comparten eje y escala; un día sin datos en una sección es un cero real
-// (el pipeline corrió y no hubo nada), no un hueco.
-const ejeDias = [...new Set(porSeccionApi.flatMap((s) => s.points.map((p) => p.day)))].sort();
+// --- 01 · Lo que más dura ---------------------------------------------------
+// Solo los que llevan 2+ días: uno de un día no ha «durado» nada.
+const duraderos = asuntos
+  .filter((a) => a.n_dias >= 2)
+  .sort((a, b) => b.n_dias - a.n_dias || b.n_articulos - a.n_articulos)
+  .slice(0, 10);
+const maxDias = Math.max(1, ...duraderos.map((a) => a.n_dias));
 
-// Los temas que concentran la atención de cada sección. Aquí sí vale
-// `daily_topic_counts`: el recuento POR TEMA es exacto — la inflación
-// aparecía solo al sumarlos como si fueran disjuntos.
-const temasPorSeccion = new Map<string, Map<string, number>>();
-for (const t of trends) {
-  const temas = temasPorSeccion.get(t.section) ?? new Map();
-  temas.set(
-    t.topic,
-    (temas.get(t.topic) ?? 0) + t.points.reduce((a, p) => a + p.n_articles, 0),
-  );
-  temasPorSeccion.set(t.section, temas);
+// --- 02 · Lo que dejó de contarse ------------------------------------------
+// El corte de 2 días no es negociable: un asunto de un solo día que no continúa
+// es lo normal de un diario, no un silencio. Sin ese filtro, esta superficie
+// serían 162 filas de nada.
+const apagados = asuntos
+  .filter((a) => a.estado === "apagado" && a.n_dias >= 2)
+  .sort((a, b) => b.n_dias - a.n_dias || b.n_articulos - a.n_articulos)
+  .slice(0, 10);
+
+// --- 03 · Cuánto dura un asunto, por sección -------------------------------
+// Esto sustituye a los múltiplos de artículos por día. Mide la PERSISTENCIA de
+// cada sección: en Política un asunto arrastra varios días; en Deportes, uno.
+// Es una media, así que se declara sobre cuántos asuntos se ha calculado — sin
+// la n, una media de 2 asuntos se lee igual que una de 40.
+const porSeccion = new Map<string, { n: number; dias: number }>();
+for (const a of asuntos) {
+  const s = a.seccion ?? "sin-clasificar";
+  const acc = porSeccion.get(s) ?? { n: 0, dias: 0 };
+  acc.n += 1;
+  acc.dias += a.n_dias;
+  porSeccion.set(s, acc);
 }
-
-type Seccion = {
-  section: string;
-  total: number;
-  porDia: number[];
-  temas: { topic: string; total: number }[];
-};
-const secciones: Seccion[] = porSeccionApi
-  .map((s) => {
-    const porDia = new Map(s.points.map((p) => [p.day, p.n_articles]));
-    return {
-      section: s.section,
-      total: s.points.reduce((a, p) => a + p.n_articles, 0),
-      porDia: ejeDias.map((d) => porDia.get(d) ?? 0),
-      temas: [...(temasPorSeccion.get(s.section) ?? new Map()).entries()]
-        .map(([topic, total]) => ({ topic, total: total as number }))
-        .sort((a, b) => b.total - a.total)
-        .slice(0, 3),
-    };
-  })
-  // Orden editorial fijo, como la portada: en un periódico las secciones no
-  // se recolocan según el volumen del día.
+const MIN_MUESTRA = 3;
+const persistencia = [...porSeccion.entries()]
+  .filter(([, v]) => v.n >= MIN_MUESTRA)
+  .map(([section, v]) => ({ section, n: v.n, media: v.dias / v.n }))
+  // Orden editorial fijo, como la portada: en un periódico las secciones no se
+  // recolocan según el dato del día.
   .sort((a, b) => pesoSeccion(a.section) - pesoSeccion(b.section));
+const maxMedia = Math.max(1, ...persistencia.map((p) => p.media));
 
-// Escala COMPARTIDA: el máximo día de la sección más cargada. Normalizar cada
-// múltiplo a su propio máximo haría que Deportes pareciera tan grande como
-// Social, y comparar es el único motivo de dibujarlos juntos.
-const maximo = Math.max(1, ...secciones.flatMap((s) => s.porDia));
+const dias = new Set(asuntos.flatMap((a) => [a.primer_dia, a.ultimo_dia])).size;
 
-// Qué se calla: temas cuya última semana cae por debajo de la mitad de la
-// anterior, con una base mínima para no señalar ruido. Solo se calcula con
-// historia suficiente; hasta entonces el aviso lo dice en palabras.
-type Caida = { section: string; topic: string; ahora: number; antes: number };
-let caidas: Caida[] = [];
-if (fiable && ejeDias.length >= 14) {
-  const corte7 = ejeDias[ejeDias.length - 7];
-  const corte14 = ejeDias[ejeDias.length - 14];
-  for (const t of trends) {
-    const suma = (desde: string, hasta: string) =>
-      t.points
-        .filter((p) => p.day >= desde && p.day < hasta)
-        .reduce((a, p) => a + p.n_articles, 0);
-    const antes = suma(corte14, corte7);
-    const ahora = suma(corte7, "9999");
-    if (antes >= 14 && ahora < antes * 0.5) {
-      caidas.push({ section: t.section, topic: t.topic, ahora, antes });
-    }
-  }
-  caidas.sort((a, b) => b.antes - a.antes);
-  caidas = caidas.slice(0, 8);
-}
-
-const rangoEje = ejeDias.length
-  ? { desde: ejeDias[0].slice(5), hasta: ejeDias[ejeDias.length - 1].slice(5) }
-  : null;
-
-// La numeración de las bandas se CALCULA. Dos de las tres son condicionales y
-// con números escritos a mano la página salía «00, 02, 03» en cuanto una no se
-// pintaba. El orden de esta lista es el orden de render.
+// La numeración se CALCULA: dos de las tres bandas son condicionales y con
+// números a mano la página salía «01, 03» en cuanto una no se pintaba.
 const bandasVisibles = [
-  accel.length > 0 ? "subiendo" : null,
-  "atencion",
-  fiable ? "calla" : null,
+  duraderos.length > 0 ? "dura" : null,
+  apagados.length > 0 ? "apagados" : null,
+  persistencia.length > 0 ? "persistencia" : null,
 ].filter((b): b is string => b !== null);
-const numBanda = (id: string) =>
-  String(bandasVisibles.indexOf(id) + 1).padStart(2, "0");
+const numBanda = (id: string) => String(bandasVisibles.indexOf(id) + 1).padStart(2, "0");
+
+const unDia = (n: number) => (n === 1 ? "1 día" : `${n} días`);
 ---
 
 <Base
   title="La Doxa — tendencias"
   seccion="tendencias"
-  edicion={`Tendencias · ${dias} ${dias === 1 ? "día" : "días"} de histórico`}
+  edicion={`Tendencias · ${asuntos.length} asuntos seguidos`}
+  descripcion="Cuánto dura la atención de la prensa española: los asuntos que siguen abiertos y los que dejaron de contarse."
 >
   <section class="cifra-hero">
-    <p class="cifra dato">{dias}</p>
+    <p class="cifra dato">{abiertos.length}</p>
     <p class="cifra-frase">
-      {dias === 1 ? "día registrado" : "días registrados"} de agenda mediática. Esta página
-      mide cuánto espacio da la prensa a cada cosa — y la señal gana sentido a partir de dos
-      o tres semanas.
+      asuntos abiertos ahora mismo. Esta página no cuenta noticias: cuenta cuánto aguanta cada
+      asunto en la prensa — y cuáles se dejaron de contar sin cerrarse.
     </p>
   </section>
 
   {
-    accel.length > 0 && (
+    duraderos.length > 0 && (
       <>
         <div class="banda">
-          <span class="banda-num">{numBanda("subiendo")}</span>
-          <h2>Subiendo</h2>
-          <span class="cuenta">7 días &gt; 2× la media de 90</span>
+          <span class="banda-num">{numBanda("dura")}</span>
+          <h2>Lo que más dura</h2>
+          <span class="cuenta">días con piezas nuevas</span>
         </div>
-        <ul class="lista-acelera">
-          {accel.map((a) => (
+        <p class="nota nota-deck">
+          Un asunto es el mismo suceso contado a lo largo de varios días. Cuanto más dura, más
+          tiempo ha sostenido la prensa la atención sobre él.
+        </p>
+        <ul class="filas-datos filas-datos-titular">
+          {duraderos.map((a) => (
             <li>
-              <a href={urlSeccion(a.section, a.topic)}>{a.topic}</a>
-              <span class="dato muted">
-                {a.avg_7d} vs {a.avg_90d}
+              <span class="fila-etiqueta">
+                <a href={urlAsunto(a.id)}>{a.titular ?? "Asunto sin titular contrastado"}</a>
+              </span>
+              <span class="fila-dato">
+                <strong>{unDia(a.n_dias)}</strong>
+                {` · ${a.n_articulos} piezas · ${a.n_medios} medios`}
+              </span>
+              <span class="celda-barra">
+                <span
+                  class="barra"
+                  style={`inline-size: ${Math.round((a.n_dias / maxDias) * 100)}%`}
+                />
               </span>
             </li>
           ))}
@@ -161,136 +135,95 @@ const numBanda = (id: string) =>
     )
   }
 
-  <div class="banda">
-    <span class="banda-num">{numBanda("atencion")}</span>
-    <h2>La atención, sección a sección</h2>
-    <span class="cuenta">artículos por día · misma escala</span>
-  </div>
-  {/* La advertencia de la ventana de 48 h vivía también aquí y salía dos veces
-      en la misma pantalla desde que el aparato es una rejilla al pie. Es nota
-      de método: se queda solo allí. */}
-  <p class="nota nota-deck">
-    Cada bloque es una sección con su serie diaria de artículos agrupados. Todas las barras
-    van a la misma escala: lo que aquí se compara es cuánto pesa cada sección en la agenda,
-    no su forma.
-  </p>
-
   {
-    secciones.length === 0 ? (
-      <p class="aviso">
-        Todavía no hay días suficientes. El histórico se acumula en cada pasada.
-      </p>
-    ) : (
-      <div class="multiples">
-        {secciones.map((s) => (
-          <section class="multiple">
-            <h3 class="rotulo-seccion">
-              <a href={urlSeccion(s.section)}>{rotula(s.section)}</a>
-              <span class="dato muted">{s.total} art.</span>
-            </h3>
-            <div
-              class="mini-barras"
-              role="img"
-              aria-label={`${rotula(s.section)}: ${s.total} artículos en ${ejeDias.length} días`}
-            >
-              {s.porDia.map((n, i) => (
-                <span
-                  class="mini-bar"
-                  style={`block-size: ${Math.max(3, Math.round((n / maximo) * 100))}%`}
-                  title={`${ejeDias[i]} · ${n} ${n === 1 ? "artículo" : "artículos"}`}
-                />
-              ))}
-            </div>
-            {rangoEje && (
-              <div class="mini-eje" aria-hidden="true">
-                <span>{rangoEje.desde}</span>
-                <span>{rangoEje.hasta}</span>
-              </div>
-            )}
-            <ul class="multiple-temas">
-              {s.temas.map((tema) => (
-                <li>
-                  <a href={urlSeccion(s.section, tema.topic)}>{tema.topic}</a>
-                  <span class="dato muted">{tema.total}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
-    )
-  }
-
-  {/* Sin 14 días esta banda no puede decir nada, y una banda numerada entera
-      para anunciar que todavía no hay señal no es información: es una excusa
-      ocupando una pantalla (reportado por el usuario el 2026-08-16). Se apaga
-      como ya hace «Subiendo», y que falta por encenderse se dice UNA vez, en
-      el aparato. Con historia sí se pinta, incluso vacía: ahí el «ningún tema»
-      es un hallazgo, porque se miró. */}
-  {
-    fiable && (
+    apagados.length > 0 && (
       <>
         <div class="banda">
-          <span class="banda-num">{numBanda("calla")}</span>
-          <h2>Qué se calla</h2>
-          <span class="cuenta">última semana &lt; ½ de la anterior</span>
+          <span class="banda-num">{numBanda("apagados")}</span>
+          <h2>Dejó de contarse</h2>
+          <span class="cuenta">2+ días de cobertura, y nada desde entonces</span>
         </div>
         <p class="nota nota-deck">
-          Un tema que ardía y desaparece de la agenda es tan revelador como uno que se
-          dispara: las historias incómodas no siempre se desmienten, a veces solo se dejan de
-          contar.
+          Asuntos que la prensa siguió varios días y ha dejado de mencionar. No quiere decir que
+          se hayan resuelto: quiere decir que ya no aparecen.
         </p>
-        {caidas.length === 0 ? (
-          <p class="nota">Ningún tema con caída clara esta semana.</p>
-        ) : (
-          <ul class="lista-acelera">
-            {caidas.map((c) => (
-              <li>
-                <a href={urlSeccion(c.section, c.topic)}>{c.topic}</a>
-                <span class="dato muted">
-                  {c.ahora} vs {c.antes}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ul class="filas-datos filas-datos-titular">
+          {apagados.map((a) => (
+            <li>
+              <span class="fila-etiqueta">
+                <a href={urlAsunto(a.id)}>{a.titular ?? "Asunto sin titular contrastado"}</a>
+              </span>
+              <span class="fila-dato">
+                <strong>{unDia(a.n_dias)}</strong>
+                {` · última pieza el ${a.ultimo_dia} · ${a.n_medios} medios`}
+              </span>
+            </li>
+          ))}
+        </ul>
       </>
     )
   }
 
-  <aside class:list={["aparato", fiable ? "aparato-3" : "aparato-4"]}>
-    {!fiable && (
-      <section class="aparato-alerta">
-        <p class="aparato-rotulo">Falta por encenderse</p>
-        <p>
-          <strong>Qué se calla.</strong> Detectar un silencio exige comparar dos semanas
-          completas y el histórico lleva <span class="dato">{dias}</span>
-          {dias === 1 ? " día" : " días"}. Aparece sola cuando haya base: antes, cualquier
-          caída sería ruido de calendario.
+  {
+    persistencia.length > 0 && (
+      <>
+        <div class="banda">
+          <span class="banda-num">{numBanda("persistencia")}</span>
+          <h2>Cuánto aguanta cada sección</h2>
+          <span class="cuenta">duración media de un asunto</span>
+        </div>
+        <p class="nota nota-deck">
+          Todas las barras van a la misma escala. Lo que se compara es cuántos días arrastra un
+          asunto según de qué hable, no cuántos asuntos hay.
         </p>
-      </section>
-    )}
-    <section>
-      <p class="aparato-rotulo">Qué mide</p>
+        <ul class="filas-datos">
+          {persistencia.map((p) => (
+            <li>
+              <span class="fila-etiqueta">
+                <a href={urlSeccion(p.section)}>{rotula(p.section)}</a>
+              </span>
+              <span class="fila-dato">
+                <strong>{p.media.toFixed(1)}</strong>
+                {` días de media · sobre ${p.n} asuntos`}
+              </span>
+              <span class="celda-barra">
+                <span
+                  class="barra"
+                  style={`inline-size: ${Math.round((p.media / maxMedia) * 100)}%`}
+                />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {/* El pie va en columnas rotuladas que ocupan el marco, no en una cinta
+      capada a la medida: a 1800 px un párrafo de `--measure` deja la página
+      pegada al margen izquierdo (§ Páginas de datos). Nunca dos columnas en
+      escritorio — serían 780 px por columna, 111 caracteres por línea. */}
+  <div class="aparato aparato-3">
+    <div>
+      <p class="aparato-rotulo">Qué es un asunto</p>
       <p>
-        <strong>Cobertura mediática</strong> sobre los feeds que el proyecto rastrea: cuánto
-        se habla de un asunto, no su importancia.
+        El mismo suceso a lo largo de los días. Se agrupan comparando los artículos que las
+        historias de cada día tienen en común, no por criterio editorial.
       </p>
-    </section>
-    <section>
+    </div>
+    <div>
       <p class="aparato-rotulo">Qué no distingue</p>
       <p>
-        El signo. Un tema se dispara igual por una oportunidad que por una crisis, y la serie
-        no separa las dos: la subida dice que hay ruido, no de qué.
+        Por qué se apaga un asunto. Puede haberse resuelto, puede haber dejado de interesar o
+        puede seguir abierto sin que nadie lo cuente. La cifra dice que no aparece, no por qué.
       </p>
-    </section>
-    <section>
+    </div>
+    <div>
       <p class="aparato-rotulo">La ventana</p>
       <p>
-        La agrupación es de 48 h, así que una misma pieza puede contar en dos días seguidos.
-        El histórico son <span class="dato">{dias}</span>
-        {dias === 1 ? " día" : " días"}.
+        {`${dias} días con datos. Un asunto vuelve a empezar si desaparece más de 48 horas: los
+        días que se cuentan aquí son días seguidos con piezas, no apariciones sueltas.`}
       </p>
-    </section>
-  </aside>
+    </div>
+  </div>
 </Base>

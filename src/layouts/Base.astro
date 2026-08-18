@@ -135,7 +135,7 @@ const imagenSocial = Astro.site
         <ul>
           <li><a href={urlInicio()} class={seccion === "hoy" ? "activo" : ""}>Portada</a></li>
           <li>
-            <a href={urlResumen()} class={seccion === "resumen" ? "activo" : ""}>Resumen</a>
+            <a href={urlResumen()} class={seccion === "resumen" ? "activo" : ""}>Escuchar</a>
           </li>
           <li>
             <a href={urlSeccion("economico")} class={seccion === "seccion" ? "activo" : ""}>
@@ -255,9 +255,15 @@ const imagenSocial = Astro.site
         // revelado además falla, se queda así para siempre.
         // Un titular de 23 px no gana nada con un fundido y lo pierde todo si
         // no llega: se pinta y ya.
+        // `.asunto-fila` y `.crono-dia` entran por lo mismo que `.lista-foco`:
+        // son filas completas —titular más cifras, o un día con sus historias—
+        // que se leen solas. `.toca-punto` NO está: es la apertura de la portada
+        // y vive sobre el pliegue, así que el propio filtro de más abajo lo
+        // dejaría fuera; tenerlo aquí solo invitaría a que un día alguien lo
+        // moviera y se llevara la primera pantalla por delante.
         const piezas = document.querySelectorAll(
           ".ficha, .banda, .cifra-hero, .tabla-envoltorio, .lista-huecos, " +
-            ".relato, .filas-datos, .multiple, .lista-foco",
+            ".relato, .filas-datos, .multiple, .lista-foco, .asunto-fila, .crono-dia",
         );
         const vigia = new IntersectionObserver(
           (entradas) => {
