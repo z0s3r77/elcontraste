@@ -1,0 +1,23 @@
+CLAUDE.md
+  s_5b0dfde68e7eff::t_87801f1a9137fa 32,708
+pipeline/hilos.py
+  s_5b0dfde68e7eff::t_8f49f9ff40fe24 5
+pipeline/run_daily.py
+  s_5b0dfde68e7eff::t_dc2e932fefd161 63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4f982b64288b8f686579cb0aa50c28a17482c781",
+  "prompts": {},
+  "sessions": {
+    "s_5b0dfde68e7eff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0defd04-3ec9-4ce5-baa7-9af57c2594eb",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
