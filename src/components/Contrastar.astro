@@ -1,0 +1,51 @@
+---
+// «Para contrastarlo» — dónde comprobar el contexto por tu cuenta (Fase 14).
+//
+// Petición del usuario: que una historia sobre una guerra, sobre medicina o
+// sobre economía enlace a algo que permita contrastar lo que cuentan los medios
+// con el dato primario.
+//
+// 🚫 **Ninguna de estas URLs sale del modelo.** Están escritas a mano en
+// `config/fuentes.yaml`; el modelo solo elige identificadores de un enum
+// cerrado y la API los resuelve. Un enlace inventado en el bloque que se llama
+// «para contrastarlo» sería la peor cosa que este sitio puede publicar, así que
+// no se confía en que no lo esté: se hace imposible.
+//
+// ⚠️ **Se dice lo que es.** Estas fuentes tienen el dato primario o el
+// repositorio, no el estudio concreto de esta noticia. Es la limitación de
+// hacerlo sin buscador (~10 $ por cada 1.000 búsquedas), se aceptó a sabiendas
+// y se confiesa en la propia página: prometer más de lo que se da es
+// exactamente lo que el sitio le reprocha a la prensa.
+//
+// Los enlaces van en TINTA y no en acento, igual que `.fuentes a`: el
+// presupuesto de acento (≤ 3 % del viewport, § Theme) ya se lo llevan la
+// capitular del relato y las marcas del glosario.
+import type { Fuente } from "../lib/api";
+
+interface Props {
+  fuentes: Fuente[];
+}
+const { fuentes } = Astro.props;
+---
+
+{
+  fuentes.length > 0 && (
+    <section class="contrastar">
+      <h2 class="rotulo-doc">Para contrastarlo</h2>
+      <ul class="contrastar-lista">
+        {fuentes.map((f) => (
+          <li>
+            <a href={f.url} target="_blank" rel="noopener noreferrer">
+              {f.nombre}
+            </a>
+            <span class="contrastar-aporta">{f.aporta}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="firma-ia">
+        Fuentes primarias escogidas de un registro escrito a mano. Llevan al organismo que
+        publica el dato, no al documento concreto de esta noticia.
+      </p>
+    </section>
+  )
+}
