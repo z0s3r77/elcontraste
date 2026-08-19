@@ -1,0 +1,26 @@
+web/src/lib/api.ts
+  s_f627612744c584::t_ea8d6cb0142ad4 169-176,227-232,252-268
+web/src/pages/cluster/[id].astro
+  s_f627612744c584::t_e0b6825eae45a9 5,48-66,69,166-170,172-174,321-327
+  s_f627612744c584::t_629e3d55d0f042 328
+web/src/styles/global.css
+  s_f627612744c584::t_58d235ced292fb 736-746,1100-1108,1111,1147-1168,1327-1362,2044-2052,2054-2057,2070-2085,2087-2090,2092-2096
+api/main.py
+  s_f627612744c584::t_25d8fa909fd4cb 23,196-197,249-261,267-274,325-328,496-507,518,595-610
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "7f3529b05d12adb80afd783f8f882d9686c5ccdd",
+  "prompts": {},
+  "sessions": {
+    "s_f627612744c584": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5654f0fa-796e-458f-a229-4f63ab36624b",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
