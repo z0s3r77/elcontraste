@@ -1,0 +1,19 @@
+web/src/pages/index.astro
+  s_f627612744c584::t_f2124ae7a42719 63-74,78-86,193-206,220
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "88d73a48a8f2464397ab194c7e14232b55742957",
+  "prompts": {},
+  "sessions": {
+    "s_f627612744c584": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5654f0fa-796e-458f-a229-4f63ab36624b",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
