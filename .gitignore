@@ -10,3 +10,7 @@ dist/
 !.env.example
 
 .DS_Store
+
+# La locución la baja el workflow al hornear (ver .github/workflows/deploy.yml).
+# Si se prueba en local, no debe acabar en el repo espejo: son ~800 KB por día.
+public/audio/

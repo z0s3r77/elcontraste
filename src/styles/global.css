@@ -769,13 +769,25 @@
      devolvió el `<p>` a ser el primer hijo del `<main>`: ahora el comentario
      vuelve a describir la página. Si algún día vuelve a moverse, se corrige
      aquí y en § Portada de design.md a la vez. */
+  /* El filete va en el envoltorio, no en el `<p>`: el lema se capa a 60ch y va
+     centrado, y un borde suyo mediría 60ch — se leería como un subrayado, no
+     como una división. Aquí cruza el marco entero y separa la cabecera del
+     día, que es lo que hace un periódico. */
+  .lema {
+    border-bottom: var(--rule-hair) solid var(--color-rule);
+    margin-bottom: var(--spacing-lg);
+  }
+  /* Sube de --text-lg a una escala fluida y pasa de `muted` a `ink`: el lema
+     explica el nombre del sitio y era lo más apagado de la primera pantalla.
+     ⚠️ El cambio de color va HACIA más contraste (muted → ink), así que no
+     puede bajar del suelo de 4,5:1 del sistema y no hay ratio que remedir. */
   .posicionamiento {
     max-width: 60ch;
     margin: 0 auto var(--spacing-md);
     font-family: var(--font-display);
-    font-size: var(--text-lg);
-    line-height: 1.35;
-    color: var(--color-muted);
+    font-size: clamp(var(--text-lg), 2.1vw, var(--text-xl));
+    line-height: 1.3;
+    color: var(--color-ink);
     text-align: center;
     text-wrap: balance;
   }
@@ -1753,6 +1765,20 @@
   .voz-icono {
     font-size: 0.9em;
   }
+  /* ---- El reproductor de la locución ----
+     Control nativo a propósito: es accesible sin una línea de JS, el navegador
+     ya sabe teclado y lectores de pantalla, y respeta el `color-scheme` del
+     tema. Un reproductor propio sería más bonito y peor. */
+  .voz-audio {
+    margin: 0 0 var(--spacing-lg);
+  }
+  .voz-audio audio {
+    display: block;
+    width: 100%;
+    max-width: var(--measure);
+    margin-bottom: var(--spacing-3xs);
+  }
+
   .voz-nota {
     font-family: var(--font-outlier);
     font-size: var(--text-xs);
@@ -2150,8 +2176,8 @@
      queda vacía») y el mismo que la retícula de dos columnas de la Fase 13
      venía a tapar. Medido en el navegador: 30ch da 1120 px en dos líneas. */
   .estado-lede h2 {
-    font-size: clamp(2rem, 5vw, 3.75rem);
-    line-height: 1.15;
+    font-size: clamp(2rem, 5.4vw, 4.25rem);
+    line-height: 1.12;
     margin: 0 0 var(--spacing-2xs);
     max-width: 30ch;
     text-wrap: balance;
@@ -2161,11 +2187,49 @@
   .estado-lede .nota-deck {
     max-width: var(--measure);
   }
+  /* ---- La apertura en dos columnas ----
+     La entradilla sube al costado del titular en vez de colgar debajo. El
+     motivo no es estético: con todo apilado a la izquierda, la primera pantalla
+     dejaba el tercio derecho vacío y la portada entera se leía como una única
+     columna corrida. Es el mismo defecto que § Anchos regla 2 prohíbe.
+
+     `align-items: end` asienta la entradilla sobre la última línea del titular,
+     que es donde la pone un periódico; alineada arriba flota y no se entiende
+     de quién cuelga.
+
+     ⚠️ Solo desde 72rem, y el umbral está MEDIDO: a 64rem la columna de la
+     entradilla salía de 358 px, o sea ~40 caracteres por línea, que es prosa
+     en un canalón. Por debajo apila, y ahí el `max-width: 30ch` del titular
+     sigue mandando. */
+  @media (width >= 72rem) {
+    .estado-lede {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: var(--spacing-lg);
+      align-items: end;
+    }
+    /* Dentro de la retícula el ancho lo pone la columna, no una medida escrita
+       a mano: con los 30ch puestos, el titular no llenaría su propia columna y
+       el hueco reaparecería más pequeño. */
+    .estado-lede h2 {
+      max-width: none;
+      margin-bottom: 0;
+    }
+    /* Y la entradilla llena la suya. La columna mide ~600 px de un marco de
+       1584, o sea ~60 caracteres: por debajo de la medida de 72ch, así que la
+       prosa sigue dentro de límites sin necesidad de caparla otra vez. */
+    .estado-lede .nota-deck {
+      max-width: none;
+    }
+  }
   /* Las cifras del día. Mismo tratamiento que `.mast-line`: es metadata, no
      dato de portada, y va debajo porque contesta «de qué tamaño es hoy»
      después de «qué ha pasado hoy», nunca antes. */
   .estado-cifras {
-    margin: var(--spacing-sm) 0 0;
+    /* Con el titular a 4,25rem y la entradilla al costado, la última línea del
+       titular llega mucho más abajo: la separación de antes dejaba las cifras
+       pegadas a los descendentes. */
+    margin: var(--spacing-md) 0 0;
     font-family: var(--font-outlier);
     font-size: var(--text-xs);
     text-transform: uppercase;

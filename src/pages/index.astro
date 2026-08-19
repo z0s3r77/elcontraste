@@ -199,10 +199,16 @@ const secciones = digest.sections
       Fase 13 lo bajó a la última línea del estado del día y en escritorio lo
       alineó a la izquierda; el resultado es que dejó de verse centrado en
       cualquier ancho pese a que design.md seguía diciendo que lo estaba. */}
-  <p class="posicionamiento">
-    Doxa es la opinión, no el saber. Todas las versiones de una misma noticia, juntas, para que
-    el criterio sea tuyo.
-  </p>
+  {/* El envoltorio existe SOLO por el filete: el lema se capa a 60ch y va
+      centrado, así que un `border-bottom` suyo mediría 60ch y se leería como
+      un subrayado del texto, no como una división de la página. El filete
+      tiene que cruzar el marco entero para separar la cabecera del día. */}
+  <div class="lema">
+    <p class="posicionamiento">
+      Doxa es la opinión, no el saber. Todas las versiones de una misma noticia, juntas, para
+      que el criterio sea tuyo.
+    </p>
+  </div>
 
   {/* 00 · Estado del día. Va sobre el pliegue, así que entra por CSS y NO
       entra en el revelado por scroll: ocultar la primera pantalla hasta que

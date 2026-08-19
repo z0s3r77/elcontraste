@@ -384,9 +384,14 @@ const imagenSocial = Astro.site
       });
 
       // ---- Voz del resumen diario -----------------------------------------
-      // Lee EXACTAMENTE lo que está escrito en la página: el saludo, y luego
-      // cada punto tal y como se ve. Nada de un guion aparte — un texto hablado
-      // distinto del publicado sería una segunda versión que nadie revisa.
+      // Dice el GUION HABLADO que viene horneado en `[data-guion]`: los mismos
+      // puntos y el mismo orden que la página, escritos para el oído. Hasta la
+      // Fase 14 se leía la página tal cual, y sonaba a teleprompter.
+      //
+      // El desajuste que evitaba aquella regla —una segunda versión que nadie
+      // revisa— se acota en tres sitios: el guion sale de la MISMA llamada que
+      // el texto, `validar()` lo tira entero si se cayó algún punto, y si falta
+      // se cae aquí a leer la página, que es el comportamiento de siempre.
       const voz = document.querySelector("[data-voz]");
       if (voz && "speechSynthesis" in window) {
         const sintesis = window.speechSynthesis;
@@ -397,13 +402,32 @@ const imagenSocial = Astro.site
         // La lista de voces llega vacía en el primer tick en casi todos los
         // navegadores y se rellena después, de forma asíncrona. Se resuelve en
         // el momento de hablar, no al cargar.
-        const vozEspanola = () => {
-          const todas = sintesis.getVoices();
-          return (
-            todas.find((v) => v.lang === "es-ES") ||
-            todas.find((v) => v.lang.startsWith("es")) ||
-            null
+        //
+        // ⚠️ Coger la PRIMERA voz `es-ES` era coger «Mónica», la voz compacta
+        // antigua de Apple: es la que sale por defecto en macOS y es justo la
+        // que suena a robot. Medido en un Mac: 20 voces en español, y de ellas
+        // ocho son las de broma de macOS (Eddy, Grandma, Rocko…), que están
+        // marcadas como `es-ES` igual que las serias. Así que no se coge la
+        // primera: se puntúan y se coge la mejor.
+        const BROMA =
+          /^(Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley|Bells|Boing|Bubbles|Jester|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Bad News|Good News)\b/i;
+
+        const puntuar = (v) => {
+          let p = v.lang === "es-ES" ? 100 : 50; // castellano antes que es-MX
+          if (BROMA.test(v.name)) p -= 200; // por debajo de cualquier voz seria
+          if (/premium|enhanced|neural|siri|mejorad/i.test(v.name)) p += 60;
+          // Las de red («Google español») suenan bastante mejor que las locales
+          // que expone macOS a Chrome. El precio está en `pausable`, más abajo.
+          if (!v.localService) p += 40;
+          return p;
+        };
+
+        const mejorVoz = (todas) => {
+          const es = (todas || sintesis.getVoices()).filter((v) =>
+            v.lang.toLowerCase().startsWith("es"),
           );
+          if (!es.length) return null;
+          return es.slice().sort((a, b) => puntuar(b) - puntuar(a))[0];
         };
 
         const saludo = () => {
@@ -412,9 +436,21 @@ const imagenSocial = Astro.site
           return `${momento}. Bienvenido a La Doxa. Esto es lo que hay que saber hoy.`;
         };
 
-        // El texto, leído del DOM ya horneado. Se recogen las frases enteras y
-        // se trocean por puntuación más abajo.
+        // El saludo lo pone SIEMPRE el cliente, nunca el modelo: depende de la
+        // hora a la que se escuche y el sitio se hornea una vez al día. Es la
+        // misma razón por la que los estados de los asuntos se calculan contra
+        // el día del digest y no contra el reloj.
+        //
+        // Lo demás sale del guion horneado si está, y de la página si no.
         const guion = () => {
+          const hablado = [...document.querySelectorAll("[data-guion] li")]
+            .map((li) => (li.textContent || "").trim())
+            .filter(Boolean);
+          if (hablado.length) return [saludo(), ...hablado];
+
+          // Respaldo: leer la página tal cual, como hasta la Fase 14. Suena más
+          // rígido, pero una etapa que puede caerse sola no puede dejar el botón
+          // sin nada que decir.
           const partes = [saludo()];
           const entradilla = document.querySelector(".resumen-entradilla");
           if (entradilla?.textContent) partes.push(entradilla.textContent);
@@ -439,16 +475,79 @@ const imagenSocial = Astro.site
             .filter(Boolean);
 
         let hablando = false;
+        // ⚠️ Chrome NO pausa las voces de red: `pause()` no hace nada y el botón
+        // se queda diciendo «Seguir escuchando» mientras la voz sigue hablando.
+        // Como ahora se prefiere «Google español», que es de red, el botón se
+        // adapta a lo que la voz elegida sabe hacer: con voz local pausa, con
+        // voz de red para. Un botón que miente es peor que un botón con menos
+        // funciones. Se fija al empezar a hablar, que es cuando se sabe.
+        let pausable = true;
+        // Si la voz de red no llega a sonar ni una vez, se deja de intentar en
+        // lo que queda de sesión y se tira de voz local (ver `arrancar`).
+        let soloLocal = false;
+        // Cada locución lleva su número. Los eventos de una locución ya
+        // cancelada siguen llegando después —`cancel()` dispara `error` en todo
+        // lo que quedaba en cola—, y sin esto el reintento con voz local se
+        // suicidaba con los errores de su propio predecesor.
+        let generacion = 0;
+
         const pintar = (estado) => {
           if (etiqueta) etiqueta.textContent = estado;
-          if (parar) parar.hidden = !hablando;
+          // Sin pausa, el botón principal ya es «Parar»: el segundo sobra.
+          if (parar) parar.hidden = !hablando || !pausable;
           voz.classList.toggle("voz-activa", hablando);
         };
 
         const detener = () => {
+          generacion += 1;
           sintesis.cancel();
           hablando = false;
           pintar("Escuchar el resumen");
+        };
+
+        const arrancar = () => {
+          const mia = (generacion += 1);
+          sintesis.cancel();
+          const candidatas = soloLocal
+            ? sintesis.getVoices().filter((v) => v.localService)
+            : sintesis.getVoices();
+          const elegida = mejorVoz(candidatas);
+          pausable = elegida ? elegida.localService : true;
+          const frases = trocear(guion());
+          hablando = true;
+          let sono = false;
+
+          frases.forEach((frase, i) => {
+            const u = new SpeechSynthesisUtterance(frase);
+            u.lang = "es-ES";
+            if (elegida) u.voice = elegida;
+            u.rate = 1.0;
+            u.addEventListener("start", () => {
+              sono = true;
+            });
+            if (i === frases.length - 1) {
+              u.addEventListener("end", () => {
+                if (mia === generacion) detener();
+              });
+            }
+            u.addEventListener("error", () => {
+              if (mia !== generacion) return; // eco de una locución ya cancelada
+              // Una voz de red que falla ANTES de sonar una sola vez no es un
+              // fallo puntual: es que no se puede usar —sin conexión, un proxy
+              // TLS por medio, el servicio de Google caído—. Y como es la que
+              // se prefiere por sonar mejor, sin este respaldo el botón se
+              // quedaría mudo justo en las máquinas con la red capada.
+              if (!sono && elegida && !elegida.localService && !soloLocal) {
+                soloLocal = true;
+                arrancar();
+                return;
+              }
+              detener();
+            });
+            sintesis.speak(u);
+          });
+
+          pintar(pausable ? "Pausar" : "Parar");
         };
 
         // ⚠️ El estado lo lleva `hablando`, NO `speechSynthesis.paused`.
@@ -458,32 +557,22 @@ const imagenSocial = Astro.site
         // y no había forma de volver atrás. Nuestra bandera solo la mueven el
         // clic y el final de la última frase, así que no puede mentir.
         play?.addEventListener("click", () => {
-          if (hablando && !sintesis.paused) {
+          if (hablando && pausable && !sintesis.paused) {
             sintesis.pause();
             pintar("Seguir escuchando");
             return;
           }
-          if (hablando && sintesis.paused) {
+          if (hablando && pausable && sintesis.paused) {
             sintesis.resume();
             pintar("Pausar");
             return;
           }
-          // Empezar de cero: `cancel()` limpia cualquier cola anterior, que es
-          // lo que deja el estado raro de arriba.
-          sintesis.cancel();
-          const elegida = vozEspanola();
-          const frases = trocear(guion());
-          hablando = true;
-          frases.forEach((frase, i) => {
-            const u = new SpeechSynthesisUtterance(frase);
-            u.lang = "es-ES";
-            if (elegida) u.voice = elegida;
-            u.rate = 1.0;
-            if (i === frases.length - 1) u.addEventListener("end", detener);
-            u.addEventListener("error", detener);
-            sintesis.speak(u);
-          });
-          pintar("Pausar");
+          // Voz de red: no hay pausa que valga, así que el botón para.
+          if (hablando) {
+            detener();
+            return;
+          }
+          arrancar();
         });
 
         parar?.addEventListener("click", detener);
@@ -491,11 +580,29 @@ const imagenSocial = Astro.site
         // `speechSynthesis` vive en el navegador, no en el documento.
         addEventListener("pagehide", () => sintesis.cancel());
 
+        // ---- Quién manda: el MP3 o la voz del navegador --------------------
+        // Si la página trae locución horneada, manda ella y este botón no
+        // aparece: son dos formas de escuchar lo mismo y enseñar las dos a la
+        // vez solo confunde.
+        //
+        // Pero el MP3 puede faltar aunque la API dijera que sí —el workflow no
+        // lo bajó, un 404, un fichero a medias—, y un reproductor roto dejaría
+        // la página sin ninguna forma de escuchar. Por eso el respaldo no es
+        // teórico: si el audio da error, se retira y sale el botón.
+        const bloqueAudio = document.querySelector("[data-voz-audio]");
+
         // Se enseña solo si hay voz que lo lea. Sin ninguna instalada, un botón
         // que no hace nada al pulsarlo es peor que no tener botón.
         const mostrar = () => {
+          if (bloqueAudio && bloqueAudio.isConnected) return;
           if (sintesis.getVoices().length > 0) voz.hidden = false;
         };
+
+        bloqueAudio?.querySelector("audio")?.addEventListener("error", () => {
+          bloqueAudio.remove();
+          mostrar();
+        });
+
         mostrar();
         sintesis.addEventListener("voiceschanged", mostrar);
       }

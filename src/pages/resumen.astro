@@ -11,7 +11,7 @@
 // arriba abajo, no una rejilla de descubrimiento.
 import Base from "../layouts/Base.astro";
 import { digestUltimo, resumenUltimo } from "../lib/api";
-import { numeral, rotula, urlCluster, urlInicio } from "../lib/ui";
+import { numeral, rotula, urlCluster, urlEstatico, urlInicio } from "../lib/ui";
 
 // El digest solo para la fecha de la cabecera. Si el resumen falta, la página
 // existe igual y lo dice: es una etapa que puede caerse sola sin tumbar la
@@ -21,6 +21,11 @@ const [digest, resumen] = await Promise.all([digestUltimo(), resumenUltimo()]);
 // Del día del resumen, no del digest: si la etapa falló hoy, lo que se está
 // leyendo es el de ayer y la fecha tiene que decirlo.
 const fecha = resumen?.date ?? digest.date;
+
+// Los trozos de la locución. Vacío si la etapa no lo escribió o si `validar()`
+// lo tiró por haberse caído algún punto (pipeline/briefing.py): en ese caso la
+// página se lee tal cual, que es el comportamiento de siempre.
+const guion = resumen?.guion_hablado ?? [];
 
 const URGENCIA: Record<string, string> = {
   ahora: "Ya está pasando",
@@ -58,6 +63,21 @@ const URGENCIA: Record<string, string> = {
       {
         resumen && (
           <>
+            {/* La locución de verdad, cuando la hay: un MP3 con voz neuronal
+                castellana que hornea `pipeline/locucion.py`. Manda sobre el
+                botón de abajo, que se queda escondido salvo que esto falle.
+                `preload="metadata"` para que se vea la duración sin bajarse
+                los ~800 KB hasta que alguien le dé al play. */}
+            {resumen.audio && (
+              <div class="voz-audio" data-voz-audio>
+                <audio controls preload="metadata" src={urlEstatico("audio/resumen.mp3")} />
+                <p class="voz-nota">
+                  Voz sintética castellana. Dice estos mismos puntos, escritos para el
+                  oído.
+                </p>
+              </div>
+            )}
+
             {/* El botón vive fuera del <p> del texto y ANTES de él: es la
                 acción principal de la página, y el script lo esconde solo si
                 el navegador no trae voz (ver Base.astro). */}
@@ -70,9 +90,24 @@ const URGENCIA: Record<string, string> = {
                 Parar
               </button>
               <p class="voz-nota">
-                Lee esta misma página con la voz del navegador. No se descarga nada.
+                Versión hablada de estos mismos puntos, con la voz del navegador. No se
+                descarga nada.
               </p>
             </div>
+
+            {/* El guion para escuchar, oculto: son los mismos puntos y el mismo
+                orden, escritos para el oído en vez de para el ojo. Va en el DOM
+                porque el sitio es estático y el script no puede pedirlo a nadie.
+                `hidden` lo saca también del árbol de accesibilidad — un lector
+                de pantalla ya tiene el texto de verdad justo debajo, y oírlo dos
+                veces sería peor. Si falta, Base.astro lee la página tal cual. */}
+            {guion.length > 0 && (
+              <ol hidden data-guion>
+                {guion.map((frase) => (
+                  <li>{frase}</li>
+                ))}
+              </ol>
+            )}
 
             {resumen.entradilla && <p class="resumen-entradilla">{resumen.entradilla}</p>}
 
@@ -123,8 +158,16 @@ const URGENCIA: Record<string, string> = {
       </p>
       <h2 class="rotulo-doc">La voz</h2>
       <p class="aparato-texto">
-        La pone el propio navegador y lee el texto que ves, sin cambiarlo. Puede que en tu
-        dispositivo no haya ninguna voz en español instalada; entonces el botón no aparece.
+        Lo que se escucha no es este texto leído en alto, sino una versión escrita para el
+        oído: los mismos puntos, el mismo orden y los mismos datos, dichos como los diría
+        una persona. Sale de la misma llamada al modelo que el texto.
+      </p>
+      {/* Dos aparatos porque son dos cosas distintas, y describir la que no
+          está sería mentir en la página que va de contrastar fuentes. */}
+      <p class="aparato-texto">
+        {resumen?.audio
+          ? "La locución está grabada de antemano con una voz sintética en castellano. No es una persona: es un modelo de voz, y por eso se nota. Si el audio no carga, sale un botón que lee la página con la voz de tu navegador."
+          : "Hoy no hay locución grabada, así que la pone el propio navegador y no se descarga ningún audio. Si en tu dispositivo no hay ninguna voz en español, el botón no aparece."}
       </p>
     </aside>
   </article>

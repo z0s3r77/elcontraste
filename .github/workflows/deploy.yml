@@ -56,6 +56,48 @@ jobs:
 
       - run: npm ci
 
+      # La locución del día, que no viaja en el repo: la genera
+      # `pipeline/locucion.py` en el portátil y pesa ~800 KB diarios, así que
+      # commitearla engordaría el historial del espejo sin ningún motivo.
+      #
+      # ⚠️ Este paso NO puede tumbar el despliegue. Si no hay locución —la etapa
+      # se cayó, falta la clave de Azure, el guion no se pudo escribir— el sitio
+      # se publica igual y la página cae al botón de la voz del navegador. Un
+      # sitio sin audio es mucho mejor que un sitio sin publicar.
+      - name: Traer la locución del día
+        continue-on-error: true
+        env:
+          API_BASE_URL: ${{ inputs.api_base_url || secrets.API_BASE_URL }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          set -uo pipefail
+          mkdir -p public/audio
+          codigo=$(curl -sS -o public/audio/resumen.mp3 -w '%{http_code}' \
+            -H "CF-Access-Client-Id: ${CF_ACCESS_CLIENT_ID:-}" \
+            -H "CF-Access-Client-Secret: ${CF_ACCESS_CLIENT_SECRET:-}" \
+            "${API_BASE_URL}/api/briefing/latest/audio.mp3" || echo 000)
+
+          # Un 404 es normal y esperado: significa «hoy no hay locución».
+          # Y hay que BORRAR el fichero, porque curl deja escrito el cuerpo del
+          # error y un MP3 con un JSON dentro rompe el reproductor en vez de
+          # caer al respaldo.
+          if [ "$codigo" != "200" ]; then
+            echo "Sin locución (HTTP $codigo): el sitio saldrá con la voz del navegador."
+            rm -f public/audio/resumen.mp3
+            exit 0
+          fi
+
+          # Access devuelve su pantalla de login con un 200, la misma trampa que
+          # ya cubre src/lib/api.ts. Un MP3 empieza por ID3 o por 0xFF; si esto
+          # es HTML, no es audio.
+          if ! file public/audio/resumen.mp3 | grep -qi 'audio\|mpeg\|MPEG'; then
+            echo "::warning::Lo descargado no es audio. Se descarta."
+            rm -f public/audio/resumen.mp3
+            exit 0
+          fi
+          echo "Locución: $(du -h public/audio/resumen.mp3 | cut -f1)"
+
       - name: Hornear el sitio
         env:
           # El input manda: con un quick tunnel la URL es distinta cada vez y

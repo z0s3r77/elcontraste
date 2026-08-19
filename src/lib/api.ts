@@ -301,6 +301,17 @@ export interface Resumen {
     n_sources: number;
     n_articles: number;
   }[];
+  /**
+   * La versión para escuchar, en trozos cortos (uno por locución). Sale de la
+   * misma llamada que el texto y cuenta los mismos puntos en el mismo orden,
+   * solo que dicho en vez de leído. Vacío = leer la página tal cual.
+   */
+  guion_hablado: string[];
+  /**
+   * ¿Hay MP3 locutado para ESTE guion? (pipeline/locucion.py). Si lo hay,
+   * la página pinta reproductor; si no, el botón de la voz del navegador.
+   */
+  audio: boolean;
   model: string | null;
   created_at: string | null;
 }
