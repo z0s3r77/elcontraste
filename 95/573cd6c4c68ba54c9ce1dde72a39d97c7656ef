@@ -1,0 +1,23 @@
+web/src/layouts/Base.astro
+  s_f627612744c584::t_a1300e42b8c406 123-133,135
+web/src/lib/glosario.ts
+  s_f627612744c584::t_1d6516323cacd0 20-46,64-65,68-74,104-105,108-114,116,119,129-132,135,141-173
+web/src/components/Glosado.astro
+  s_f627612744c584::t_46a00d73f7bb81 34-39,41-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "95573cd6c4c68ba54c9ce1dde72a39d97c7656ef",
+  "prompts": {},
+  "sessions": {
+    "s_f627612744c584": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5654f0fa-796e-458f-a229-4f63ab36624b",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
