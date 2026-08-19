@@ -1,0 +1,51 @@
+.gitignore
+  s_eb268582fd8af7::t_f80a4856913254 36-39
+CLAUDE.md
+  s_eb268582fd8af7::t_e3500f23f136ed 41-50,990-1176
+api/main.py
+  s_eb268582fd8af7::t_838beec3cc6560 20,26,525-566,615-623
+design.md
+  s_eb268582fd8af7::t_f02432c5deea01 306,313-330,387-399
+docker-compose.yml
+  s_eb268582fd8af7::t_fff92e1287a4a0 37-42
+docs/despliegue.md
+  s_eb268582fd8af7::t_9df5b2fd811f4d 493-548
+pipeline/briefing.py
+  s_eb268582fd8af7::t_f08bc546158d18 10-20,34,45-48,108-149,170-173,175,264,266-307
+pipeline/locucion.py
+  s_eb268582fd8af7::t_d5c57fb394a106 1-303
+pipeline/run_daily.py
+  s_eb268582fd8af7::t_3e4be9fbdab12c 31,154-158
+pyproject.toml
+  s_eb268582fd8af7::t_8a0e81e8bac8e4 27-34
+web/.github/workflows/deploy.yml
+  s_eb268582fd8af7::t_34914a81b4781f 59-100
+web/.gitignore
+  s_eb268582fd8af7::t_0a035f72b83111 13-16
+web/src/layouts/Base.astro
+  s_eb268582fd8af7::t_d4ea12caafb9ba 387-394,405-427,429-430,439-444,446-453,478-493,496-497,502,508-552,560,565,570-575,583-593,597,600-605
+web/src/lib/api.ts
+  s_eb268582fd8af7::t_2770296684c11c 304-314
+web/src/pages/index.astro
+  s_eb268582fd8af7::t_f379dc508f9b25 202-211
+web/src/pages/resumen.astro
+  s_eb268582fd8af7::t_dcef27fbb4d114 14,25-29,66-80,93-94,98-111,161-170
+web/src/styles/global.css
+  s_eb268582fd8af7::t_742c286a5753a5 772-783,788-790,1768-1781,2179-2180,2190-2224,2229-2232
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "bdb087833ebe3567dc8d53011eaacf119360139e",
+  "prompts": {},
+  "sessions": {
+    "s_eb268582fd8af7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc14b709-faf6-48a4-b092-1d6d992ac632",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
