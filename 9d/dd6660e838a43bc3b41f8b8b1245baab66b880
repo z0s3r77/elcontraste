@@ -1,0 +1,29 @@
+CLAUDE.md
+  s_84882010464709::t_bbe6240ab7dc6a 819-857
+design.md
+  s_84882010464709::t_7d548e12e96a63 89-103,109,125-160,283-302,351-365
+pipeline/run_daily.py
+  s_84882010464709::t_96bace82c2f9d4 68-94,106-110
+web/src/pages/cluster/[id].astro
+  s_84882010464709::t_08c67893b45dfd 129-135,138-141
+web/src/pages/index.astro
+  s_84882010464709::t_401bb7e06c4ac3 59-66,178-185
+web/src/styles/global.css
+  s_84882010464709::t_c843ac71622fd8 76-82,237-255,754-755,764,1044,1046-1050,1056-1067,1073-1102,1109-1110,1114-1121,2048-2051,2059-2069,2074-2075,2080-2100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9ddd6660e838a43bc3b41f8b8b1245baab66b880",
+  "prompts": {},
+  "sessions": {
+    "s_84882010464709": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c8ad5cab-485e-4c0f-bd85-d78cdcd18655",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
