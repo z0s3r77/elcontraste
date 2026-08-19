@@ -17,8 +17,33 @@ export interface Termino {
   delModelo?: boolean;
 }
 
-/** Un trozo de texto ya clasificado: literal, o término con su definición. */
-export type Trozo = { texto: string; termino?: Termino };
+/**
+ * Las marcas tipográficas que puede llevar un trozo, aparte del glosario.
+ *
+ * - `nombre` → negrita. Medios y entidades: quién dice cada cosa y de quién se
+ *   habla. En un relato donde la atribución es la regla que sostiene el
+ *   producto («según ABC», «solo El Mundo menciona»), dejarla como texto plano
+ *   la esconde.
+ * - `cita` → cursiva. Lo entrecomillado, con sus comillas dentro.
+ */
+export type Marca = "nombre" | "cita";
+
+/** Un trozo de texto ya clasificado: literal, término del glosario, o marcado. */
+export type Trozo = { texto: string; termino?: Termino; marca?: Marca };
+
+/**
+ * Lo entrecomillado, en dos formas.
+ *
+ * ⚠️ Medido sobre los 143 relatos que había en la base el 2026-08-19: el
+ * modelo escribe **comillas rectas** (152 apariciones, en 32 relatos) y casi
+ * nunca latinas (8, en 5). Marcar solo `«»` —que es lo correcto en español y lo
+ * que ahora pide el prompt— habría cubierto **5 de 143**. Se aceptan las dos
+ * para que lo ya publicado también gane la cursiva.
+ *
+ * El contenido no cruza saltos de línea ni pasa de 300 caracteres: una comilla
+ * suelta y sin pareja no puede tragarse medio relato.
+ */
+const CITA = String.raw`«[^»\n]{1,300}»|"[^"\n]{1,300}"`;
 
 /** Escapa lo que va dentro de una clase de caracteres o una alternancia. */
 const escapar = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -36,13 +61,17 @@ const escapar = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
  * Sin eso, «inflación subyacente» se marcaría como «inflación» y el lector
  * vería explicada la palabra fácil en lugar de la difícil.
  */
-function construirRegex(terminos: Termino[]): RegExp | null {
-  const formas = terminos
-    .flatMap((t) => t.formas)
+function construirRegex(terminos: Termino[], nombres: string[]): RegExp | null {
+  const formas = [...terminos.flatMap((t) => t.formas), ...nombres]
     .sort((a, b) => b.length - a.length)
     .map(escapar);
-  if (formas.length === 0) return null;
-  return new RegExp(`(?<![\\p{L}\\p{N}])(${formas.join("|")})(?![\\p{L}\\p{N}])`, "giu");
+  const alternativas: string[] = [`(?<cita>${CITA})`];
+  if (formas.length > 0) {
+    alternativas.push(
+      `(?<![\\p{L}\\p{N}])(?<palabra>${formas.join("|")})(?![\\p{L}\\p{N}])`,
+    );
+  }
+  return new RegExp(alternativas.join("|"), "giu");
 }
 
 /** Índice forma normalizada → entrada, para resolver qué encajó. */
@@ -72,14 +101,22 @@ const indexar = (terminos: Termino[]): Map<string, Termino> => {
 export class Marcador {
   private regex: RegExp | null;
   private porForma: Map<string, Termino>;
+  /** minúsculas → nombre con su caja original, para exigirla al encajar. */
+  private nombres: Map<string, string>;
   private usados = new Set<string>();
 
-  constructor(terminos: Termino[]) {
-    this.regex = construirRegex(terminos);
+  /**
+   * @param terminos  El diccionario del glosario, ya combinado con lo del modelo.
+   * @param nombres   Medios y entidades a poner en negrita. **Se exige la caja
+   *                  exacta** (ver `trocear`).
+   */
+  constructor(terminos: Termino[], nombres: string[] = []) {
+    this.regex = construirRegex(terminos, nombres);
     this.porForma = indexar(terminos);
+    this.nombres = new Map(nombres.map((n) => [n.toLowerCase(), n]));
   }
 
-  /** Parte un texto en trozos literales y trozos con término. */
+  /** Parte un texto en trozos: literales, términos del glosario y marcas. */
   trocear(texto: string): Trozo[] {
     if (!this.regex) return [{ texto }];
     const trozos: Trozo[] = [];
@@ -89,16 +126,50 @@ export class Marcador {
     this.regex.lastIndex = 0;
     for (const m of texto.matchAll(this.regex)) {
       const encontrado = m[0];
-      const termino = this.porForma.get(encontrado.toLowerCase());
-      if (!termino || this.usados.has(termino.termino)) continue;
-      this.usados.add(termino.termino);
+      const trozo = m.groups?.cita
+        ? ({ texto: encontrado, marca: "cita" } as Trozo)
+        : this.clasificarPalabra(encontrado);
+      if (!trozo) continue;
       const i = m.index!;
       if (i > ultimo) trozos.push({ texto: texto.slice(ultimo, i) });
-      trozos.push({ texto: encontrado, termino });
+      trozos.push(trozo);
       ultimo = i + encontrado.length;
     }
     if (ultimo < texto.length) trozos.push({ texto: texto.slice(ultimo) });
     return trozos;
+  }
+
+  /**
+   * Decide si una palabra encajada es término, nombre, o nada. `null` = se deja
+   * como texto plano y el troceador sigue.
+   *
+   * **El glosario gana siempre**: una definición dice más que una negrita, y si
+   * el mismo texto es las dos cosas el lector se lleva la información, no el
+   * énfasis.
+   */
+  private clasificarPalabra(encontrado: string): Trozo | null {
+    const clave = encontrado.toLowerCase();
+
+    const termino = this.porForma.get(clave);
+    if (termino) {
+      if (this.usados.has(termino.termino)) return null;
+      this.usados.add(termino.termino);
+      return { texto: encontrado, termino };
+    }
+
+    const nombre = this.nombres.get(clave);
+    if (!nombre) return null;
+    // ⚠️ **La caja tiene que coincidir exactamente.** La regex es `i` porque el
+    // glosario la necesita, y sin esta comprobación el medio «El Mundo» pondría
+    // en negrita «el mundo» en «una decisión que cambió el mundo»: un nombre
+    // propio inventado en mitad de una frase corriente. Mismo problema que
+    // resolvió `formas:` en el glosario cuando «fiscal» marcaba el adjetivo de
+    // «rebaja fiscal», y misma lección: encajar no es acertar.
+    if (encontrado !== nombre) return null;
+    const marcaUsada = `nombre:${nombre}`;
+    if (this.usados.has(marcaUsada)) return null;
+    this.usados.add(marcaUsada);
+    return { texto: encontrado, marca: "nombre" };
   }
 }
 

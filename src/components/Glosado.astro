@@ -31,8 +31,22 @@ const bloques = parrafos(texto).map((lineas) => lineas.map((linea) => marcador.t
       {lineas.map((trozos, i) => (
         <>
           {i > 0 && <br />}
+          {/* Tres marcas y un literal. El orden del ternario ES la precedencia:
+              glosario > negrita > cursiva > texto. Los trozos son PLANOS y no
+              se solapan (el troceador avanza con un solo cursor), así que no
+              habrá una negrita dentro de un término ni dentro de una cita —
+              y está bien: una palabra con dos marcas a la vez no comunica el
+              doble, comunica la mitad. */}
           {trozos.map((t) =>
-            t.termino ? <Termino texto={t.texto} termino={t.termino} /> : t.texto,
+            t.termino ? (
+              <Termino texto={t.texto} termino={t.termino} />
+            ) : t.marca === "nombre" ? (
+              <strong>{t.texto}</strong>
+            ) : t.marca === "cita" ? (
+              <em>{t.texto}</em>
+            ) : (
+              t.texto
+            ),
           )}
         </>
       ))}

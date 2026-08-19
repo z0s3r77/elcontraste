@@ -120,8 +120,19 @@ const imagenSocial = Astro.site
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {/* ⚠️ El eje `ital` de Spectral se añadió en la Fase 14, y arregla una deuda
+        que llevaba abierta desde la Fase 10 sin que nadie la viera: el CSS ya
+        pedía `font-style: italic` en tres sitios (`.ficha-prestamo`,
+        `.contraste-heredado` y el titular prestado) con solo `wght@400;600`
+        cargado, así que el navegador **sintetizaba** la cursiva inclinando la
+        romana. Una itálica falsa en una serif de texto se nota, y en un sitio
+        cuyo género es Newsprint editorial es un defecto, no un matiz.
+        Si algún día se toca esta URL: la itálica se usa en la prosa (las citas
+        del relato), no es decorativa, y quitarla vuelve a la falsa en silencio.
+        Libre Caslon Display se queda en romana — § Typography la prohíbe en
+        cursiva, y por eso el titular prestado dejó de pedirla. */}
     <link
-      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Spectral:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
   </head>
