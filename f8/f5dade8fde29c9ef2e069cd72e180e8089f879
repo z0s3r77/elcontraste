@@ -1,0 +1,27 @@
+web/src/components/Contrastar.astro
+  s_f627612744c584::t_a23e6eaf71e0f4 1-51
+scripts/comprobar_fuentes.py
+  s_f627612744c584::t_53a72532672b5e 1-117
+config/fuentes.yaml
+  s_f627612744c584::t_09339bc5eb8710 1-325
+pipeline/explicar.py
+  s_f627612744c584::t_bb8a5a699c9df3 41,114-129,132,137-140,142-152,157-162,165-178,206-211,213,281-282,284-285,287-289,327-331,339,342-345,348-349,351-356,361,368,371-375,377,381-383,386-390,405-406
+pipeline/fuentes.py
+  s_f627612744c584::t_a5153fb63fbddb 1-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "f8f5dade8fde29c9ef2e069cd72e180e8089f879",
+  "prompts": {},
+  "sessions": {
+    "s_f627612744c584": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5654f0fa-796e-458f-a229-4f63ab36624b",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
