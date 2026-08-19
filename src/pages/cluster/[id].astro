@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import Parrafos from "../../components/Parrafos.astro";
 import Glosado from "../../components/Glosado.astro";
+import Contrastar from "../../components/Contrastar.astro";
 import Impacto from "../../components/Impacto.astro";
 import {
   enLote,
@@ -44,9 +45,28 @@ export async function getStaticPaths() {
 const { c, diccionario } = Astro.props as { c: Historia; diccionario: TerminoGlosario[] };
 const s = c.synthesis;
 
+// Los nombres que van en NEGRITA dentro del relato (Fase 14). Dos fuentes, y
+// las dos son exactas — aquí no se adivina quién es un nombre propio:
+//
+//  1. Los MEDIOS del clúster. `synthesize.SYSTEM` obliga a que todo dato que no
+//     compartan todos vaya atribuido dentro de la prosa («según ABC», «solo El
+//     Mundo menciona»). Esa atribución es la regla que sostiene el producto y
+//     hasta ahora era texto plano indistinguible del resto. Sale gratis y vale
+//     para las 576 historias ya publicadas.
+//  2. `entidades`, que la síntesis declara desde la Fase 14: personas y
+//     organismos nombrados en el relato. Solo en síntesis nuevas; las viejas
+//     se quedan con los medios, que ya es bastante.
+const nombres = [...(c.media ?? []), ...(s?.entidades ?? [])];
+
+// Una síntesis BREVE (Fase 14): historias de dos o tres medios, resumidas seis
+// por llamada. Tienen relato y hechos comunes, pero NO análisis de divergencias
+// —con dos versiones no hay encuadre que comparar—, así que la página no puede
+// firmar «contraste» ni pintar el sello.
+const esBreve = c.synthesis_kind === "breve";
+
 // Un marcador POR PÁGINA: su memoria de "ya marcado" tiene que cruzar los
 // párrafos del relato pero no filtrarse a la historia siguiente.
-const marcador = new Marcador(combinar(diccionario, c.explicacion?.glosario ?? []));
+const marcador = new Marcador(combinar(diccionario, c.explicacion?.glosario ?? []), nombres);
 
 // `hechos_divergentes` mezcla DOS cosas distintas, y llamarlas a las dos
 // "contradicciones" engaña: en la base hay ~200 exclusivas por cada ~31
@@ -152,9 +172,15 @@ const descripcion = arranque
               </div>
             )}
 
+            {/* ⚠️ La firma dice qué se hizo, y en una breve NO se hizo
+                contraste. Firmar «relato y contraste» sobre una historia de dos
+                medios donde nadie buscó divergencias sería prometer un análisis
+                que no existe — la misma regla que impide pintar «0
+                contradicciones» ahí (§ El sello de una historia). */}
             <p class="firma-ia">
-              Relato y contraste redactados por un modelo de lenguaje a partir de los textos
-              enlazados al margen. Puede contener errores: los originales mandan.
+              {esBreve
+                ? "Resumen redactado por un modelo de lenguaje a partir de los textos enlazados al margen. Esta historia la cuentan pocos medios, así que no hay contraste de versiones que medir. Puede contener errores: los originales mandan."
+                : "Relato y contraste redactados por un modelo de lenguaje a partir de los textos enlazados al margen. Puede contener errores: los originales mandan."}
             </p>
 
             {comunes.length > 0 && (
@@ -300,6 +326,14 @@ const descripcion = arranque
            nada — la etapa `explicar` solo pasa por las historias sintetizadas
            en modo contraste, y un hueco es más honesto que un placeholder. */
         c.explicacion && <Impacto explicacion={c.explicacion} />
+      }
+      {
+        /* «Para contrastarlo» va DEBAJO de «en qué te afecta» y por el mismo
+           criterio que puso a ese bloque el último: primero qué significa esto
+           para ti, y solo después dónde comprobarlo. Quien quiere comprobar
+           llega hasta abajo; quien solo quiere entender no tiene que pasar por
+           encima de una lista de enlaces institucionales. */
+        c.explicacion?.fuentes?.length ? <Contrastar fuentes={c.explicacion.fuentes} /> : null
       }
     </aside>
   </article>

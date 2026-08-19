@@ -758,7 +758,17 @@
      Va en la display porque pertenece a la cabecera, no al cuerpo, pero en
      `--text-lg` y en `muted`: es el subtítulo de la cabecera, no un titular
      que compita con la apertura. `balance` reparte las líneas — centrado, un
-     último renglón corto y suelto es lo que peor se ve. */
+     último renglón corto y suelto es lo que peor se ve.
+
+     ⚠️ Este comentario describió durante toda la Fase 13 algo que ya no era
+     verdad. El rediseño de la portada bajó el lema al final de `.estado` y le
+     puso un override dentro de `@media (width >= 52rem)` que lo alineaba a la
+     izquierda dentro de la columna del titular. Entre ese override y el de
+     `< 52rem` de aquí abajo, el lema NO SE VEÍA CENTRADO EN NINGÚN ANCHO
+     mientras design.md seguía afirmando que sí. La Fase 14 borró el override y
+     devolvió el `<p>` a ser el primer hijo del `<main>`: ahora el comentario
+     vuelve a describir la página. Si algún día vuelve a moverse, se corrige
+     aquí y en § Portada de design.md a la vez. */
   .posicionamiento {
     max-width: 60ch;
     margin: 0 auto var(--spacing-md);
@@ -1164,10 +1174,18 @@
     font-size: clamp(1.875rem, 5vw, 3rem);
     margin: 0 0 var(--spacing-xs);
   }
-  /* Titular prestado: cursiva, igual que en la ficha. */
+  /* Titular prestado: en tinta apagada, no en cursiva.
+     ⚠️ Pedía `font-style: italic` desde la Fase 11 sobre `--font-display`, y
+     Libre Caslon Display **no tiene itálica** — ni cargada ni permitida:
+     § Typography dice «Roman, nunca cursiva». O sea que el navegador la
+     sintetizaba inclinando la romana, que es justo lo que un sistema con una
+     display elegida a mano no debe enseñar. El préstamo ya lo dice en palabras
+     (`.doc-prestamo` en la historia, `.ficha-prestamo` en la lista); aquí basta
+     con bajar el tono. La cursiva de verdad, la de Spectral, se reserva a la
+     prosa (§ Relieve tipográfico). */
   h1.prestado,
   .lista-titulares a.prestado {
-    font-style: italic;
+    color: var(--color-muted);
   }
   .doc-prestamo {
     font-family: var(--font-outlier);
@@ -1201,6 +1219,28 @@
     line-height: 0.82;
     padding: 0.05em 0.08em 0 0;
     color: var(--color-accent);
+  }
+
+  /* ---- Relieve tipográfico del relato (Fase 14) ----
+     Dos marcas, y las dos en tinta: la negrita para quién dice y de quién se
+     habla, la cursiva para lo entrecomillado. NO gastan presupuesto de acento
+     (≤ 3 % del viewport, § Theme), que ya se llevan la capitular y las marcas
+     del glosario — por eso ninguna de las dos lleva color. */
+
+  /* ⚠️ El peso va EXPLÍCITO. El Preflight de Tailwind deja `strong` en
+     `bolder`, que sobre 400 resuelve a **700**, y Spectral solo carga 400 y
+     600: el navegador engordaría la 400 por su cuenta y saldría una negrita
+     falsa al lado de una verdadera. El precedente del sistema es
+     `.divergencia-hecho`, que ya declara 600 por lo mismo. */
+  .relato strong {
+    font-weight: 600;
+  }
+  /* La cursiva de verdad (Spectral 1,400), cargada en Base.astro desde la
+     Fase 14. Antes de eso cualquier `em` aquí habría salido inclinado a
+     máquina. Las comillas se quedan DENTRO de la cursiva y no se sustituyen:
+     el texto entrecomillado es del modelo y la web no lo reescribe. */
+  .relato em {
+    font-style: italic;
   }
 
   /* Prosa suelta dentro de un .doc-cuerpo (la página de contacto). Va por
@@ -1360,6 +1400,42 @@
     color: var(--color-ink);
     text-decoration: none;
     overflow-wrap: anywhere;
+  }
+
+  /* ---- «Para contrastarlo» (Fase 14) ----
+     Mismo tratamiento que `.fuentes`: enlaces en tinta con el acento reservado
+     al hover. Son enlaces externos como los de las versiones originales y se
+     comportan igual; lo que cambia es que estos no son medios, son quien
+     publica el dato.
+     Va en el aparato, debajo de «En qué te afecta», y NO se pliega: son tres
+     como mucho (`fuentes.MAX_FUENTES`) y esconder tres líneas tras un clic
+     cuesta más de lo que ahorra. */
+  .contrastar-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .contrastar-lista li {
+    padding: var(--spacing-2xs) 0;
+    border-bottom: var(--rule-hair) dotted var(--color-rule);
+  }
+  .contrastar-lista a {
+    display: block;
+    color: var(--color-ink);
+    text-decoration: none;
+    line-height: 1.4;
+  }
+  .contrastar-lista a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  /* El «qué aporta» en gris y pequeño: es la razón de pulsar, no el enlace. */
+  .contrastar-aporta {
+    display: block;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--color-muted);
+    margin-top: var(--spacing-3xs);
   }
   .fuentes a:hover {
     color: var(--color-accent);
@@ -2042,13 +2118,20 @@
 
   /* ---- 00 · Estado del día (portada) ----
      Lo que la portada no tenía: algo que en cinco segundos diga qué es hoy.
-     Antes abría con el lema centrado y nada más, y el usuario lo describió
-     como «entras y nada te llama la atención».
+     El titular y la entradilla del resumen diario, a todo el ancho.
 
-     Fue Stat-Led hasta el 2026-08-19, con tres cifras de asuntos como oreja a
-     la derecha. Se retiraron: exigían saber qué es un «asunto» para valer algo,
-     y el sitio se lee sin ese vocabulario (§ Portada). Queda lo que sí se
-     entiende sin explicación: el lema y el titular del día.
+     🔑 Reescrito en la Fase 14. Hasta entonces era una retícula de dos
+     columnas con tres cifras de asuntos a 3 rem en la derecha. Se retiraron
+     porque NO LLEVABAN A NINGÚN SITIO y no podían: no existe página
+     `/asuntos/`, y `/asunto/{id}/` solo se hornea con `min_dias >= 2`, así que
+     «44 asuntos nuevos» no tenía destino posible. Tres números grandes que el
+     lector no puede pulsar ocupando media primera pantalla es peor que no
+     tenerlos: prometen una navegación que no existe.
+
+     Las cifras no se pierden —siguen diciendo de qué tamaño es el día— pero
+     bajan a una línea de apoyo bajo la entradilla, en la monoespaciada de la
+     metadata. La regla de qué se cuenta no cambia: son ASUNTOS, nunca
+     artículos rastreados (§ Páginas de datos).
 
      ⚠️ Vive sobre el pliegue, así que NO entra en el revelado por scroll: su
      entrada la hace el CSS de la cabecera, que no depende de ningún script
@@ -2056,47 +2139,38 @@
   .estado {
     margin-bottom: var(--spacing-lg);
   }
-  /* Filete en tinta plena BAJO EL LEMA, no bajo la banda entera (2026-08-19).
-     Cerrar `.estado` por abajo lo ponía a un pelo del `border-top` de la
-     primera `.banda` y se veían DOS rayas casi juntas, que es lo que el usuario
-     reportó. Aquí separa lo que hay que separar: arriba qué es este sitio,
-     abajo qué pasa hoy. El doble se reserva a la cabecera (`.rule-double`),
-     que es el único sitio del sistema donde va.
-     Va en `.estado-lede` y no en `.posicionamiento` porque el lema está capado
-     a 60ch: su borde mediría 60ch y no cruzaría la página. */
-  .estado-lede {
-    border-top: var(--rule-hair) solid var(--color-ink);
-    padding-top: var(--spacing-md);
-  }
   /* El titular del día, del resumen. Es lo que el sitio tenía escondido en una
-     página secundaria mientras la portada abría por lo más cubierto. */
+     página secundaria mientras la portada abría por lo más cubierto.
+     Sin la columna de cifras al lado puede crecer: a todo el ancho la apertura
+     se lee como la de un periódico y no como una ficha. */
+  /* ⚠️ La medida es de 30ch y el cuerpo llega a 3.75rem porque la apertura
+     tiene que CRUZAR la página. Con los 24ch y 3rem de la primera versión
+     medía 717 px de un marco de 1664 y dejaba media portada en blanco a la
+     derecha — el defecto que § Anchos regla 2 prohíbe («ninguna columna se
+     queda vacía») y el mismo que la retícula de dos columnas de la Fase 13
+     venía a tapar. Medido en el navegador: 30ch da 1120 px en dos líneas. */
   .estado-lede h2 {
-    font-size: clamp(1.75rem, 4.2vw, 3rem);
-    line-height: 1.1;
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    line-height: 1.15;
     margin: 0 0 var(--spacing-2xs);
-    max-width: 34ch;
+    max-width: 30ch;
     text-wrap: balance;
   }
-  /* A partir de md el lede se reparte en dos: titular a la izquierda y
-     entradilla a la derecha. Retiradas las tres cifras de asuntos (2026-08-19),
-     la banda se quedaba en un bloque de 34ch con media página en blanco al
-     lado, que es justo el defecto que § Anchos regla 5 corrigió en Contacto y
-     en el pie de las páginas de datos. La columna hace de medida, así que el
-     tope en `ch` sobra: capar dos veces deja la línea más corta de las dos. */
-  @media (width >= 52rem) {
-    .estado-lede {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-      gap: var(--spacing-md) var(--spacing-xl);
-      align-items: start;
-    }
-    .estado-lede h2 {
-      max-width: none;
-      margin-bottom: 0;
-    }
-    .estado-lede .nota-deck {
-      max-width: var(--measure);
-    }
+  /* La entradilla sí se capa a la medida de lectura: el titular puede cruzar la
+     página, la prosa no (§ Anchos, «ganar ancho no es ensanchar»). */
+  .estado-lede .nota-deck {
+    max-width: var(--measure);
+  }
+  /* Las cifras del día. Mismo tratamiento que `.mast-line`: es metadata, no
+     dato de portada, y va debajo porque contesta «de qué tamaño es hoy»
+     después de «qué ha pasado hoy», nunca antes. */
+  .estado-cifras {
+    margin: var(--spacing-sm) 0 0;
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-neutral);
   }
 
   /* ---- 01 · Lo que te toca hoy (portada) ----
