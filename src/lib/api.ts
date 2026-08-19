@@ -167,6 +167,14 @@ export interface FichaCluster {
    */
   mode?: string | null;
   /**
+   * `completa` | `breve` (Fase 14). La segunda es el resumen corto que reciben
+   * las historias de dos o tres medios, seis por llamada. Compañera de `mode` y
+   * por el mismo motivo: las dos dicen QUÉ SE MIRÓ. Una breve viene siempre con
+   * `contraste: null` — su prompt no analiza divergencias, así que un cero ahí
+   * significaría «no se buscó», no «coinciden».
+   */
+  synthesis_kind?: string | null;
+  /**
    * Cobertura ponderada por la edad media de los artículos, calculada en la API
    * (`pipeline/relevancia.py`). Es el orden en el que vienen los clústeres; la
    * portada lo necesita como número porque mezcla secciones y tiene que
@@ -216,6 +224,12 @@ export interface Sintesis {
   hechos_divergentes?: { hecho: string; solo_en?: string[] }[];
   diferencias_de_encuadre?: string | null;
   que_falta_por_saber?: string | null;
+  /**
+   * Personas y organismos nombrados en el relato, para ponerlos en negrita
+   * (Fase 14). Opcional a propósito: las síntesis anteriores no lo traen y la
+   * página tiene que seguir pintándose sin él.
+   */
+  entidades?: string[];
 }
 
 /**
@@ -235,6 +249,23 @@ export interface Explicacion {
   alcance: string | null;
   /** Tecnicismos de ESTA historia que no están en `config/glosario.yaml`. */
   glosario: { termino: string; definicion: string }[];
+  /**
+   * Dónde contrastar el contexto (Fase 14). Ya resueltas por la API a partir de
+   * `config/fuentes.yaml`: el modelo solo elige identificadores de una lista
+   * cerrada, así que una URL de aquí no puede ser inventada.
+   * Vacío es una respuesta correcta y frecuente.
+   */
+  fuentes?: Fuente[];
+}
+
+/** Una fuente primaria del registro `config/fuentes.yaml`. */
+export interface Fuente {
+  id: string;
+  nombre: string;
+  url: string;
+  /** Qué aporta que la noticia no tiene. Se pinta bajo el nombre. */
+  aporta: string;
+  materias: string[];
 }
 
 export interface Historia extends FichaCluster {
