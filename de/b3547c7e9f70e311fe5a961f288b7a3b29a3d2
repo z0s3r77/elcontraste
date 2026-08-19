@@ -1,0 +1,21 @@
+CLAUDE.md
+  s_f627612744c584::t_1b10e4a35b7d71 862-866,916-919
+docs/fase-14.md
+  s_f627612744c584::t_9e9df3004dd544 286-332,338-339,351-358
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "deb3547c7e9f70e311fe5a961f288b7a3b29a3d2",
+  "prompts": {},
+  "sessions": {
+    "s_f627612744c584": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5654f0fa-796e-458f-a229-4f63ab36624b",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
