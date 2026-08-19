@@ -60,19 +60,30 @@ const porId = new Map(todas.map((c) => [c.id, c]));
 // ya obligó a retirar la gráfica de totales de Tendencias el 2026-08-16: la
 // cifra que manda tiene que ser del lector, y «429 artículos rastreados» habla
 // del rastreador. «6 asuntos nuevos, 14 que siguen» habla del día.
+//
+// 🔑 Hasta la Fase 14 estas tres cifras se pintaban a 3 rem en la columna
+// derecha de la primera pantalla. Se retiraron por una razón concreta: NO
+// LLEVABAN A NINGÚN SITIO, y no podían — no existe página `/asuntos/`, y
+// `/asunto/{id}/` solo se hornea con `min_dias >= 2`, así que «44 asuntos
+// nuevos» no tiene destino posible. Media pantalla ocupada por tres números
+// que el lector no puede usar. Ahora son una línea de apoyo bajo la entradilla.
+//
+// ⚠️ `apagados` se cae de la línea. Es la cifra que ya obligó a reescribir su
+// SQL por leerse como «139 asuntos han muerto hoy» (Fase 13), y en una línea
+// corrida no queda sitio para explicar que son solo los que acaban de cruzar
+// la raya. Una cifra que necesita nota al pie no cabe en un pie de entradilla.
 const a = digest.asuntos;
 // ⚠️ Frases enteras: Astro se come el espacio entre dos interpolaciones
 // contiguas y saldría «6nuevos» (visto en el HTML horneado, no en el editor).
-const cifras = a
-  ? [
-      { n: a.nuevos, texto: a.nuevos === 1 ? "asunto nuevo" : "asuntos nuevos" },
-      { n: a.siguen, texto: a.siguen === 1 ? "viene de antes" : "vienen de antes" },
-      {
-        n: a.apagados,
-        texto: a.apagados === 1 ? "dejó de contarse" : "dejaron de contarse",
-      },
-    ]
-  : [];
+const cifras = [
+  `${digest.n_clusters} ${digest.n_clusters === 1 ? "historia" : "historias"}`,
+  ...(a
+    ? [
+        `${a.nuevos} ${a.nuevos === 1 ? "asunto nuevo" : "asuntos nuevos"}`,
+        `${a.siguen} ${a.siguen === 1 ? "viene de antes" : "vienen de antes"}`,
+      ]
+    : []),
+].join(" · ");
 
 // --- 01 · Lo que te toca hoy -------------------------------------------------
 //
@@ -179,23 +190,25 @@ const secciones = digest.sections
   seccion="hoy"
   edicion={`Edición del ${digest.date} · ${digest.n_clusters} historias`}
 >
+  {/* El lema explica el nombre y lo que se pretende con él: doxa es la
+      opinión, lo que se cree saber, frente a episteme. El sitio no promete la
+      versión verdadera —no la tiene—, sino todas las versiones juntas para que
+      el criterio salga de compararlas.
+
+      Va PRIMERO y centrado, colgando de la cabecera, que también lo está. La
+      Fase 13 lo bajó a la última línea del estado del día y en escritorio lo
+      alineó a la izquierda; el resultado es que dejó de verse centrado en
+      cualquier ancho pese a que design.md seguía diciendo que lo estaba. */}
+  <p class="posicionamiento">
+    Doxa es la opinión, no el saber. Todas las versiones de una misma noticia, juntas, para que
+    el criterio sea tuyo.
+  </p>
+
   {/* 00 · Estado del día. Va sobre el pliegue, así que entra por CSS y NO
       entra en el revelado por scroll: ocultar la primera pantalla hasta que
       corra un script retrasa el LCP y deja la portada en blanco si el JS falla
       (§ Motion de design.md). */}
   <section class="estado">
-    {
-      cifras.length > 0 && (
-        <ul class="estado-cifras">
-          {cifras.map((c) => (
-            <li>
-              <span class="estado-n">{c.n}</span>
-              <span class="estado-que">{c.texto}</span>
-            </li>
-          ))}
-        </ul>
-      )
-    }
     {
       resumen?.titular_del_dia && (
         <div class="estado-lede">
@@ -204,12 +217,7 @@ const secciones = digest.sections
         </div>
       )
     }
-    {/* El lema explica el nombre —doxa es la opinión, lo que se cree saber,
-        frente a episteme— y va DEBAJO del estado: explica el sitio, no el día. */}
-    <p class="posicionamiento">
-      Doxa es la opinión, no el saber. Todas las versiones de una misma noticia, juntas, para
-      que el criterio sea tuyo.
-    </p>
+    <p class="estado-cifras">{cifras}</p>
   </section>
 
   <section class="superficie">
