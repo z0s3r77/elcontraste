@@ -1,0 +1,28 @@
+design.md
+  s_f627612744c584::t_5721696a0f1107 73,78-112,270-273,277-280,326-327,330-363,612-651
+  s_f627612744c584::t_7ce76f787a23dc 652
+CLAUDE.md
+  s_f627612744c584::t_13a1df653a7d6d 31-42,818-925
+ESTADO.md
+  s_f627612744c584::t_1440b4fbfcbf28 92-93,96-98,126-141,179-184
+docs/despliegue.md
+  s_f627612744c584::t_696af2d3744680 43-65,387-400
+docs/fase-14.md
+  s_f627612744c584::t_ca2a7ab39c5ef3 1-309
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "eb6db6920f80f021e68f48a2696daf087855d7d8",
+  "prompts": {},
+  "sessions": {
+    "s_f627612744c584": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5654f0fa-796e-458f-a229-4f63ab36624b",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
