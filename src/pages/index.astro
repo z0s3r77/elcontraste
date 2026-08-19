@@ -56,23 +56,14 @@ const porId = new Map(todas.map((c) => [c.id, c]));
 
 // --- 00 · Estado del día -----------------------------------------------------
 //
-// Las cifras son de ASUNTOS, no de artículos rastreados. Es la misma regla que
-// ya obligó a retirar la gráfica de totales de Tendencias el 2026-08-16: la
-// cifra que manda tiene que ser del lector, y «429 artículos rastreados» habla
-// del rastreador. «6 asuntos nuevos, 14 que siguen» habla del día.
-const a = digest.asuntos;
-// ⚠️ Frases enteras: Astro se come el espacio entre dos interpolaciones
-// contiguas y saldría «6nuevos» (visto en el HTML horneado, no en el editor).
-const cifras = a
-  ? [
-      { n: a.nuevos, texto: a.nuevos === 1 ? "asunto nuevo" : "asuntos nuevos" },
-      { n: a.siguen, texto: a.siguen === 1 ? "viene de antes" : "vienen de antes" },
-      {
-        n: a.apagados,
-        texto: a.apagados === 1 ? "dejó de contarse" : "dejaron de contarse",
-      },
-    ]
-  : [];
+// Abre el LEMA y después el titular del resumen. Las tres cifras de asuntos
+// (`43 nuevos · 48 vienen de antes · 20 dejaron de contarse`) se retiraron el
+// 2026-08-19 por diagnóstico del usuario: «la columna con los 3 datos no nos
+// añade valor ni nada, es confuso». Eran contabilidad interna del pipeline —
+// para saber si «48 vienen de antes» es mucho o poco hace falta saber qué es un
+// asunto, y eso lo sabe quien construyó el sitio, no quien entra a leer. El
+// tamaño del día ya lo dice la cabecera («Edición del … · 91 historias»), que
+// además está en todas las páginas.
 
 // --- 01 · Lo que te toca hoy -------------------------------------------------
 //
@@ -184,18 +175,14 @@ const secciones = digest.sections
       corra un script retrasa el LCP y deja la portada en blanco si el JS falla
       (§ Motion de design.md). */}
   <section class="estado">
-    {
-      cifras.length > 0 && (
-        <ul class="estado-cifras">
-          {cifras.map((c) => (
-            <li>
-              <span class="estado-n">{c.n}</span>
-              <span class="estado-que">{c.texto}</span>
-            </li>
-          ))}
-        </ul>
-      )
-    }
+    {/* El lema explica el nombre —doxa es la opinión, lo que se cree saber,
+        frente a episteme— y abre la página: es lo primero que hay que entender
+        para saber qué se está leyendo. Estuvo debajo del estado del día entre
+        el 2026-08-18 y el 2026-08-19, y ahí llegaba tarde. */}
+    <p class="posicionamiento">
+      Doxa es la opinión, no el saber. Todas las versiones de una misma noticia, juntas, para
+      que el criterio sea tuyo.
+    </p>
     {
       resumen?.titular_del_dia && (
         <div class="estado-lede">
@@ -204,12 +191,6 @@ const secciones = digest.sections
         </div>
       )
     }
-    {/* El lema explica el nombre —doxa es la opinión, lo que se cree saber,
-        frente a episteme— y va DEBAJO del estado: explica el sitio, no el día. */}
-    <p class="posicionamiento">
-      Doxa es la opinión, no el saber. Todas las versiones de una misma noticia, juntas, para
-      que el criterio sea tuyo.
-    </p>
   </section>
 
   <section class="superficie">

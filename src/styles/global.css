@@ -73,7 +73,13 @@
 :root {
   --rule-hair: 1px;
   --page-gutter: clamp(1rem, 4vw, 2.5rem);
-  --measure: 64ch;
+  /* Medida de lectura. 64ch hasta el 2026-08-19; subida a 72ch a petición del
+     usuario («los textos se ven amontonados»). Sigue dentro de la banda sana de
+     tipografía —los 45-75 caracteres por línea de siempre—, y al ser el mismo
+     token para todo el sitio, ensancharlo ensancha la retícula entera sin que
+     ninguna página se descuelgue. Por encima de ~75ch el ojo empieza a perder
+     el renglón al volver: ese es el techo, no una preferencia. */
+  --measure: 72ch;
 
   /* Estado del tema como NÚMERO (0 claro · 1 oscuro), no como `display`.
      Es la pieza que hace que el botón se anime: de un número se puede
@@ -228,6 +234,25 @@
      que a 1800 px el filete doble sobresalía ~315 px por cada lado. Ese
      desajuste era la mitad de la sensación de "acortado".
      ------------------------------------------------------------------ */
+  /* El cuerpo crece con la pantalla (2026-08-19). Es la ÚNICA forma de ocupar
+     un monitor ancho sin romper la lectura: la medida sana son 45-75 caracteres
+     por línea pase lo que pase, así que a 1800 px no se puede alargar el
+     renglón — se agranda la letra, y entonces esos mismos 72ch miden más
+     píxeles. Ensanchar la columna en vez de esto daría ~130 caracteres por
+     línea, que es ilegible por mucho que llene la página.
+     `ch` se mide contra la letra del propio elemento, así que `--measure` se
+     ensancha solo. Nada de esto toca al móvil: empieza en 1280. */
+  @media (width >= 80rem) {
+    :root {
+      --text-md: 1.125rem;
+    }
+  }
+  @media (width >= 100rem) {
+    :root {
+      --text-md: 1.1875rem;
+    }
+  }
+
   .marco {
     width: 100%;
     max-width: var(--container-page);
@@ -726,8 +751,8 @@
   }
 
   /* ================================================== PORTADA ========= */
-  /* El lema del sitio, justo debajo del filete doble. Cuelga de una cabecera
-     CENTRADA, así que va centrado: alineado a la izquierda y capado a 52ch se
+  /* El lema del sitio, lo primero de la página y justo debajo del filete doble.
+     Cuelga de una cabecera CENTRADA, así que va centrado: alineado a la izquierda y capado a 52ch se
      quedaba pegado a un lado con media página en blanco al otro, y lo que
      parecía era que la maqueta se había roto ahí.
      Va en la display porque pertenece a la cabecera, no al cuerpo, pero en
@@ -736,7 +761,7 @@
      último renglón corto y suelto es lo que peor se ve. */
   .posicionamiento {
     max-width: 60ch;
-    margin: 0 auto var(--spacing-lg);
+    margin: 0 auto var(--spacing-md);
     font-family: var(--font-display);
     font-size: var(--text-lg);
     line-height: 1.35;
@@ -1016,31 +1041,83 @@
   }
   @media (width >= 80rem) {
     .doc {
-      grid-template-columns: minmax(0, var(--measure)) minmax(16rem, 22rem);
+      grid-template-columns: minmax(0, var(--measure)) minmax(18rem, 26rem);
       justify-content: center;
-      align-items: start;
+      /* `stretch`, no `start`: el margen tiene que llegar tan abajo como el
+         artículo para poder repartirse por él. Con `start` los tres bloques se
+         amontonaban arriba y el resto de la columna era un vacío de 570 a
+         2.180 px según la historia (medido sobre 10 el 2026-08-19). */
+      align-items: stretch;
       column-gap: var(--spacing-2xl);
     }
     .doc-cuerpo {
       margin-inline: 0;
     }
+    /* ⚠️ NO lleva `position: sticky` ni scroll propio (retirados el
+       2026-08-19). Los tuvo desde E3.3 con la idea de leer el relato viendo a
+       la vez quién lo cuenta distinto, y la idea era buena mientras el aparato
+       cabía en pantalla. Dejó de caber cuando la Fase 12 le metió «En qué te
+       afecta»: con `max-height: calc(100vh - …)` y `overflow-y: auto`, medido
+       sobre 12 historias a 1456×1009, **10 escondían entre 106 y 498 px** tras
+       un scrollbar que macOS no dibuja hasta que lo tocas. El sticky acabó
+       tapando justo lo que existía para enseñar, y la página se leía cortada a
+       media frase (reportado por el usuario: «no se cuadran las versiones»).
+       Ahora el aparato fluye en su columna, como la marginalia de un impreso.
+       Que termine antes que la prosa y deje margen en blanco es correcto: es
+       un margen, no una segunda columna que haya que llenar. */
     .doc-aparato {
       margin-inline: 0;
       max-width: none;
-      position: sticky;
-      top: var(--spacing-md);
-      max-height: calc(100vh - var(--spacing-xl));
-      overflow-y: auto;
       border-left: var(--rule-hair) solid var(--color-rule);
       padding-left: var(--spacing-lg);
+      /* Los bloques bajan con AIRE FIJO entre ellos, no repartiéndose todo lo
+         que sobre. `justify-content: space-between` estuvo aquí unas horas el
+         2026-08-19 y se retiró el mismo día: reparte bien cuando el margen
+         está lleno, pero en cuanto el lector pliega los dos desplegables —o la
+         historia no tiene «en qué te afecta»— quedan dos rótulos separados por
+         más de mil píxeles de nada, y eso no se lee como una columna, se lee
+         como una página rota. El reparto depende del contenido y el contenido
+         lo cambia el lector con un clic; el aire fijo no depende de nadie.
+
+         ⚠️ Y el aire va en MÁRGENES, no en `gap` de flex. Con `gap` el aire cae
+         entre TODOS los hijos, y en `/resumen/` el margen son parejas de rótulo
+         + párrafo: cada rótulo quedó a 190 px de su propio texto (reportado el
+         2026-08-19). Un margen se puede anular para un caso concreto; un `gap`
+         no. */
+    }
+    /* Aire normal entre las piezas del margen… */
+    .doc-aparato > * + * {
+      margin-top: var(--spacing-lg);
+    }
+    /* Los bloques de una historia llevan un punto más de aire que el resto,
+       porque son piezas independientes y no secciones de un mismo texto.
+       ⚠️ Nada de estirarlos por la columna. `min(20vh, 10rem)` —190 px— estuvo
+       aquí unas horas el 2026-08-19 para que el margen llegara tan abajo como
+       el artículo, y se retiró el mismo día: con los desplegables plegados
+       quedaban tres rótulos flotando en la nada («mucho espacio entre filas»).
+       El margen se lee como una columna o no se lee; que acabe antes que la
+       prosa es correcto (regla 4). */
+    .doc-aparato > * + .pliegue,
+    .doc-aparato > * + .impacto {
+      margin-top: var(--spacing-xl);
     }
     /* En el margen los rótulos no necesitan el filete grueso del cuerpo. */
     .doc-aparato .rotulo-doc {
       margin-top: 0;
       border-top: 0;
     }
+    /* Un rótulo NUNCA se separa de su texto: es la excepción que obliga a que
+       el aire sean márgenes y no `gap`. */
     .doc-aparato .rotulo-doc + * {
       margin-top: 0;
+    }
+    /* Pero un rótulo que abre sección SÍ se separa de la anterior. Va después
+       del `margin-top: 0` a propósito: aquel cero es para el PRIMERO, que
+       cuelga del filete de la cabecera, no para todos. Sin esta línea, en
+       `/resumen/` y en `/contacto/` las secciones del margen quedaban a 16 px
+       unas de otras y se leían como un solo bloque corrido. */
+    .doc-aparato > * + .rotulo-doc {
+      margin-top: var(--spacing-lg);
     }
     .doc-aparato .exclusivas li {
       grid-template-columns: minmax(0, 1fr);
@@ -1968,98 +2045,58 @@
      Antes abría con el lema centrado y nada más, y el usuario lo describió
      como «entras y nada te llama la atención».
 
-     Es Stat-Led entrando en una página índice, y las cifras son de ASUNTOS,
-     nunca de artículos rastreados: la misma regla que obligó a retirar la
-     gráfica de totales de Tendencias (§ Páginas de datos).
+     Fue Stat-Led hasta el 2026-08-19, con tres cifras de asuntos como oreja a
+     la derecha. Se retiraron: exigían saber qué es un «asunto» para valer algo,
+     y el sitio se lee sin ese vocabulario (§ Portada). Queda lo que sí se
+     entiende sin explicación: el lema y el titular del día.
 
      ⚠️ Vive sobre el pliegue, así que NO entra en el revelado por scroll: su
      entrada la hace el CSS de la cabecera, que no depende de ningún script
      (§ Motion). */
   .estado {
-    /* Filete en tinta plena: el estado del día es el divisor mayor de la
-       portada. El doble se reserva a la cabecera (`.rule-double`), que es el
-       único sitio del sistema donde va. */
-    border-bottom: var(--rule-hair) solid var(--color-ink);
-    padding-bottom: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
   }
-  /* A partir de md la banda se reparte: el titular del día a la izquierda, a su
-     medida, y las cifras como «oreja» a la derecha. Apilado dejaba el lede
-     capado a 34ch con media página en blanco al lado —el defecto que § Anchos
-     regla 5 ya corrigió en Contacto y en el pie de las páginas de datos—, y en
-     la superficie de apertura se notaba el doble. */
-  .estado-cifras {
-    list-style: none;
-    margin: 0 0 var(--spacing-md);
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm) var(--spacing-lg);
-  }
-  @media (width >= 52rem) {
-    .estado {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: var(--spacing-lg) var(--spacing-xl);
-      align-items: start;
-    }
-    /* El lede primero en la retícula pero segundo en el DOM: en móvil las
-       cifras abren (son el vistazo) y en escritorio manda el titular. */
-    .estado-lede {
-      grid-column: 1;
-      grid-row: 1;
-    }
-    .estado-cifras {
-      grid-column: 2;
-      grid-row: 1;
-      flex-direction: column;
-      gap: var(--spacing-sm);
-      margin: 0;
-      text-align: right;
-    }
-    .estado-cifras li {
-      justify-content: flex-end;
-    }
-    /* El lema va en la columna del lede y alineado a la izquierda, NO centrado
-       cruzando las dos. Centrado caía justo en el hueco entre el titular y las
-       cifras y se leía como un bloque suelto, sin colgar de nada. Aquí cierra
-       la banda: primero qué pasa hoy, y debajo qué es este sitio. */
-    .posicionamiento {
-      grid-column: 1;
-      margin-inline: 0;
-      text-align: left;
-    }
-  }
-  .estado-cifras li {
-    display: flex;
-    align-items: baseline;
-    gap: var(--spacing-3xs);
-  }
-  /* Aquí `baseline` SÍ es correcto, al contrario que en `.cifra-hero`: la
-     etiqueta es de una línea, así que no hay texto colgando por debajo de la
-     cifra (§ Páginas de datos, la nota de `.cifra-hero`). */
-  .estado-n {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 5vw, 3rem);
-    line-height: 0.9;
-    letter-spacing: -0.02em;
-  }
-  .estado-que {
-    font-family: var(--font-outlier);
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-neutral);
-    max-width: 12ch;
+  /* Filete en tinta plena BAJO EL LEMA, no bajo la banda entera (2026-08-19).
+     Cerrar `.estado` por abajo lo ponía a un pelo del `border-top` de la
+     primera `.banda` y se veían DOS rayas casi juntas, que es lo que el usuario
+     reportó. Aquí separa lo que hay que separar: arriba qué es este sitio,
+     abajo qué pasa hoy. El doble se reserva a la cabecera (`.rule-double`),
+     que es el único sitio del sistema donde va.
+     Va en `.estado-lede` y no en `.posicionamiento` porque el lema está capado
+     a 60ch: su borde mediría 60ch y no cruzaría la página. */
+  .estado-lede {
+    border-top: var(--rule-hair) solid var(--color-ink);
+    padding-top: var(--spacing-md);
   }
   /* El titular del día, del resumen. Es lo que el sitio tenía escondido en una
      página secundaria mientras la portada abría por lo más cubierto. */
   .estado-lede h2 {
-    font-size: clamp(1.5rem, 3.4vw, 2.25rem);
-    line-height: 1.15;
+    font-size: clamp(1.75rem, 4.2vw, 3rem);
+    line-height: 1.1;
     margin: 0 0 var(--spacing-2xs);
     max-width: 34ch;
     text-wrap: balance;
+  }
+  /* A partir de md el lede se reparte en dos: titular a la izquierda y
+     entradilla a la derecha. Retiradas las tres cifras de asuntos (2026-08-19),
+     la banda se quedaba en un bloque de 34ch con media página en blanco al
+     lado, que es justo el defecto que § Anchos regla 5 corrigió en Contacto y
+     en el pie de las páginas de datos. La columna hace de medida, así que el
+     tope en `ch` sobra: capar dos veces deja la línea más corta de las dos. */
+  @media (width >= 52rem) {
+    .estado-lede {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: var(--spacing-md) var(--spacing-xl);
+      align-items: start;
+    }
+    .estado-lede h2 {
+      max-width: none;
+      margin-bottom: 0;
+    }
+    .estado-lede .nota-deck {
+      max-width: var(--measure);
+    }
   }
 
   /* ---- 01 · Lo que te toca hoy (portada) ----

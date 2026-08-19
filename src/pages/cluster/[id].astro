@@ -126,10 +126,19 @@ const descripcion = arranque
       </header>
 
       {
+        /* ⚠️ Este aviso decía «el presupuesto diario cubre las historias con más
+           medios detrás», y era FALSO: el orden no lo da el número de medios,
+           lo da `pipeline/relevancia.py`, que es cobertura DIVIDIDA por la
+           antigüedad media. Se vio en el clúster 584 el 2026-08-19 —5 medios y
+           17 versiones sin síntesis, mientras otras de 2 medios sí la tenían—,
+           o sea que la página contradecía a la vista lo que ella misma decía.
+           Si se cambia la fórmula, se cambia esta frase. */
         !s && (
           <p class="aviso">
-            Esta historia está agrupada pero todavía no tiene síntesis: el presupuesto
-            diario cubre las historias con más medios detrás.
+            Esta historia está agrupada pero todavía no tiene síntesis. Cada día se redacta
+            un número fijo de ellas, y el orden no lo da cuántos medios la cuentan sino esa
+            cobertura dividida por lo vieja que es: una historia de tres medios de esta
+            mañana pasa por delante de una de cinco repartida en varios días.
           </p>
         )
       }
