@@ -15,49 +15,51 @@
 
 @theme {
   /* ---- Paleta Newsprint (design.md § Theme) ----
-     Papel CÁLIDO desde el 2026-08-13: el tono pasó de 250 (azul) a ~60-85
-     (crema), que es el color real del papel de periódico, y de paso subió el
-     contraste de todo el texto secundario. El cambio no fue estético: medido
-     con la fórmula WCAG, `neutral` sobre `paper` daba **4,25:1**, por debajo
-     del mínimo AA de 4,5 — y `neutral` es el color de TODA la metadata en
-     monoespaciada (colofón, pies de ficha, recuentos). Ahora da 6,53.
-     2026-08-20: el papel claro es BEIGE, no casi-blanco. Dos pasadas el mismo
-     día — 97% L / 0.010 C se leía como blanco puro, y 95% / 0.022 seguía
-     leyéndose como blanco. El valor bueno es **92,5% L / 0.038 C (#f2e5ca)**,
-     con `paper-2` a 89,5% / 0.044 (#ebdabc). Regla que sale de aquí: en un
-     fondo claro la calidez no se ve subiendo el croma, se ve BAJANDO la
-     luminancia — por encima del ~95% el ojo normaliza cualquier tinte a blanco.
-     Bajar la luminancia del fondo SUBE el contraste de toda la tinta más
-     oscura que él (todas), así que el texto no fue el problema:
-     `neutral` 5,72:1 sobre paper · 5,21 sobre paper-2 (mínimo 4,5);
-     `muted` 9,45 · 8,60; `ink` 15,57 · 14,18 (prosa, mínimo 7);
-     `accent` 5,99 · 5,45.
-     ⚠️ **Quien topa primero NO es el texto, es `link-line` sobre `paper-2`**
-     (mínimo 3:1 de WCAG 1.4.11, elemento no textual): con el papel a 91,5% ya
-     daba 3,00 clavado y a 90,5% caía a 2,91. Por eso `link-line` bajó de
-     58% a 55% de luminancia (3,85 sobre paper · 3,51 sobre paper-2) y `rule`
-     de 75% a 72%, que no es contraste sino que el filete se veía igual de
-     fuerte sobre un papel más oscuro. **Ese par es el techo real de cuánto
-     más se puede oscurecer el papel, no la metadata.**
+     Papel CÁLIDO desde el 2026-08-13 (tono 250 → ~60-85, crema real de
+     periódico), pero **BLANCO desde el 2026-08-20 (tarde), a petición
+     explícita del usuario** tras ver el beige en pantalla ("se ve muy
+     amarilla" → "la quiero mucho más blanca"). Ese mismo día había pasado por
+     un punto intermedio —92,5% L / 0.038 C, #f2e5ca— que llegó a escribirse
+     aquí como "el valor bueno"; no lo fue: era la lectura de una sesión
+     anterior, no la de esta. El valor actual es el que la Fase 10 ya había
+     probado y se descartó entonces por "leerse como blanco puro" — ahora es
+     EXACTAMENTE lo que se pide, así que vuelve a ser el bueno:
+     **97% L / 0.010 C (#f8f5ee)**, con `paper-2` a 94,5% / 0.014 (#f1ece3).
+     ⚠️ Esto CONTRADICE el "papel cálido" de más arriba y de `design.md`: el
+     genero seguía llamándose Newsprint, pero el papel ya no es beige. Si
+     alguna vez alguien retoma el argumento del beige "de verdad", que sea con
+     el usuario delante, no releyendo esta nota — la preferencia se midió dos
+     veces en vivo y las dos veces ganó el blanco.
+     Aclarar por qué NO hay riesgo de contraste al aclarar el papel: subir la
+     luminancia del fondo solo puede SUBIR el contraste de una tinta más
+     oscura que él (todas lo son), así que cada ratio de abajo es MEJOR que
+     con el papel beige, nunca peor. Medido: `neutral` 6,55:1 sobre paper ·
+     6,08 sobre paper-2 (mínimo 4,5); `muted` 10,81 · 10,04; `ink` 17,82 ·
+     16,55 (prosa, mínimo 7); `accent` 6,85 · 6,36; `link-line` 4,41 · 4,09
+     (mínimo 3, elemento no textual — ver nota de abajo). El único ajuste que
+     pide un papel más claro es cosmético, no de contraste: `rule` sube de
+     72% a 80% porque a 97% de papel el filete se volvía invisible, no porque
+     hiciera falta.
      El `meta[name=theme-color]` de `Base.astro` lleva este mismo hex escrito
      a mano en tres sitios: si cambias el papel, cámbialo ahí.
      Si tocas estos valores, vuelve a medir; el aspecto engaña. */
-  --color-paper: oklch(87.5% 0.058 88);
-  --color-paper-2: oklch(84.5% 0.064 85);
-  --color-rule: oklch(66% 0.024 80);
-  --color-neutral: oklch(42% 0.018 70);
-  --color-muted: oklch(32% 0.016 65);
+  --color-paper: oklch(97% 0.010 85);
+  --color-paper-2: oklch(94.5% 0.014 83);
+  --color-rule: oklch(80% 0.012 78);
+  --color-neutral: oklch(46% 0.016 70);
+  --color-muted: oklch(34% 0.016 65);
   --color-ink: oklch(16% 0.018 60);
-  --color-accent: oklch(42% 0.150 245);
+  --color-accent: oklch(44% 0.150 245);
   /* La raya que marca un enlace de contenido. Va más suave que el acento para
      no gritar bajo un titular de display, pero el umbral que le aplica NO es el
      de texto (4,5:1) sino el de elemento no textual: WCAG 1.4.11, 3:1. Medido
-     sobre `paper`: 3,85:1 en claro y 3,98:1 en oscuro; sobre `paper-2`, que es
-     el fondo de fichas y desplegables, 3,51:1 — y ESA es la medida que topa
-     primero cuando se oscurece el papel (ver la nota del bloque de arriba). El texto del titular
-     conserva el suyo, que es el de la tinta (17,8:1). */
-  --color-link-line: oklch(48% 0.140 245);
-  --color-focus: oklch(48% 0.180 245);
+     sobre `paper`: 4,41:1 en claro (el oscuro no cambió: 3,98:1) y sobre
+     `paper-2`, que es el fondo de fichas y desplegables, 4,09:1 — con el papel
+     blanco del 2026-08-20 sube margen en vez de topar, al revés que con el
+     beige (ver la nota del bloque de arriba). El texto del titular conserva
+     el suyo, que es el de la tinta (17,8:1). */
+  --color-link-line: oklch(55% 0.125 245);
+  --color-focus: oklch(52% 0.180 245);
   --color-alerta: oklch(43% 0.165 28);
 
   /* ---- Regla 2+1: tres familias como techo ---- */

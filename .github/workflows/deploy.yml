@@ -16,8 +16,10 @@
 #   CF_ACCESS_CLIENT_SECRET   idem
 #
 # Variables (no secretas):
-#   SITE_URL    https://usuario.github.io  o  https://tu-dominio.tld
-#   BASE_PATH   /el-contraste-web/         o  /
+#   SITE_URL        https://usuario.github.io  o  https://tu-dominio.tld
+#   BASE_PATH       /el-contraste-web/         o  /
+#   CF_BEACON_TOKEN token de Cloudflare Web Analytics. Opcional: sin ella no
+#                   se pinta el script y el sitio queda como hasta ahora.
 
 name: Publicar el sitio
 
@@ -113,6 +115,7 @@ jobs:
           # Las variables solo hacen falta el día que haya dominio propio.
           SITE_URL: ${{ vars.SITE_URL || format('https://{0}.github.io', github.repository_owner) }}
           BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
+          CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
         run: npm run build
         # src/lib/api.ts ya se cae solo si la API no responde, si devuelve el
         # HTML de login de Access en vez de JSON, o si el digest viene sin un

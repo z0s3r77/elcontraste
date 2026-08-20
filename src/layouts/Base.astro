@@ -25,6 +25,10 @@ interface Props {
   edicion?: string;
   /** Resumen de la página: <meta description> y tarjeta al compartir. */
   descripcion?: string;
+  /** Datos estructurados (schema.org) de ESTA página. La página los arma —
+   * Base solo los serializa—, porque solo ella sabe si es un NewsArticle,
+   * una lista o nada. */
+  jsonLd?: Record<string, unknown>;
 }
 const {
   title = "La Doxa",
@@ -35,7 +39,15 @@ const {
   descripcion = "Todas las versiones de una misma noticia, juntas: en qué " +
     "coinciden los medios, en qué se contradicen y qué cuenta uno solo. " +
     "Doxa es la opinión, no el saber.",
+  jsonLd,
 } = Astro.props;
+
+// JSON-LD: la única razón para usar `set:html` en todo el sitio (regla 1 de
+// design.md). El escapado aquí es cosa nuestra: `<` se convierte en su escape
+// Unicode para que un valor con "</script>" dentro —un titular, un nombre de
+// medio— no pueda cerrar la etiqueta y colar HTML/JS ajeno. JSON.stringify ya
+// garantiza que el resto son comillas y llaves válidas, nunca marcado.
+const jsonLdSeguro = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : undefined;
 
 // URL absoluta de ESTA página. Sale de `site` (SITE_URL en el workflow), así
 // que con el dominio propio conectado el canonical y las tarjetas apuntan a
@@ -70,7 +82,7 @@ const imagenSocial = Astro.site
          Son los hex exactos de --color-paper (design.md § Theme).
          Una sola etiqueta, sin `media`: desde que hay botón, el tema puede no
          coincidir con el del sistema y el script de abajo la mantiene al día. -->
-    <meta name="theme-color" content="#e6d4ab" />
+    <meta name="theme-color" content="#f8f5ee" />
 
     <!-- Tema elegido. `is:inline` y aquí arriba a propósito: tiene que correr
          ANTES del primer pintado o se ve un fogonazo claro antes de aplicarse
@@ -91,7 +103,7 @@ const imagenSocial = Astro.site
             ? elegido === "dark"
             : matchMedia("(prefers-color-scheme: dark)").matches;
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.content = oscuro ? "#130e09" : "#e6d4ab";
+          if (meta) meta.content = oscuro ? "#130e09" : "#f8f5ee";
         } catch (e) {
           /* localStorage puede fallar (modo privado, cookies bloqueadas).
              Sin preferencia guardada el sitio sigue el sistema y todo va. */
@@ -118,6 +130,28 @@ const imagenSocial = Astro.site
       )
     }
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Datos estructurados de la página, si los trae. Un motor de respuesta
+         (Google AI Overviews, ChatGPT, Perplexity…) lee esto antes que la
+         maquetación: le dice sin ambigüedad qué es la página, de cuándo es y
+         qué cita. Ver el escapado de jsonLdSeguro arriba. -->
+    {jsonLdSeguro && <script type="application/ld+json" set:html={jsonLdSeguro} />}
+
+    <!-- Cloudflare Web Analytics: sin cookies, sin banner de consentimiento
+         (no hay dato personal persistente que consentir). El token NO es
+         secreto —viaja igual en el HTML de cada página—, así que llega como
+         variable de build normal (CF_BEACON_TOKEN), igual que SITE_URL.
+         Sin variable, no se pinta nada: el sitio funciona igual sin ella. -->
+    {
+      import.meta.env.CF_BEACON_TOKEN && (
+        <script
+          type="module"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: import.meta.env.CF_BEACON_TOKEN })}
+        />
+      )
+    }
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     {/* ⚠️ El eje `ital` de Spectral se añadió en la Fase 14, y arregla una deuda
@@ -243,7 +277,7 @@ const imagenSocial = Astro.site
         quitarFundido = setTimeout(() => raiz.classList.remove("cambiando-tema"), 400);
 
         raiz.dataset.theme = nuevo;
-        if (meta) meta.content = nuevo === "dark" ? "#130e09" : "#e6d4ab";
+        if (meta) meta.content = nuevo === "dark" ? "#130e09" : "#f8f5ee";
         try {
           localStorage.setItem("tema", nuevo);
         } catch (e) {

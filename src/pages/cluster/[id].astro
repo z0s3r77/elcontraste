@@ -113,12 +113,55 @@ const descripcion = arranque
     ? arranque.slice(0, arranque.lastIndexOf(" ", 200)) + "…"
     : arranque
   : `Cómo cuentan esta noticia ${c.n_sources} medios, en ${c.n_articles} versiones.`;
+
+// JSON-LD NewsArticle (AEO/SEO): la señal más directa para que un motor de
+// respuesta entienda de qué trata la página sin tener que parsear la
+// maqueta. `citation` apunta a los originales que YA enlazamos al margen —no
+// se inventa ninguna URL nueva, es la misma lista de `medios`—, y
+// `articleBody` es SIEMPRE nuestro relato, nunca texto de los medios: eso
+// sería justo lo que la Fase 2 decidió no hacer.
+const fechaISO = c.digest_date ? `${c.digest_date}T00:00:00Z` : undefined;
+const imagenSocial = Astro.site
+  ? new URL(`${import.meta.env.BASE_URL.replace(/\/$/, "")}/og.png`, Astro.site).href
+  : undefined;
+const jsonLd =
+  Astro.site &&
+  ({
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: c.headline ?? "Historia",
+    description: descripcion,
+    inLanguage: "es",
+    ...(fechaISO && { datePublished: fechaISO, dateModified: fechaISO }),
+    ...(imagenSocial && { image: [imagenSocial] }),
+    ...(c.section && { articleSection: rotula(c.section) }),
+    ...((c.topics?.length ?? 0) > 0 && { keywords: c.topics!.join(", ") }),
+    ...(s?.relato && { articleBody: s.relato }),
+    author: { "@type": "Organization", name: "La Doxa", url: Astro.site.href },
+    publisher: {
+      "@type": "Organization",
+      name: "La Doxa",
+      ...(imagenSocial && { logo: { "@type": "ImageObject", url: imagenSocial } }),
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": new URL(Astro.url.pathname, Astro.site).href,
+    },
+    ...((c.articles?.length ?? 0) > 0 && {
+      citation: c.articles!.slice(0, 20).map((a) => ({
+        "@type": "NewsArticle",
+        headline: a.title,
+        url: a.url,
+      })),
+    }),
+  } as Record<string, unknown>);
 ---
 
 <Base
   title={`${c.headline ?? "Historia"} — La Doxa`}
   edicion={`${rotula(c.section ?? "")} · ${c.digest_date ?? ""}`}
   descripcion={descripcion}
+  jsonLd={jsonLd || undefined}
 >
   <article class="doc">
     <div class="doc-cuerpo">
