@@ -1,0 +1,39 @@
+web/src/layouts/Base.astro
+  s_8fd8e2ed5b1a40::t_7ee077ba4677bb 28-31,42,45-51,85,106,133-154,280
+web/src/styles/global.css
+  s_8fd8e2ed5b1a40::t_a7b327f9d86216 18-42,46-50,52,56-62
+web/.env.example
+  s_729e35726d1631::t_c7050e3c0e556c 14-18
+web/.github/workflows/deploy.yml
+  s_729e35726d1631::t_29825893200ae7 19-22,118
+web/src/pages/cluster/[id].astro
+  s_729e35726d1631::t_a4d23173b23d39 116-157,164
+web/src/pages/llms.txt.ts
+  s_729e35726d1631::t_f55a58a70fc630 1-65
+design.md
+  s_729e35726d1631::t_6c59a6c53a6bb0 36-38,41-47,50-57,65-94,102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9085da43cdd342c31ded963190e84de13dfc50e4",
+  "prompts": {},
+  "sessions": {
+    "s_729e35726d1631": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4bb24618-f305-4f7a-99b5-b1739992393a",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    },
+    "s_8fd8e2ed5b1a40": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "15890777-4c87-4daa-9b8f-b996112eef0e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
