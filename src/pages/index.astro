@@ -85,6 +85,23 @@ const cifras = [
     : []),
 ].join(" · ");
 
+// Los asuntos que hoy no salen porque no han traído nada. Desde el 2026-08-20 la
+// portada no publica el ECO —el mismo suceso que la ventana de 48 h vuelve a
+// agrupar con las mismas piezas—, y entre el 24 % y el 72 % del digest de cada
+// día era exactamente eso.
+//
+// 🔑 Va en su propia línea y NO en la cadena de cifras de arriba: esconder algo
+// y no decirlo es disimular, y esta es la frase que convierte el filtro en
+// información. Es además una cifra que el lector PUEDE usar —los asuntos siguen
+// abiertos y su página existe—, que es lo que le faltaba a las tres que se
+// retiraron en la Fase 14.
+const callados =
+  a?.sin_novedades
+    ? a.sin_novedades === 1
+      ? "1 asunto sigue abierto y hoy no ha traído nada nuevo"
+      : `${a.sin_novedades} asuntos siguen abiertos y hoy no han traído nada nuevo`
+    : null;
+
 // --- 01 · Lo que te toca hoy -------------------------------------------------
 //
 // El orden lo elige el modelo viendo el día entero, con lo inmediato y lo
@@ -224,6 +241,7 @@ const secciones = digest.sections
       )
     }
     <p class="estado-cifras">{cifras}</p>
+    {callados && <p class="estado-callados">{callados}</p>}
   </section>
 
   <section class="superficie">

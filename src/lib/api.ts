@@ -109,7 +109,16 @@ export async function enLote<T>(rutas: string[], enParalelo = EN_PARALELO): Prom
  */
 export interface Hilo {
   id: number;
+  /**
+   * Qué día del asunto es esta historia. ⚠️ Cuenta días CON MATERIAL NUEVO, no
+   * días en que el suceso apareció: la ventana de clustering son 48 h y el
+   * mismo suceso se reagrupa dos y tres días seguidos con las mismas piezas.
+   */
   dia: number;
+  /** Piezas que entran hoy y no estaban en ningún día anterior del asunto. */
+  piezas_nuevas?: number;
+  /** `piezas_nuevas === 0`: hoy no ha avanzado, solo se ha reagrupado. */
+  eco?: boolean;
   n_dias: number;
   n_clusters: number;
   n_articulos: number;
@@ -189,7 +198,17 @@ export interface Digest {
   /** Reparto de los asuntos del día. Es una cifra del lector, no del pipeline:
    *  cuánto de hoy es nuevo, cuánto viene de antes y cuánto se quedó sin
    *  continuación. Alimenta la banda de apertura de la portada. */
-  asuntos?: { nuevos: number; siguen: number; apagados: number };
+  asuntos?: {
+    nuevos: number;
+    siguen: number;
+    apagados: number;
+    /**
+     * Asuntos abiertos que hoy NO se publican porque no traen ni una pieza
+     * nueva. Es la contrapartida honesta de esconder el eco: la portada deja de
+     * repetir la historia y a cambio dice cuántas se ha callado.
+     */
+    sin_novedades?: number;
+  };
   sections: { section: string; clusters: FichaCluster[] }[];
 }
 
@@ -212,8 +231,24 @@ export interface Asunto {
 }
 
 /** Un asunto con su cronología, de `/api/asunto/{id}`. */
+/** Un punto de la cronología de un asunto: lo que pasó un día. */
+export interface DiaAsunto {
+  /** La fecha del digest. */
+  dia: string;
+  /** El número de día DEL ASUNTO. Un día de eco repite el del día anterior. */
+  n: number;
+  /** No entró ni una pieza nueva: la ventana volvió a agrupar lo mismo. */
+  eco: boolean;
+  piezas_nuevas: number;
+  /** Las piezas que entran ese día, las 6 más recientes. */
+  nuevas: { medio: string; title: string; url: string; published_at: string | null }[];
+  clusters: FichaCluster[];
+}
+
 export interface AsuntoDetalle extends Omit<Asunto, "ultimo_cluster"> {
-  cronologia: { dia: string; clusters: FichaCluster[] }[];
+  cronologia: DiaAsunto[];
+  /** Días en que el asunto no trajo nada nuevo. */
+  dias_eco: number;
   explicacion: Explicacion | null;
   explicacion_del_dia: string | null;
 }
@@ -239,16 +274,23 @@ export interface Sintesis {
  * agregación: la web no pinta el bloque en vez de inventárselo.
  */
 export interface Explicacion {
-  impacto: {
+  /**
+   * ⚠️ OPCIONAL desde el 2026-08-20. Una historia BREVE recibe explicación con
+   * SOLO `fuentes`: «para contrastarlo» se puede escribir sabiendo de qué va la
+   * noticia, pero «en qué te afecta a ti» necesita los hechos, y con dos medios
+   * y dos artículos sería adivinar. Comprueba `impacto` antes de pintar el
+   * bloque, nunca `explicacion` a secas.
+   */
+  impacto?: {
     que_ha_pasado: string;
     quien_lo_causa: string;
     efecto_directo: string;
     repercusion: string;
   };
   /** `general` | `grupo` | `indirecto`. A cuánta gente le llega de verdad. */
-  alcance: string | null;
+  alcance?: string | null;
   /** Tecnicismos de ESTA historia que no están en `config/glosario.yaml`. */
-  glosario: { termino: string; definicion: string }[];
+  glosario?: { termino: string; definicion: string }[];
   /**
    * Dónde contrastar el contexto (Fase 14). Ya resueltas por la API a partir de
    * `config/fuentes.yaml`: el modelo solo elige identificadores de una lista

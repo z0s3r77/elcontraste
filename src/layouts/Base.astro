@@ -70,7 +70,7 @@ const imagenSocial = Astro.site
          Son los hex exactos de --color-paper (design.md § Theme).
          Una sola etiqueta, sin `media`: desde que hay botón, el tema puede no
          coincidir con el del sistema y el script de abajo la mantiene al día. -->
-    <meta name="theme-color" content="#f8f5ee" />
+    <meta name="theme-color" content="#e6d4ab" />
 
     <!-- Tema elegido. `is:inline` y aquí arriba a propósito: tiene que correr
          ANTES del primer pintado o se ve un fogonazo claro antes de aplicarse
@@ -91,7 +91,7 @@ const imagenSocial = Astro.site
             ? elegido === "dark"
             : matchMedia("(prefers-color-scheme: dark)").matches;
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.content = oscuro ? "#130e09" : "#f8f5ee";
+          if (meta) meta.content = oscuro ? "#130e09" : "#e6d4ab";
         } catch (e) {
           /* localStorage puede fallar (modo privado, cookies bloqueadas).
              Sin preferencia guardada el sitio sigue el sistema y todo va. */
@@ -243,7 +243,7 @@ const imagenSocial = Astro.site
         quitarFundido = setTimeout(() => raiz.classList.remove("cambiando-tema"), 400);
 
         raiz.dataset.theme = nuevo;
-        if (meta) meta.content = nuevo === "dark" ? "#130e09" : "#f8f5ee";
+        if (meta) meta.content = nuevo === "dark" ? "#130e09" : "#e6d4ab";
         try {
           localStorage.setItem("tema", nuevo);
         } catch (e) {

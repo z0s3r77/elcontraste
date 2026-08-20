@@ -48,8 +48,15 @@ const exclusiva =
 //
 // Solo a partir del segundo día. «Día 1» en un asunto que empieza hoy es ruido:
 // no informa de nada que el lector no dé por supuesto al entrar en un diario.
+//
+// ⚠️ `hilo.dia` cuenta días CON PIEZAS NUEVAS. La agrupación mira 48 h atrás, así
+// que el mismo suceso reaparece con las mismas piezas dos y tres días seguidos:
+// contando apariciones, el sello subía un día cada mañana aunque no se hubiera
+// publicado nada, que es justo lo contrario de lo que promete decir. En un día
+// de eco el número no sube y el sello lo dice — un asunto abierto sobre el que
+// hoy nadie ha escrito es información, y esconderlo sería fingir movimiento.
 const hilo = c.hilo;
-const dia = hilo && hilo.n_dias >= 2 ? `Día ${hilo.dia}` : null;
+const dia = !hilo || hilo.n_dias < 2 ? null : hilo.eco ? `Día ${hilo.dia} · hoy sin piezas nuevas` : `Día ${hilo.dia}`;
 
 // --- Silencio: quién no lo ha contado ------------------------------------
 //

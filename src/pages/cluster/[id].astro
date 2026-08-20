@@ -324,8 +324,14 @@ const descripcion = arranque
            hace a quien no sigue la actualidad, y esconderlo tras un clic
            contradice el motivo de escribirlo. Sin explicación no se pinta
            nada — la etapa `explicar` solo pasa por las historias sintetizadas
-           en modo contraste, y un hueco es más honesto que un placeholder. */
-        c.explicacion && <Impacto explicacion={c.explicacion} />
+           en modo contraste, y un hueco es más honesto que un placeholder.
+
+           ⚠️ Se comprueba `impacto` y NO `explicacion` a secas: desde el
+           2026-08-20 una historia BREVE puede tener explicación con SOLO
+           `fuentes` («para contrastarlo» sí, «en qué te afecta» no — ver
+           pipeline/explicar.py). Con la comprobación antigua saldrían cuatro
+           filas vacías y un sello de alcance inventado. */
+        c.explicacion?.impacto && <Impacto explicacion={c.explicacion} />
       }
       {
         /* «Para contrastarlo» va DEBAJO de «en qué te afecta» y por el mismo

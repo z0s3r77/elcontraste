@@ -42,11 +42,38 @@ const ultimo = cronologia[cronologia.length - 1];
 
 // ⚠️ Frases con número armadas enteras: Astro se come el espacio entre dos
 // interpolaciones contiguas y saldría «6días».
+//
+// `n_dias` cuenta días CON PIEZAS NUEVAS, no días en que el asunto salió. La
+// agrupación mira 48 h atrás, así que el mismo suceso se reagrupa dos o tres
+// días seguidos: contando apariciones, este número decía «5 días» de una
+// noticia que solo se había movido 4 (y 207 de 231 asuntos estaban inflados).
+//
+// Los días de eco entran en la MISMA cadena de puntos medios, no como un span
+// suelto: `.doc-meta` no es flex y dos spans contiguos se leen pegados («7
+// medios un día de por medio…»). El resto del sitio separa con «·» en el texto
+// (ver /cluster/ y /resumen/), y esta página no va a inventar otra convención.
 const resumenCifras = [
-  `${a.n_dias} días`,
+  a.n_dias === 1 ? "1 día" : `${a.n_dias} días`,
   `${a.n_articulos} piezas`,
   `${a.n_medios} medios`,
+  // La diferencia entre «lleva 5 días» y «lleva 4 días, y uno de por medio en
+  // que no se publicó nada».
+  ...(a.dias_eco === 0
+    ? []
+    : [
+        a.dias_eco === 1
+          ? "1 día sin piezas nuevas"
+          : `${a.dias_eco} días sin piezas nuevas`,
+      ]),
 ].join(" · ");
+
+/** Frases con número armadas enteras, por el espacio que Astro se come. */
+function frasePiezas(n: number): string {
+  return n === 1 ? "1 pieza nueva" : `${n} piezas nuevas`;
+}
+function fraseResto(n: number): string {
+  return n === 1 ? "y 1 pieza más" : `y ${n} piezas más`;
+}
 
 const descripcion =
   `${titular}. Seguimiento día a día: ${a.n_dias} días, ${a.n_articulos} piezas de ` +
@@ -68,45 +95,89 @@ const descripcion =
         <h1>{titular}</h1>
         <p class="doc-meta">
           <span class="dato">{resumenCifras}</span>
-          {estado && <span class:list={["asunto-sello", `sello-${a.estado}`]}>{estado}</span>}
+          {estado && <>{" · "}<span class:list={["asunto-sello", `sello-${a.estado}`]}>{estado}</span></>}
         </p>
       </header>
 
       <h2 class="rotulo-doc">Cómo ha ido, día a día</h2>
       <ol class="cronologia">
         {
-          cronologia.map((punto, i) => (
-            <li class:list={["crono-dia", { "crono-ultimo": punto === ultimo }]}>
+          cronologia.map((punto) => (
+            <li
+              class:list={[
+                "crono-dia",
+                { "crono-ultimo": punto === ultimo, "crono-eco": punto.eco },
+              ]}
+            >
               <p class="crono-fecha">
-                <span class="dato crono-n">{`Día ${i + 1}`}</span>
+                {/* Un día de eco NO gasta número de día: repetiría el anterior
+                    y el lector leería «Día 3» dos veces seguidas. */}
+                {!punto.eco && <span class="dato crono-n">{`Día ${punto.n}`}</span>}
                 <span class="dato muted">{punto.dia}</span>
+                {!punto.eco && (
+                  <span class="dato crono-entran">{frasePiezas(punto.piezas_nuevas)}</span>
+                )}
               </p>
-              {punto.clusters.map((c) => (
-                <div class="crono-historia">
-                  <h3>
-                    <a href={urlCluster(c.id)}>{c.headline ?? "Sin titular"}</a>
-                  </h3>
-                  {c.entradilla && <p class="crono-entradilla">{c.entradilla}</p>}
-                  <p class="crono-pie">
-                    {/* Sin síntesis el titular es el de UN medio, con su
-                        encuadre: hay que decirlo o se lee como neutral. */}
-                    {!c.has_synthesis && c.titular_de && (
-                      <span class="ficha-prestamo">{`titular de ${c.titular_de} · sin contrastar`}</span>
-                    )}
-                    <span class="dato">{`${c.n_sources} medios · ${c.n_articles} versiones`}</span>
-                    {c.media && <span class="ficha-medios">{c.media.join(" · ")}</span>}
-                  </p>
-                </div>
-              ))}
+
+              {punto.eco ? (
+                /* La agrupación mira 48 h hacia atrás, así que un suceso puede
+                   reaparecer sin que se haya publicado nada. Decirlo en una
+                   línea es información; repetir la historia entera era el fallo
+                   que tenía esta página. */
+                <p class="crono-quieto">
+                  No entró ninguna pieza nueva: los medios no volvieron sobre el asunto.
+                </p>
+              ) : (
+                <>
+                  <ul class="crono-nuevas">
+                    {punto.nuevas.map((a) => (
+                      <li>
+                        <a href={a.url} rel="nofollow noopener" target="_blank">
+                          {a.title}
+                        </a>
+                        <span class="dato crono-medio">{a.medio}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {punto.piezas_nuevas > punto.nuevas.length && (
+                    <p class="crono-pie">{fraseResto(punto.piezas_nuevas - punto.nuevas.length)}</p>
+                  )}
+                </>
+              )}
+
+              {/* ⚠️ El filtro va por CLÚSTER y no por día. Un mismo día puede
+                  dejar dos clústeres del mismo asunto —uno con piezas nuevas y
+                  otro que solo reagrupa—, y con el filtro por día los de eco
+                  seguían enlazando: 6 enlaces a páginas que ya no se hornean
+                  (asuntos 6 y 111, medido en el build del 2026-08-20). */}
+              {punto.clusters
+                .filter((c) => !c.hilo?.eco)
+                .map((c) => (
+                <p class="crono-pie">
+                  <a href={urlCluster(c.id)}>{`Cómo se contaba el ${punto.dia}`}</a>
+                  <span class="dato">{`${c.n_sources} medios · ${c.n_articles} versiones`}</span>
+                  {/* Sin síntesis el titular es el de UN medio, con su encuadre:
+                      hay que decirlo o se lee como neutral. */}
+                  {!c.has_synthesis && c.titular_de && (
+                    <span class="ficha-prestamo">{`titular de ${c.titular_de} · sin contrastar`}</span>
+                  )}
+                  {c.sintesis_del_dia && (
+                    <span class="ficha-prestamo">{`síntesis del ${c.sintesis_del_dia}`}</span>
+                  )}
+                </p>
+                ))}
             </li>
           ))
         }
       </ol>
 
       <p class="firma-ia">
-        Las historias de cada día se agrupan en un asunto comparando los artículos que tienen en
-        común, no por criterio editorial. Los titulares neutros los redacta un modelo de lenguaje
-        a partir de todas las versiones; cada uno enlaza sus originales.
+        Cada día lista las piezas que ENTRAN ese día, no todas las del asunto: la agrupación mira
+        48 horas hacia atrás, así que un mismo artículo aparece en varios días y contarlo cada vez
+        haría parecer que la noticia avanza cuando se está repitiendo. Los días sin piezas nuevas
+        se dicen y no se numeran. Las historias se agrupan comparando los artículos que tienen en
+        común, no por criterio editorial; los titulares neutros los redacta un modelo de lenguaje
+        a partir de todas las versiones.
       </p>
     </div>
 
@@ -139,7 +210,7 @@ const descripcion =
       }
 
       {
-        a.explicacion && (
+        a.explicacion?.impacto && (
           <>
             <Impacto explicacion={a.explicacion} />
             {a.explicacion_del_dia && a.explicacion_del_dia !== a.ultimo_dia && (

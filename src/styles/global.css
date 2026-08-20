@@ -21,16 +21,44 @@
      con la fórmula WCAG, `neutral` sobre `paper` daba **4,25:1**, por debajo
      del mínimo AA de 4,5 — y `neutral` es el color de TODA la metadata en
      monoespaciada (colofón, pies de ficha, recuentos). Ahora da 6,53.
+     2026-08-20: el papel claro es BEIGE, no casi-blanco. Dos pasadas el mismo
+     día — 97% L / 0.010 C se leía como blanco puro, y 95% / 0.022 seguía
+     leyéndose como blanco. El valor bueno es **92,5% L / 0.038 C (#f2e5ca)**,
+     con `paper-2` a 89,5% / 0.044 (#ebdabc). Regla que sale de aquí: en un
+     fondo claro la calidez no se ve subiendo el croma, se ve BAJANDO la
+     luminancia — por encima del ~95% el ojo normaliza cualquier tinte a blanco.
+     Bajar la luminancia del fondo SUBE el contraste de toda la tinta más
+     oscura que él (todas), así que el texto no fue el problema:
+     `neutral` 5,72:1 sobre paper · 5,21 sobre paper-2 (mínimo 4,5);
+     `muted` 9,45 · 8,60; `ink` 15,57 · 14,18 (prosa, mínimo 7);
+     `accent` 5,99 · 5,45.
+     ⚠️ **Quien topa primero NO es el texto, es `link-line` sobre `paper-2`**
+     (mínimo 3:1 de WCAG 1.4.11, elemento no textual): con el papel a 91,5% ya
+     daba 3,00 clavado y a 90,5% caía a 2,91. Por eso `link-line` bajó de
+     58% a 55% de luminancia (3,85 sobre paper · 3,51 sobre paper-2) y `rule`
+     de 75% a 72%, que no es contraste sino que el filete se veía igual de
+     fuerte sobre un papel más oscuro. **Ese par es el techo real de cuánto
+     más se puede oscurecer el papel, no la metadata.**
+     El `meta[name=theme-color]` de `Base.astro` lleva este mismo hex escrito
+     a mano en tres sitios: si cambias el papel, cámbialo ahí.
      Si tocas estos valores, vuelve a medir; el aspecto engaña. */
-  --color-paper: oklch(97% 0.010 85);
-  --color-paper-2: oklch(94% 0.014 82);
-  --color-rule: oklch(75% 0.018 78);
-  --color-neutral: oklch(46% 0.016 70);
-  --color-muted: oklch(34% 0.016 65);
+  --color-paper: oklch(87.5% 0.058 88);
+  --color-paper-2: oklch(84.5% 0.064 85);
+  --color-rule: oklch(66% 0.024 80);
+  --color-neutral: oklch(42% 0.018 70);
+  --color-muted: oklch(32% 0.016 65);
   --color-ink: oklch(16% 0.018 60);
-  --color-accent: oklch(44% 0.150 245);
-  --color-focus: oklch(52% 0.180 245);
-  --color-alerta: oklch(45% 0.165 28);
+  --color-accent: oklch(42% 0.150 245);
+  /* La raya que marca un enlace de contenido. Va más suave que el acento para
+     no gritar bajo un titular de display, pero el umbral que le aplica NO es el
+     de texto (4,5:1) sino el de elemento no textual: WCAG 1.4.11, 3:1. Medido
+     sobre `paper`: 3,85:1 en claro y 3,98:1 en oscuro; sobre `paper-2`, que es
+     el fondo de fichas y desplegables, 3,51:1 — y ESA es la medida que topa
+     primero cuando se oscurece el papel (ver la nota del bloque de arriba). El texto del titular
+     conserva el suyo, que es el de la tinta (17,8:1). */
+  --color-link-line: oklch(48% 0.140 245);
+  --color-focus: oklch(48% 0.180 245);
+  --color-alerta: oklch(43% 0.165 28);
 
   /* ---- Regla 2+1: tres familias como techo ---- */
   --font-display: "Libre Caslon Display", ui-serif, Georgia, serif;
@@ -129,6 +157,7 @@
     --color-muted: oklch(82% 0.014 82);
     --color-ink: oklch(96% 0.010 88);
     --color-accent: oklch(80% 0.130 245);
+    --color-link-line: oklch(55% 0.120 245);
     --color-focus: oklch(84% 0.160 245);
     --color-alerta: oklch(76% 0.140 30);
 
@@ -145,6 +174,7 @@
   --color-muted: oklch(82% 0.014 82);
   --color-ink: oklch(96% 0.010 88);
   --color-accent: oklch(80% 0.130 245);
+  --color-link-line: oklch(55% 0.120 245);
   --color-focus: oklch(84% 0.160 245);
   --color-alerta: oklch(76% 0.140 30);
 
@@ -180,9 +210,21 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* ⚠️ El subrayado hay que PONERLO: el Preflight de Tailwind declara
+     `a { text-decoration: inherit }`, que hereda `none` del body. Sin esta
+     línea, TODOS los enlaces del sitio se señalaban solo con color — que es
+     exactamente lo que WCAG 1.4.1 prohíbe, y lo que hacía imposible saber qué
+     era enlace en una portada donde los titulares van en tinta. */
   a {
     color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-color: var(--color-link-line);
+    text-decoration-thickness: 1px;
     text-underline-offset: 0.18em;
+  }
+  a:hover {
+    text-decoration-color: currentcolor;
+    text-decoration-thickness: 2px;
   }
   a:focus-visible,
   button:focus-visible {
@@ -317,6 +359,9 @@
   }
   .mast-nav a:hover {
     color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-color: currentcolor;
+    text-decoration-thickness: 1px;
   }
   .mast-nav a.activo {
     color: var(--color-ink);
@@ -785,7 +830,7 @@
     max-width: 60ch;
     margin: 0 auto var(--spacing-md);
     font-family: var(--font-display);
-    font-size: clamp(var(--text-lg), 2.1vw, var(--text-xl));
+    font-size: clamp(var(--text-lg), 1.7vw, 1.55rem);
     line-height: 1.3;
     color: var(--color-ink);
     text-align: center;
@@ -2176,7 +2221,7 @@
      queda vacía») y el mismo que la retícula de dos columnas de la Fase 13
      venía a tapar. Medido en el navegador: 30ch da 1120 px en dos líneas. */
   .estado-lede h2 {
-    font-size: clamp(2rem, 5.4vw, 4.25rem);
+    font-size: clamp(1.85rem, 4vw, 3.25rem);
     line-height: 1.12;
     margin: 0 0 var(--spacing-2xs);
     max-width: 30ch;
@@ -2235,6 +2280,15 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-neutral);
+  }
+  /* Los asuntos que hoy no salen. Debajo de las cifras y en gris: no es un dato
+     del día, es la nota que hace honesto haber escondido el eco (§ Días de un
+     asunto). Si se pintara al mismo peso competiría con lo que sí ha pasado. */
+  .estado-callados {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-neutral);
+    margin: var(--spacing-3xs) 0 0;
   }
 
   /* ---- 01 · Lo que te toca hoy (portada) ----
@@ -2431,32 +2485,52 @@
     letter-spacing: 0.1em;
     color: var(--color-ink);
   }
-  .crono-historia + .crono-historia {
-    margin-top: var(--spacing-sm);
-  }
-  .crono-historia h3 {
-    font-size: var(--text-md);
-    line-height: 1.25;
-    margin: 0 0 var(--spacing-3xs);
-    max-width: var(--measure);
-  }
-  .crono-historia h3 a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .crono-historia h3 a:hover {
-    color: var(--color-accent);
-  }
-  .crono-entradilla {
-    margin: 0 0 var(--spacing-3xs);
-    max-width: var(--measure);
-    line-height: 1.6;
-  }
   .crono-pie {
     margin: 0;
     font-family: var(--font-outlier);
     font-size: var(--text-xs);
     color: var(--color-neutral);
+  }
+  .crono-pie + .crono-pie {
+    margin-top: var(--spacing-3xs);
+  }
+  /* Cuántas piezas ENTRAN ese día. Va en tinta y no en gris porque es el dato
+     que distingue un día en que la noticia avanza de uno en que se repite —
+     antes esta página no lo decía en ningún sitio. */
+  .crono-entran {
+    color: var(--color-ink);
+  }
+  /* Las piezas nuevas del día: titulares originales, cada uno a su medio. Es lo
+     que de verdad pasó ese día, y sustituye a la repetición del titular neutro
+     del asunto entero (que es el mismo todos los días, y por eso la página se
+     leía como la misma noticia cinco veces). */
+  .crono-nuevas {
+    list-style: none;
+    margin: 0 0 var(--spacing-3xs);
+    padding: 0;
+    max-width: var(--measure);
+  }
+  .crono-nuevas li {
+    margin: 0 0 var(--spacing-3xs);
+    line-height: 1.4;
+  }
+  .crono-medio {
+    display: block;
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-neutral);
+  }
+  /* Un día sin novedades no se apaga del todo —es información: el asunto sigue
+     abierto y nadie ha vuelto sobre él— pero tampoco compite con los días en
+     que sí pasó algo. Filete punteado y texto en gris. */
+  .crono-eco {
+    border-left-style: dotted;
+  }
+  .crono-quieto {
+    margin: 0 0 var(--spacing-3xs);
+    max-width: var(--measure);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
   }
 
   /* ---- Página de asunto: el aparato al margen ---- */
@@ -2584,5 +2658,94 @@
       background-color var(--dur-media) var(--curva),
       color var(--dur-media) var(--curva),
       border-color var(--dur-media) var(--curva) !important;
+  }
+
+  /* ---- Un enlace de contenido se ve que lo es (2026-08-19) ----
+     Petición del usuario: «más contraste, más color para saber qué son enlaces
+     y qué no». Medido antes de tocar nada, y el diagnóstico era peor de lo que
+     parecía: `.toca-titulo a` y `.ficha-titular` devolvían EXACTAMENTE el mismo
+     `color` y el mismo `text-decoration: none` que el párrafo de al lado. En
+     reposo, un titular enlazado y un texto muerto eran indistinguibles; la
+     única señal era el `:hover`, que en una pantalla táctil no existe.
+
+     Qué se hace, y por qué no es «poner todo azul»: el texto SE QUEDA EN TINTA
+     —si los titulares se tiñeran de acento, la portada dejaría de ser un
+     periódico— y la señal la lleva una raya fina bajo la línea base. Al pasar
+     por encima o al enfocar con el teclado, el texto sí toma el acento y la
+     raya engorda: el estado de reposo informa, el de interacción confirma.
+
+     ⚠️ Este bloque va AL FINAL del fichero a propósito. Quince reglas repartidas
+     por el sistema apagan el subrayado con `text-decoration: none`, y cada
+     selector de aquí REPITE el suyo exactamente para igualar especificidad y
+     ganar por orden. Si mueves este bloque hacia arriba, deja de aplicarse y no
+     hay error que lo avise. Los seis que NO están aquí lo están a propósito:
+     el logotipo, la navegación y los chips tienen su propia señal (posición,
+     borde, subrayado al pasar).
+
+     ⚠️ Al añadir un tipo de enlace nuevo al sistema, se añade aquí. */
+  .ficha-titular,
+  .rotulo-seccion a,
+  .lista-titulares a,
+  .lista-huecos a,
+  .lista-foco a,
+  .lista-acelera a,
+  .fila-etiqueta a,
+  .multiple-temas a,
+  .contrastar-lista a,
+  .fuentes a,
+  .correo a,
+  .asunto-titular,
+  .toca-titulo a,
+  .crono-nuevas a,
+  .crono-pie a,
+  .tabla-radar tbody th a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-link-line);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .ficha-titular:hover,
+  .ficha-titular:focus-visible,
+  .rotulo-seccion a:hover,
+  .lista-titulares a:hover,
+  .lista-huecos a:hover,
+  .lista-foco a:hover,
+  .lista-acelera a:hover,
+  .fila-etiqueta a:hover,
+  .multiple-temas a:hover,
+  .contrastar-lista a:hover,
+  .fuentes a:hover,
+  .correo a:hover,
+  .asunto-titular:hover,
+  .toca-titulo a:hover,
+  .crono-nuevas a:hover,
+  .crono-pie a:hover,
+  .tabla-radar tbody th a:hover {
+    color: var(--color-accent);
+    text-decoration-color: currentcolor;
+    text-decoration-thickness: 2px;
+  }
+
+  /* El enlace de acción conserva su voz tipográfica con flecha (§ Voz de los
+     enlaces de acción) y suma la raya: la flecha ya era una señal no cromática,
+     pero iba en un mono de 12 px donde se lee como adorno. */
+  .enlace-accion {
+    text-decoration: underline;
+    text-decoration-color: var(--color-link-line);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+  }
+  .enlace-accion:hover {
+    text-decoration-color: currentcolor;
+    text-decoration-thickness: 2px;
+  }
+
+  /* La ficha entera es zona de clic, así que el titular también responde cuando
+     el puntero está en cualquier parte de ella. Sin esto, la raya solo cambia
+     si apuntas justo a las letras y el resto de la ficha parece muerta. */
+  .ficha:hover .ficha-titular,
+  .ficha:focus-within .ficha-titular {
+    text-decoration-color: currentcolor;
+    text-decoration-thickness: 2px;
   }
 }
