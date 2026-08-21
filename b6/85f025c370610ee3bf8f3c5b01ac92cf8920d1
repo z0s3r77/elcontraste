@@ -1,0 +1,73 @@
+.gitignore
+  s_968a98318f48ed::t_3b745137ed6d89 40-43
+docker-compose.yml
+  s_968a98318f48ed::t_ab829cd83b06dd 27-35
+pipeline/briefing.py
+  s_2581487658b394::t_d33e940bdad559 39,46-55,282,333-335,339-347,349-350,353-355,357-358,361,365-366,378,384-385,388-393
+pipeline/classify.py
+  s_2581487658b394::t_2dba418662f72e 30-34,151-152,164,271,280
+pipeline/explicar.py
+  s_2581487658b394::t_1af116661cde9b 41,46-58,296-304,308,462-469,511-512,531,545,615-616,636,657
+pipeline/llm.py
+  s_43b3dee660d4fe::t_1b096979a38ca1 1-12,17-18,20
+pipeline/lote.py
+  s_2581487658b394::t_750ad09db998e3 4-7,29-31,34-46,57,59,61,63-66,79-83,86-93,95-96,99,108-110,114,124,126,128,130-131,136-141,144,146-172
+pipeline/providers/anthropic_provider.py
+  s_2581487658b394::t_2d6859f37cd809 1-110
+pipeline/providers/base.py
+  s_2581487658b394::t_e7971ea6c8568e 1-130
+pipeline/providers/config.py
+  s_968a98318f48ed::t_889dd8fa992f5e 1-72
+pipeline/providers/openai_provider.py
+  s_2581487658b394::t_e13b84876618a5 1-243
+pipeline/synthesize.py
+  s_968a98318f48ed::t_44933e88c05ea4 8-11,23,41-54,389,430,563-564,569,585,588,611,629
+pyproject.toml
+  s_968a98318f48ed::t_c64fdc612fca97 14-18
+cola.py
+  s_336973bedad307::t_77babcbde2d6b2 1-6
+docker-compose.prod.yml
+  s_43b3dee660d4fe::t_a2d7ad6b6a68fa 42-44
+pipeline/providers/__init__.py
+  s_43b3dee660d4fe::t_f63a5b2553aaae 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "b685f025c370610ee3bf8f3c5b01ac92cf8920d1",
+  "prompts": {},
+  "sessions": {
+    "s_2581487658b394": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5e723f95-d338-4edf-bd0b-e5ea03dd84b2",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    },
+    "s_336973bedad307": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3ee18ec1-23ff-4ded-aec5-2ff3c7bef4a2",
+        "model": "unknown"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    },
+    "s_43b3dee660d4fe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "47e208d9-04ad-4360-9006-0c118234f02c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    },
+    "s_968a98318f48ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b7c32fd-55c6-466f-9d69-796c3b6284fa",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
