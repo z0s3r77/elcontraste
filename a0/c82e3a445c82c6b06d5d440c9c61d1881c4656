@@ -1,0 +1,27 @@
+design.md
+  s_968a98318f48ed::t_bfcf9d2fa12913 950-1007
+web/src/pages/asunto/[id].astro
+  s_968a98318f48ed::t_3032edcabecc19 4,183-184
+web/src/pages/cluster/[id].astro
+  s_968a98318f48ed::t_d6204c76597d90 6,273-274
+web/src/styles/global.css
+  s_968a98318f48ed::t_3df4f6c45a97a5 1491-1550,2689,2764-2768,2791-2792
+web/src/components/Compartir.astro
+  s_968a98318f48ed::t_21b79ebd4f7afb 1-139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "a0c82e3a445c82c6b06d5d440c9c61d1881c4656",
+  "prompts": {},
+  "sessions": {
+    "s_968a98318f48ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b7c32fd-55c6-466f-9d69-796c3b6284fa",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
