@@ -1,0 +1,21 @@
+CLAUDE.md
+  s_968a98318f48ed::t_e12efda7085dde 31-41,1431-1512,1514-1519
+docs/despliegue.md
+  s_968a98318f48ed::t_df1f36c0eeaba6 396
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4ae230e19ac64f30641161b01d5155d9a181981a",
+  "prompts": {},
+  "sessions": {
+    "s_968a98318f48ed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b7c32fd-55c6-466f-9d69-796c3b6284fa",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
