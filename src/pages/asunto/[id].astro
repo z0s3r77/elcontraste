@@ -1,6 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import Impacto from "../../components/Impacto.astro";
+import Compartir from "../../components/Compartir.astro";
 import { enLote, traer, type Asunto, type AsuntoDetalle } from "../../lib/api";
 import { rotula, rotulaEstado, urlCluster, urlSeccion } from "../../lib/ui";
 
@@ -179,6 +180,8 @@ const descripcion =
         común, no por criterio editorial; los titulares neutros los redacta un modelo de lenguaje
         a partir de todas las versiones.
       </p>
+
+      <Compartir titulo={titular} />
     </div>
 
     <aside class="doc-aparato">

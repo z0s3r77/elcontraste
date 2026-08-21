@@ -1,0 +1,139 @@
+---
+// «Compartir» — el enlace de una historia, listo para pasárselo a alguien.
+//
+// Petición del usuario (2026-08-22): un botón de compartir en cada historia,
+// en redes o copiando el enlace. El motivo que dio importa para el diseño:
+// «dicen que la calidad de nuestros clusters es muy buena». Lo que se comparte
+// no es una noticia más, es LA AGRUPACIÓN — todas las versiones juntas—, así
+// que lo que tiene que viajar es la URL de la página, no un extracto.
+//
+// 🚫 **Ni un script de terceros.** Facebook, X y compañía ofrecen sus botones
+// oficiales como SDK, y todos traen un rastreador que carga en cuanto la
+// página se pinta, mire quien mire, pulse o no. Aquí son ENLACES NORMALES a
+// la URL de compartir de cada red: no se ejecuta nada suyo, no saben quién ha
+// entrado, y el sitio sigue sin depender de un dominio externo para dibujarse
+// (§ Compartir de design.md).
+//
+// **Voz tipográfica, no botonera.** § Voz de los enlaces de acción prohíbe el
+// botón sólido, y el chip con borde está reservado a los filtros de sección.
+// Esto es una línea de aparato como `.doc-meta`: rótulo en monoespaciada y
+// enlaces en tinta con su raya.
+//
+// ⚠️ **Los dos controles de JS nacen ocultos y los enseña el script.** Copiar
+// al portapapeles y el diálogo del sistema no existen en todos los navegadores
+// —`navigator.clipboard` pide contexto seguro y `navigator.share` es casi solo
+// móvil—, y un botón que no hace nada al pulsarlo es peor que un botón que no
+// está. Si el JS no llega, quedan los enlaces de las redes, que son `href` y
+// funcionan solos. Esto NO contradice la regla de motion de no esconder lo que
+// ya está en pantalla: no se oculta nada que se haya visto, se revela lo que
+// la máquina puede cumplir.
+interface Props {
+  /** El texto que acompaña al enlace en las redes que lo admiten. */
+  titulo: string;
+}
+const { titulo } = Astro.props;
+
+// Misma construcción que el `canonical` de Base.astro: sale de `Astro.site`
+// (SITE_URL en el workflow), así que lo que se comparte es la URL pública y no
+// la del túnel ni la del dev server. Sin `site` configurado se cae a la URL de
+// la petición, que en `astro dev` es justo lo que se quiere probar.
+const url = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.href;
+
+const u = encodeURIComponent(url);
+const t = encodeURIComponent(titulo);
+
+// El orden es el de uso real para compartir prensa en España: la mensajería
+// primero. Facebook va nombrado porque lo pidió el usuario.
+const redes = [
+  { nombre: "WhatsApp", href: `https://wa.me/?text=${t}%20${u}` },
+  { nombre: "Telegram", href: `https://t.me/share/url?url=${u}&text=${t}` },
+  { nombre: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${u}` },
+  { nombre: "X", href: `https://twitter.com/intent/tweet?url=${u}&text=${t}` },
+];
+---
+
+<section class="compartir" data-compartir-caja data-url={url} data-titulo={titulo}>
+  <p class="compartir-rotulo">Compartir</p>
+  <ul class="compartir-lista">
+    <li>
+      <button type="button" class="compartir-accion" data-compartir="nativo" hidden>
+        Enviar…
+      </button>
+    </li>
+    <li>
+      <button type="button" class="compartir-accion" data-compartir="copiar" hidden>
+        Copiar enlace
+      </button>
+    </li>
+    {
+      redes.map((r) => (
+        <li>
+          <a class="compartir-accion" href={r.href} target="_blank" rel="noopener noreferrer">
+            {r.nombre}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  {/* `role="status"` + `aria-live`: quien navega con lector de pantalla no ve
+      cambiar la etiqueta, así que la confirmación hay que anunciarla. Nace
+      vacío a propósito — un `aria-live` con texto dentro al cargar se lee
+      solo. */}
+  <p class="compartir-estado" data-compartir="estado" role="status" aria-live="polite"></p>
+</section>
+
+<script>
+  // Un `<script>` de componente: Astro lo empaqueta y lo sirve una sola vez
+  // por página, aunque el componente se pinte más de una. Puede ir diferido —
+  // nadie comparte antes de que cargue la página.
+  document.querySelectorAll<HTMLElement>("[data-compartir-caja]").forEach((caja) => {
+    const url = caja.dataset.url || location.href;
+    const titulo = caja.dataset.titulo || document.title;
+    const estado = caja.querySelector<HTMLElement>('[data-compartir="estado"]');
+    const copiar = caja.querySelector<HTMLButtonElement>('[data-compartir="copiar"]');
+    const nativo = caja.querySelector<HTMLButtonElement>('[data-compartir="nativo"]');
+
+    let temporizador: number | undefined;
+    const avisar = (texto: string) => {
+      if (!estado) return;
+      estado.textContent = texto;
+      estado.classList.add("visible");
+      // Se reinicia el plazo en cada aviso: sin esto, dos clics seguidos
+      // dejarían que el temporizador del primero borrase el segundo mensaje.
+      clearTimeout(temporizador);
+      temporizador = setTimeout(() => {
+        estado.classList.remove("visible");
+        estado.textContent = "";
+      }, 4000);
+    };
+
+    // `clipboard` solo existe en contexto seguro (https o localhost). En
+    // cualquier otro sitio el botón no aparece y no se promete nada.
+    if (navigator.clipboard && window.isSecureContext && copiar) {
+      copiar.hidden = false;
+      copiar.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          avisar("Enlace copiado.");
+        } catch {
+          // Puede fallar aunque exista: el permiso se deniega, o el documento
+          // no tiene el foco. Se dice qué hacer en vez de callar.
+          avisar("No se pudo copiar. El enlace está en la barra del navegador.");
+        }
+      });
+    }
+
+    if (typeof navigator.share === "function" && nativo) {
+      nativo.hidden = false;
+      nativo.addEventListener("click", async () => {
+        try {
+          await navigator.share({ title: titulo, url });
+        } catch {
+          // Cancelar el diálogo del sistema lanza `AbortError`, que NO es un
+          // error del sitio: cerrar sin compartir es una decisión, no un fallo,
+          // y avisar de ella sería regañar al lector.
+        }
+      });
+    }
+  });
+</script>

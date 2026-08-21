@@ -1488,6 +1488,66 @@
     color: var(--color-accent);
     text-decoration: underline;
   }
+  /* ── Compartir (2026-08-22) ───────────────────────────────────────────
+     Cierra el cuerpo del documento: se comparte al terminar de leer, no antes.
+     Es una línea de APARATO, no una botonera — § Voz de los enlaces de acción
+     prohíbe el botón sólido y reserva el chip con borde a los filtros de
+     sección—, así que se compone como `.doc-meta`: rótulo en monoespaciada y
+     acciones en tinta con la raya de enlace.
+     ⚠️ Los `<button>` se desmaquillan a mano (`background: none`, `border: 0`):
+     el Preflight de Tailwind los deja con el estilo del sistema operativo, y
+     dos de las cinco acciones son botones mientras las otras tres son enlaces.
+     Si no coinciden al píxel, la fila se lee como dos cosas distintas. */
+  .compartir {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-2xs) var(--spacing-sm);
+    border-top: var(--rule-hair) solid var(--color-ink);
+    padding-top: var(--spacing-2xs);
+    margin: var(--spacing-xl) 0 var(--spacing-lg);
+  }
+  .compartir-rotulo {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-muted);
+    margin: 0;
+  }
+  .compartir-lista {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--spacing-2xs) var(--spacing-sm);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .compartir-accion {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-ink);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  /* La confirmación de haber copiado. Nace vacía y sin ocupar sitio; cuando
+     llega el aviso, aparece. Es el caso de manual de § Motion: el movimiento
+     CONFIRMA una acción del lector, no decora. */
+  .compartir-estado {
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+    margin: 0;
+    opacity: 0;
+    transition: opacity var(--dur-corta) var(--curva);
+  }
+  .compartir-estado.visible {
+    opacity: 1;
+  }
+
   /* El «qué aporta» en gris y pequeño: es la razón de pulsar, no el enlace. */
   .contrastar-aporta {
     display: block;
@@ -2626,6 +2686,7 @@
   .enlace-accion,
   .ficha-titular,
   .correo a,
+  .compartir-accion,
   .tema {
     transition:
       color var(--dur-corta) var(--curva),
@@ -2700,6 +2761,11 @@
   .toca-titulo a,
   .crono-nuevas a,
   .crono-pie a,
+  /* Los botones de compartir llevan la MISMA raya que sus vecinos enlace.
+     WCAG 1.4.1 solo obliga en los enlaces, pero la fila mezcla `<button>` y
+     `<a>` en una sola línea: si únicamente la mitad se subrayara, la otra
+     mitad parecería texto muerto. */
+  .compartir-accion,
   .tabla-radar tbody th a {
     text-decoration: underline;
     text-decoration-color: var(--color-link-line);
@@ -2722,6 +2788,8 @@
   .toca-titulo a:hover,
   .crono-nuevas a:hover,
   .crono-pie a:hover,
+  .compartir-accion:hover,
+  .compartir-accion:focus-visible,
   .tabla-radar tbody th a:hover {
     color: var(--color-accent);
     text-decoration-color: currentcolor;

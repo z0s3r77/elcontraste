@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import Parrafos from "../../components/Parrafos.astro";
 import Glosado from "../../components/Glosado.astro";
 import Contrastar from "../../components/Contrastar.astro";
+import Compartir from "../../components/Compartir.astro";
 import Impacto from "../../components/Impacto.astro";
 import {
   enLote,
@@ -269,6 +270,8 @@ const jsonLd =
           </>
         )
       }
+
+      <Compartir titulo={c.headline ?? "Sin titular"} />
     </div>
 
     {/* Aparato del margen. Hasta el 2026-08-16 era solo atribución —quién la
