@@ -10,10 +10,13 @@ import {
   urlInicio,
   urlResumen,
   urlSeccion,
+  RADAR_VISIBLE,
   urlRadar,
   urlFocos,
   urlTendencias,
   urlContacto,
+  urlTerminos,
+  urlPrivacidad,
   urlEstatico,
 } from "../lib/ui";
 
@@ -190,9 +193,18 @@ const imagenSocial = Astro.site
           <li>
             <a href={urlFocos()} class={seccion === "focos" ? "activo" : ""}>Focos</a>
           </li>
-          <li>
-            <a href={urlRadar("economico")} class={seccion === "radar" ? "activo" : ""}>Radar</a>
-          </li>
+          {
+            /* Radar escondido (2026-08-25): la entrada se pinta o no según la
+               MISMA bandera que decide si la página se hornea. Ver RADAR_VISIBLE
+               en lib/ui.ts — un solo sitio, o vuelve el enlace muerto. */
+            RADAR_VISIBLE && (
+              <li>
+                <a href={urlRadar("economico")} class={seccion === "radar" ? "activo" : ""}>
+                  Radar
+                </a>
+              </li>
+            )
+          }
           <li>
             <a href={urlTendencias()} class={seccion === "tendencias" ? "activo" : ""}>
               Tendencias
@@ -249,6 +261,60 @@ const imagenSocial = Astro.site
             <a href="mailto:contacto@noticiasdoxa.es">contacto@noticiasdoxa.es</a>
           </p>
         </section>
+      </div>
+
+      <!-- Apoyo (2026-08-26). Va ENTRE las cuatro columnas y el aviso legal a
+           propósito: el lector acaba de leer con qué reglas se hace esto, y es
+           justo ahí donde una petición de dinero se entiende en vez de
+           interrumpir. Arriba del todo sería lo contrario — una portada de
+           periódico que pide antes de dar.
+           🚫 Es un `href`, no el widget de Buy Me a Coffee: su botón oficial es
+           un script de terceros que carga con la página y rastrea mire quien
+           mire, exactamente lo que se rechazó en Compartir. Nada sale hacia
+           buymeacoffee.com salvo que el lector pulse.
+           ⚠️ Si esta línea cambia, cambian también /terminos/ («cómo se
+           sostiene») y /privacidad/ («si pulsas el enlace de apoyo»). Las tres
+           dicen lo mismo desde tres sitios y solo valen si coinciden. -->
+      <div class="marco colofon-apoyo">
+        <p class="colofon-rotulo">Cómo se sostiene</p>
+        <p>
+          La Doxa no cobra ni cobrará por leerla y no lleva publicidad. Lo que cuesta
+          —el dominio y las llamadas al modelo que redacta las síntesis— sale del
+          bolsillo de una persona. Si te sirve y quieres que crezca, puedes echar una
+          mano; no hay nada detrás de ese enlace más que un café.
+        </p>
+        <p class="colofon-apoyo-accion">
+          <a
+            class="enlace-accion"
+            href="https://buymeacoffee.com/ipopdue24o"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Invitar a un café ↗
+          </a>
+        </p>
+      </div>
+
+      <!-- Aviso legal: una FILA bajo las cuatro columnas, no una quinta
+           columna. § Nav y footer fija el colofón en cuatro columnas rotuladas
+           con los parámetros del sistema, y lo legal no es un parámetro del
+           sistema: es de otra clase. Un periódico lo pone igual, en una línea
+           al pie de todo. En móvil se apila solo, porque es un flex con wrap. -->
+      <div class="marco colofon-legal">
+        <p class="colofon-declaracion">
+          Proyecto personal sin ánimo de lucro: no hay publicidad, ni patrocinios, ni
+          afiliación, ni cuentas de usuario. Cada historia enlaza al artículo original,
+          que es de su medio.
+        </p>
+        <nav class="colofon-enlaces" aria-label="Legal">
+          <a href={urlTerminos()} class={seccion === "terminos" ? "activo" : ""}>
+            Términos y condiciones
+          </a>
+          <a href={urlPrivacidad()} class={seccion === "privacidad" ? "activo" : ""}>
+            Política de privacidad
+          </a>
+          <a href={urlContacto()}>Contacto</a>
+        </nav>
       </div>
     </footer>
 

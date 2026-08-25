@@ -2,7 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import Conmutador from "../../components/Conmutador.astro";
 import { taxonomia, traer, type Radar } from "../../lib/api";
-import { rotula, urlRadar, urlSeccion } from "../../lib/ui";
+import { RADAR_VISIBLE, rotula, urlRadar, urlSeccion } from "../../lib/ui";
 
 // Macrostructure: 04 · Stat-Led — la cifra manda y el texto la cualifica.
 //
@@ -16,6 +16,10 @@ import { rotula, urlRadar, urlSeccion } from "../../lib/ui";
 // menos, la página lo dice en palabras en vez de dibujar una flecha que miente.
 
 export async function getStaticPaths() {
+  // ⚠️ Escondido: con `RADAR_VISIBLE = false` esto devuelve [] y no se hornea
+  // ni una página de radar. La página sigue aquí entera y viva; lo único que
+  // hay que tocar para que vuelva es esa bandera en `lib/ui.ts`.
+  if (!RADAR_VISIBLE) return [];
   const tax = await taxonomia();
   return tax.map((t) => ({ params: { seccion: t.section } }));
 }

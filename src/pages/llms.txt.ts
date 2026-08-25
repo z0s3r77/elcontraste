@@ -47,6 +47,8 @@ export const GET: APIRoute = async ({ site }) => {
     `- [Focos](${abs("/focos/")}) — qué cubre mucho la prensa y qué cubre poco, un día dado.`,
     `- [Tendencias](${abs("/tendencias/")}) — qué asuntos llevan más tiempo abiertos.`,
     `- [Contacto](${abs("/contacto/")})`,
+    `- [Términos y condiciones](${abs("/terminos/")}) — sin ánimo de lucro, sin publicidad, y con qué reglas se cita a los medios.`,
+    `- [Política de privacidad](${abs("/privacidad/")}) — sin cuentas ni cookies propias; qué terceros intervienen.`,
     "",
     "## Aviso",
     "",

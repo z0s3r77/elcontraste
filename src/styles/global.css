@@ -508,6 +508,78 @@
     color: var(--color-ink);
   }
 
+  /* Apoyo económico (2026-08-26). Fila propia entre las cuatro columnas y el
+     aviso legal. Lleva el mismo rótulo que las columnas (`.colofon-rotulo`)
+     porque es lo mismo: un dato de cómo funciona esto, no una llamada a la
+     acción de otra cosa. Un botón sólido aquí rompería el género —§ Nav y
+     footer prohíbe Ft8 marquesina— y además convertiría el colofón de un
+     periódico en una barra de captación.
+     El texto se capa a `--measure`: es prosa, y en 1584 px una sola línea de
+     monoespaciada no se lee, se escanea. */
+  /* ⚠️ SIN filete propio arriba: el `border-bottom` de su `.colofon-rotulo`
+     ya cruza el marco entero y divide, exactamente igual que los rótulos de
+     las cuatro columnas. Con los dos quedaban dos hairlines a 30 px una de
+     otra y el pie se leía cargado. Lo que separa es el aire. */
+  .colofon-apoyo {
+    margin-top: var(--spacing-lg);
+  }
+  .colofon-apoyo p:not(.colofon-rotulo) {
+    max-width: var(--measure);
+  }
+  .colofon p.colofon-apoyo-accion {
+    margin-top: var(--spacing-2xs);
+  }
+  /* El enlace sube a tinta plena: es lo único accionable del colofón junto al
+     correo, y en `--color-neutral` se perdía entre la prosa de al lado. */
+  .colofon-apoyo-accion a {
+    color: var(--color-ink);
+  }
+  .colofon-apoyo-accion a:hover,
+  .colofon-apoyo-accion a:focus-visible {
+    color: var(--color-accent);
+  }
+
+  /* Aviso legal del colofón: una fila bajo las cuatro columnas rotuladas, no
+     una quinta columna. Las cuatro llevan los PARÁMETROS del sistema (umbral,
+     ventana, medios) y lo legal no es un parámetro: mezclarlo ahí lo dejaría
+     leyéndose como un dato más de la maquinaria. Como línea al pie se lee por
+     lo que es, que es donde lo pone un periódico.
+     Filete arriba para separarlo del bloque de arriba, y `wrap` para que en
+     móvil la declaración y los enlaces se apilen sin ninguna media query. */
+  .colofon-legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-2xs) var(--spacing-lg);
+    border-top: var(--rule-hair) solid var(--color-rule);
+    padding-top: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+  }
+  /* La declaración se capa a `--measure`: es la única prosa del colofón y a
+     1584 px una sola línea de mono cruzando la página entera no se lee, se
+     escanea. Los enlaces no la empujan porque el flex es `space-between`. */
+  .colofon p.colofon-declaracion {
+    max-width: var(--measure);
+    flex: 1 1 22rem;
+  }
+  .colofon-enlaces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2xs) var(--spacing-md);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.7;
+  }
+  .colofon-enlaces a {
+    color: var(--color-neutral);
+  }
+  .colofon-enlaces a:hover,
+  .colofon-enlaces a:focus-visible,
+  .colofon-enlaces a.activo {
+    color: var(--color-ink);
+  }
+
   /* ---------------------------------------------------- piezas comunes */
   .banda {
     display: flex;
@@ -1327,6 +1399,17 @@
   .motivos li {
     padding: var(--spacing-3xs) 0;
     border-bottom: var(--rule-hair) dotted var(--color-rule);
+  }
+
+  /* `.prosa` al margen (páginas legales): la misma clase, un cuerpo menos. Sin
+     esto la nota del aparato sale al tamaño del artículo y compite con él en
+     vez de anotarlo — el margen es marginalia, no una segunda columna de
+     texto (§ Anchos regla 4). */
+  .doc-aparato .prosa {
+    max-width: none;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-muted);
   }
 
   /* La dirección de contacto es lo único accionable de su página: se compone
@@ -2757,6 +2840,8 @@
   .contrastar-lista a,
   .fuentes a,
   .correo a,
+  .motivos a,
+  .colofon-enlaces a,
   .asunto-titular,
   .toca-titulo a,
   .crono-nuevas a,
@@ -2784,6 +2869,9 @@
   .contrastar-lista a:hover,
   .fuentes a:hover,
   .correo a:hover,
+  .motivos a:hover,
+  .colofon-enlaces a:hover,
+  .colofon-enlaces a:focus-visible,
   .asunto-titular:hover,
   .toca-titulo a:hover,
   .crono-nuevas a:hover,

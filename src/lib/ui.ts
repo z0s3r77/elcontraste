@@ -79,6 +79,15 @@ export const urlCluster = (id: number | string) => `${BASE}/cluster/${id}/`;
 export const urlSeccion = (s: string, tema?: string | null) =>
   tema ? `${BASE}/seccion/${s}/${tema}/` : `${BASE}/seccion/${s}/`;
 
+/** ⚠️ RADAR ESCONDIDO (2026-08-25, a petición del usuario; volverá).
+ *  Un solo interruptor para las DOS mitades de esconder una página: que no se
+ *  hornee y que no se enlace. Separarlas es lo que produce enlaces muertos —
+ *  quitar el enlace y seguir horneando deja páginas huérfanas indexadas; dejar
+ *  de hornear y no quitar el enlace deja la navegación apuntando a un 404.
+ *  Para volver a enseñarlo: `true`, y nada más. El código del radar se queda
+ *  entero (la página, `urlRadar`, `/api/radar/` y sus estilos). */
+export const RADAR_VISIBLE = false;
+
 export const urlRadar = (s: string) => `${BASE}/radar/${s}/`;
 
 /** URL de un ASUNTO: el mismo suceso a lo largo de los días (Fase 13). */
@@ -139,6 +148,14 @@ export const urlFocos = () => `${BASE}/focos/`;
 export const urlTendencias = () => `${BASE}/tendencias/`;
 
 export const urlContacto = () => `${BASE}/contacto/`;
+
+/* Las dos páginas legales. No están en la navegación a propósito: viven en el
+   colofón, que es donde un periódico pone su aviso legal. Helpers por la misma
+   razón que las demás — un href escrito a mano funciona en local y da 404 bajo
+   /<repo>/, que es el fallo que ya se pagó con los <link> del icono. */
+export const urlTerminos = () => `${BASE}/terminos/`;
+
+export const urlPrivacidad = () => `${BASE}/privacidad/`;
 
 /** URL de un fichero de `public/`. Mismo prefijo, misma trampa: un
  *  `href="/favicon.svg"` a pelo funciona en local y 404 en /<repo>/. */

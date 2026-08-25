@@ -1,0 +1,189 @@
+---
+// Página estática, hermana de `terminos.astro`.
+//
+// ⚠️ Esta página enumera TODO lo que sale del navegador del lector, y solo
+// vale mientras la enumeración esté completa. Los tres terceros que hay hoy
+// —Cloudflare Web Analytics, Google Fonts y GitHub Pages como servidor— están
+// en `Base.astro` y en el workflow de despliegue. **Si se añade un script, un
+// tipo de letra remoto, una imagen alojada fuera o un iframe, se añade aquí en
+// el mismo commit.** Una política de privacidad incompleta no es un descuido
+// de forma: afirma que no ocurre algo que sí ocurre.
+import Base from "../layouts/Base.astro";
+import { urlTerminos } from "../lib/ui";
+
+const CORREO = "contacto@noticiasdoxa.es";
+const ACTUALIZADO = "26 de agosto de 2026";
+---
+
+<Base
+  title="Política de privacidad — La Doxa"
+  seccion="privacidad"
+  edicion="Qué sale de tu navegador y adónde va"
+  descripcion="Qué datos trata La Doxa: sin cuentas, sin cookies propias, sin publicidad y sin perfilado. La lista completa de lo que sale del navegador."
+>
+  <article class="doc">
+    <div class="doc-cuerpo">
+      <header class="doc-cabecera">
+        <p class="doc-seccion">La Doxa</p>
+        <h1>Política de privacidad</h1>
+        <p class="doc-meta">
+          Actualizado el {ACTUALIZADO} · sin cuentas · sin cookies propias
+        </p>
+      </header>
+
+      <div class="relato">
+        <p>
+          La Doxa <strong>no te pide nada</strong>: no hay registro, ni formularios, ni
+          comentarios, ni boletín, ni carrito. No sabemos quién eres, no se construye ningún
+          perfil tuyo y no hay nada que vender, porque no se recoge nada que se pueda vender.
+        </p>
+        <p>
+          Lo honesto, aun así, no es decir «no recogemos datos» y callar: al abrir cualquier
+          página web tu navegador habla con servidores, y algunos de esos servidores no son
+          nuestros. Abajo está la lista completa de los que intervienen aquí y de para qué.
+        </p>
+      </div>
+
+      <p class="rotulo-doc">Quién responde</p>
+      <p class="prosa">
+        Un particular, responsable a título personal de este proyecto sin ánimo de lucro. Vía
+        de contacto para cualquier asunto relacionado con datos:
+        <a href={`mailto:${CORREO}`}>{CORREO}</a>.
+      </p>
+
+      <p class="rotulo-doc">Lo que se queda en tu navegador y no sale</p>
+      <p class="prosa">
+        El sitio guarda <strong>una sola cosa</strong> en tu equipo: si eliges tema claro u
+        oscuro, esa elección se anota en el almacenamiento local del navegador
+        (<code class="dato">localStorage</code>, clave <code class="dato">tema</code>) para no
+        deslumbrarte en la siguiente visita. No es una cookie, no viaja en ninguna petición y
+        nadie más puede leerla. Se borra vaciando los datos del sitio en tu navegador.
+        <strong>No hay cookies propias</strong>, y por eso tampoco hay ventana de consentimiento:
+        no habría nada que consentir.
+      </p>
+
+      <p class="rotulo-doc">Quién sirve las páginas: GitHub Pages</p>
+      <p class="prosa">
+        El sitio es un montón de ficheros estáticos alojados en GitHub Pages (GitHub, Inc.).
+        Como cualquier servidor web, recibe la dirección IP y el <em>User-Agent</em> de quien
+        pide una página y los registra en sus propios <em>logs</em>. A esos registros no
+        tenemos acceso; se rigen por la privacidad de GitHub.
+      </p>
+
+      <p class="rotulo-doc">Cuánta gente entra: Cloudflare Web Analytics</p>
+      <p class="prosa">
+        Para saber cuántas visitas hay y qué páginas se leen, el sitio carga el contador de
+        Cloudflare Web Analytics. Se eligió justo por lo que no hace:
+        <strong>no pone cookies, no usa huella del dispositivo y no sigue a nadie entre
+        sitios</strong>. Lo que se ve del lado de acá son cifras agregadas —visitas por página,
+        país, tipo de navegador—, nunca personas. Si prefieres no cargarlo, cualquier bloqueador
+        de contenidos lo detiene y el sitio sigue funcionando exactamente igual.
+      </p>
+
+      <p class="rotulo-doc">Los tipos de letra: Google Fonts</p>
+      <p class="prosa">
+        Las tres familias con las que está compuesto el sitio se piden a Google Fonts, así que
+        al cargar una página <strong>tu navegador hace una petición a servidores de Google</strong>
+        y esa petición lleva tu IP, como cualquier otra. No se manda nada más, ni hay cookie de
+        por medio. Se dice aquí porque es el único tercero que interviene sin que se note, y
+        callarlo sería exactamente lo que este sitio critica.
+      </p>
+
+      <p class="rotulo-doc">Compartir: enlaces, no botones espía</p>
+      <p class="prosa">
+        Los botones de compartir de cada historia son <strong>enlaces normales</strong>. No hay
+        un solo <em>script</em> de WhatsApp, X, Bluesky, Telegram ni de nadie: los oficiales son
+        SDK con rastreador que se cargan mire quien mire, y aquí no entran. Nada sale hacia una
+        red social a menos que pulses tú, y entonces sale porque tú lo has decidido. Copiar el
+        enlace ocurre entero dentro de tu navegador.
+      </p>
+
+      <p class="rotulo-doc">El audio del resumen diario</p>
+      <p class="prosa">
+        El MP3 del resumen se sintetiza en el ordenador de casa antes de publicar y se sirve
+        desde este mismo dominio, como una imagen más. No hay servicio de voz de terceros ni
+        nada que se envíe al pulsar «reproducir». Si ese fichero faltara, la página ofrece
+        leerlo con la voz que ya trae tu propio navegador, que tampoco manda nada fuera.
+      </p>
+
+      <p class="rotulo-doc">El enlace para apoyar</p>
+      <p class="prosa">
+        El «invitar a un café» del pie es un <strong>enlace normal</strong> a Buy Me a
+        Coffee: no se carga aquí ningún botón, ni script, ni iframe suyo, así que mientras no
+        lo pulses <strong>esa empresa no sabe que existes</strong>. Si lo pulsas, sales a su
+        sitio y a partir de ahí mandan sus condiciones y su privacidad, no las de aquí. Aquí
+        no llega ningún dato de pago: no se ve tu tarjeta, ni tu dirección, ni tu nombre, y
+        aportar no crea ninguna cuenta ni cambia lo que ves en este sitio.
+      </p>
+
+      <p class="rotulo-doc">Si escribes al correo</p>
+      <p class="prosa">
+        Tu mensaje y tu dirección quedan en el buzón, se usan para responderte y para nada más.
+        No van a ninguna lista, no se ceden y se borran cuando el asunto está cerrado.
+      </p>
+
+      <p class="rotulo-doc">Personas que aparecen en las noticias</p>
+      <p class="prosa">
+        Las síntesis nombran a quien la prensa nombra, con fines de información pública y
+        siempre enlazando al artículo original, que es la fuente. Si apareces en un texto de
+        este sitio y crees que es inexacto, incompleto o que ya no debería estar,
+        <a href={`mailto:${CORREO}`}>escribe</a>: se corrige o se retira. No se pide que
+        justifiques el motivo ni que acredites nada.
+      </p>
+
+      <p class="rotulo-doc">Tus derechos</p>
+      <p class="prosa">
+        Puedes ejercer los derechos de acceso, rectificación, supresión, oposición, limitación y
+        portabilidad del Reglamento (UE) 2016/679 escribiendo a esa dirección. Conviene decirlo
+        sin adornos: <strong>como no hay cuentas ni identificadores, lo más probable es que aquí
+        no exista ningún dato tuyo</strong> y la respuesta sea justamente esa. También puedes
+        reclamar ante la Agencia Española de Protección de Datos.
+      </p>
+
+      <p class="rotulo-doc">Menores y publicidad</p>
+      <p class="prosa">
+        El sitio no está dirigido a menores de forma específica y no recoge datos de nadie, de
+        ninguna edad. No hay publicidad ni perfilado publicitario, hoy ni previsto: el porqué
+        está en los <a href={urlTerminos()}>términos y condiciones</a>.
+      </p>
+
+      <p class="rotulo-doc">Cambios</p>
+      <p class="prosa">
+        Si algún día entra un tercero nuevo, aparecerá en esta lista el mismo día que entre y la
+        fecha de arriba lo dirá.
+      </p>
+    </div>
+
+    <aside class="doc-aparato">
+      <p class="rotulo-doc">En una línea</p>
+      <p class="prosa">
+        Sin cuentas, sin cookies propias, sin publicidad y sin perfiles. Lo único que se guarda
+        de ti es el tema claro u oscuro, y se queda en tu navegador.
+      </p>
+
+      <p class="rotulo-doc">Terceros que intervienen</p>
+      <ul class="motivos">
+        <li>GitHub Pages — sirve las páginas</li>
+        <li>Cloudflare Web Analytics — cuenta visitas, sin cookies</li>
+        <li>Google Fonts — sirve los tipos de letra</li>
+      </ul>
+      <p class="prosa">
+        Buy Me a Coffee no está en la lista a propósito: no se carga nada suyo. Solo
+        intervendría si pulsas el enlace del pie.
+      </p>
+
+      <p class="rotulo-doc">Ejercer derechos</p>
+      <p class="correo">
+        <a href={`mailto:${CORREO}`}>{CORREO}</a>
+      </p>
+
+      <p class="rotulo-doc">También</p>
+      <ul class="motivos">
+        <li><a href={urlTerminos()}>Términos y condiciones</a></li>
+      </ul>
+
+      <p class="rotulo-doc">Versión</p>
+      <p class="prosa">{ACTUALIZADO}</p>
+    </aside>
+  </article>
+</Base>

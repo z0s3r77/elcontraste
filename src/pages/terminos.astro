@@ -1,0 +1,192 @@
+---
+// Página estática: no llama a la API, como `contacto.astro`. Mismo Long
+// Document con aparato al margen (design.md § Anchos regla 4): lo que sube al
+// margen es lo accionable —la vía de retirada y la fecha de la versión—, no
+// relleno.
+//
+// ⚠️ Este texto describe lo que el sitio HACE, no lo que estaría bien que
+// hiciera. Si cambia una práctica del pipeline (el ritmo de rastreo, el
+// respeto a robots.txt, la ausencia de publicidad), cambia también aquí: una
+// página de condiciones que se desactualiza es peor que no tenerla, porque
+// afirma cosas falsas con tono de compromiso.
+import Base from "../layouts/Base.astro";
+import { urlPrivacidad } from "../lib/ui";
+
+const CORREO = "contacto@noticiasdoxa.es";
+// ⚠️ La misma URL vive en el colofón (`Base.astro`) y se nombra en
+// /privacidad/. Si cambia la vía de apoyo, cambian las tres.
+const URL_APOYO = "https://buymeacoffee.com/ipopdue24o";
+const ACTUALIZADO = "26 de agosto de 2026";
+---
+
+<Base
+  title="Términos y condiciones — La Doxa"
+  seccion="terminos"
+  edicion="Qué es esto, qué no es y con qué reglas se hace"
+  descripcion="Condiciones de uso de La Doxa: proyecto personal sin publicidad, sin patrocinios y sin cuentas de usuario, sostenido por aportaciones voluntarias, que enlaza siempre al artículo original."
+>
+  <article class="doc">
+    <div class="doc-cuerpo">
+      <header class="doc-cabecera">
+        <p class="doc-seccion">La Doxa</p>
+        <h1>Términos y condiciones</h1>
+        <p class="doc-meta">
+          Actualizado el {ACTUALIZADO} · sin publicidad · sin cobrar por leer
+        </p>
+      </header>
+
+      <div class="relato">
+        <p>
+          La Doxa es un <strong>proyecto personal</strong>. No es una empresa, no es un
+          medio de comunicación y no tiene detrás una redacción. Lo que hace es leer los
+          canales públicos de varios periódicos españoles, agrupar las versiones que dan
+          de una misma noticia y enseñar en qué coinciden, en qué se contradicen y qué
+          cuenta uno solo.
+        </p>
+        <p>
+          Existe por una razón y solo por esa: que se vea el encuadre. Quien lee un único
+          periódico no puede saber qué le están dejando fuera, y ese hueco no se ve leyendo
+          más despacio: se ve poniendo las versiones al lado. Todo lo que sigue son las
+          reglas con las que se hace, escritas para que se puedan comprobar.
+        </p>
+      </div>
+
+      <p class="rotulo-doc">Aquí no se cobra por leer</p>
+      <p class="prosa">
+        No hay publicidad, ni patrocinios, ni enlaces de afiliación, ni contenido pagado, ni
+        suscripciones, ni muro de pago, ni tienda. No se vende ni se cede ningún dato a nadie
+        —tampoco los habría que vender: mira la
+        <a href={urlPrivacidad()}>política de privacidad</a>—. No hay cuentas de usuario ni
+        boletín, y <strong>ningún medio paga por aparecer aquí ni podría</strong>: la
+        selección la hace un cálculo, no una tarifa.
+      </p>
+
+      <p class="rotulo-doc">Cómo se sostiene</p>
+      <p class="prosa">
+        Esto cuesta dinero: el dominio y, sobre todo, las llamadas al modelo de lenguaje que
+        redacta las síntesis. Hasta ahora lo ha pagado su autor de su bolsillo. Desde el 26
+        de agosto de 2026 hay <strong>una única vía de ingreso</strong>, voluntaria y sin
+        contrapartida: aportaciones a través de
+        <a href={URL_APOYO} target="_blank" rel="noopener noreferrer">Buy Me a Coffee</a>.
+      </p>
+      <p class="prosa">
+        Conviene decir qué <em>no</em> compra ese dinero, porque es lo único que importa:
+        <strong>no compra un lugar en la portada, ni un enfoque, ni que se deje de agrupar
+        una noticia incómoda, ni acceso a nada que los demás no tengan</strong>. Quien aporta
+        ve exactamente el mismo sitio que quien no. Va a lo que cuesta funcionar, y si algún
+        día sobrara, a cubrir más medios y más días de memoria. Si eso cambiara —si entrara
+        publicidad, un patrocinio o cualquier forma de pago con contrapartida—, se diría aquí
+        y en la portada <strong>antes</strong> de que ocurriera, no después.
+      </p>
+
+      <p class="rotulo-doc">Qué se toma de los medios, y qué no</p>
+      <p class="prosa">
+        La Doxa <strong>no republica el texto de los artículos</strong>. De cada pieza se
+        muestran el titular, a veces la entradilla, el medio que la firma y el enlace al
+        original. El resumen que aparece en cada historia lo redacta un modelo de lenguaje
+        a partir de esos textos: es obra derivada de carácter informativo, con la atribución
+        dentro de la propia prosa —el sitio dice qué medio cuenta cada cosa— y siempre con el
+        enlace al artículo, que es la fuente que manda.
+      </p>
+      <p class="prosa">
+        Este uso se ampara en el derecho de cita y reseña del artículo 32 del texto refundido
+        de la Ley de Propiedad Intelectual: extractos breves, con fin informativo, citando
+        fuente y autor. <strong>La propiedad intelectual de cada artículo es de su medio y de
+        quien lo firma</strong>, y aquí no se discute ni se diluye: el objetivo es mandar
+        lectores al original, no retenerlos.
+      </p>
+
+      <p class="rotulo-doc">Cómo se rastrea</p>
+      <p class="prosa">
+        Solo canales públicos (RSS y la portada abierta de cada medio). Se respeta el
+        <code class="dato">robots.txt</code> de cada dominio, el <em>User-Agent</em> se
+        identifica, el ritmo es lento y espaciado, y <strong>no se sortea ningún muro de
+        pago</strong>. Cuando un medio devuelve un bloqueo, se acepta el bloqueo: no se rotan
+        identidades, ni se usan proxies, ni se recupera por otra vía lo que ese medio niega en
+        directo. Si un artículo no se puede leer, esa historia se queda con el titular y ya.
+      </p>
+
+      <p class="rotulo-doc">Retirada</p>
+      <p class="prosa">
+        Si eres responsable de un medio y no quieres que tus titulares aparezcan aquí, basta
+        con escribir a <a href={`mailto:${CORREO}`}>{CORREO}</a> desde una dirección del
+        dominio del medio: se retira el medio entero y se deja de leer su fuente. No hace
+        falta un requerimiento formal ni justificar el motivo, y no se pide nada a cambio. Lo
+        mismo vale para una persona que aparezca nombrada en una síntesis y considere que el
+        texto es inexacto: se corrige o se retira.
+      </p>
+
+      <p class="rotulo-doc">Las síntesis las escribe una máquina</p>
+      <p class="prosa">
+        Los resúmenes, el bloque «En qué te afecta» y el resumen diario hablado los genera un
+        modelo de lenguaje, y <strong>pueden contener errores</strong>: atribuir mal una
+        declaración, mezclar dos hechos o afirmar con seguridad algo que en el original iba
+        con matices. Por eso cada historia lleva los enlaces a las versiones originales, y por
+        eso están los primeros. Lo que dice el medio manda sobre lo que dice La Doxa.
+      </p>
+      <p class="prosa">
+        Nada de lo que aparece aquí es asesoramiento jurídico, médico, financiero ni
+        profesional de ningún tipo. El bloque «En qué te afecta» explica en castellano llano
+        una consecuencia general de una noticia; no es un dictamen sobre tu caso.
+      </p>
+
+      <p class="rotulo-doc">Sin garantías, y sin responsabilidad por lo enlazado</p>
+      <p class="prosa">
+        El sitio se ofrece tal cual, sin garantía de disponibilidad, de continuidad ni de
+        exactitud. Puede dejar de actualizarse un día cualquiera, o para siempre, sin previo
+        aviso. Tampoco se responde del contenido de las páginas enlazadas: son de sus medios,
+        y un enlace no es un aval.
+      </p>
+
+      <p class="rotulo-doc">Uso que se espera de ti</p>
+      <p class="prosa">
+        Léelo, cítalo y compártelo libremente, con enlace a la página. Lo que no encaja con
+        el motivo por el que esto existe es volcar el sitio entero de forma automatizada,
+        revender su contenido o presentarlo como propio. Si quieres los datos para algo,
+        escribe: es más fácil que se te den que que los raspes.
+      </p>
+
+      <p class="rotulo-doc">Cambios y ley aplicable</p>
+      <p class="prosa">
+        Estas condiciones pueden cambiar; la fecha de arriba dice cuándo se tocaron por última
+        vez. La relación se rige por la legislación española.
+      </p>
+    </div>
+
+    <aside class="doc-aparato">
+      <p class="rotulo-doc">En una línea</p>
+      <p class="prosa">
+        Agregador personal, sin publicidad y sin cobrar por leer, que enlaza siempre al
+        artículo original.
+      </p>
+
+      <p class="rotulo-doc">Apoyar</p>
+      <p class="prosa">
+        Voluntario y sin contrapartida: no compra portada, ni enfoque, ni acceso.
+      </p>
+      <p class="colofon-apoyo-accion">
+        <a
+          class="enlace-accion"
+          href={URL_APOYO}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Invitar a un café ↗
+        </a>
+      </p>
+
+      <p class="rotulo-doc">Retirar un medio</p>
+      <p class="correo">
+        <a href={`mailto:${CORREO}`}>{CORREO}</a>
+      </p>
+
+      <p class="rotulo-doc">También</p>
+      <ul class="motivos">
+        <li><a href={urlPrivacidad()}>Política de privacidad</a></li>
+      </ul>
+
+      <p class="rotulo-doc">Versión</p>
+      <p class="prosa">{ACTUALIZADO}</p>
+    </aside>
+  </article>
+</Base>
