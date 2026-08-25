@@ -1,0 +1,35 @@
+CLAUDE.md
+  s_dff068cc0e37a0::t_2f3bff86bfa167 31-44,1518-1598
+design.md
+  s_dff068cc0e37a0::t_e525bf46f180a9 324-355,358-394
+web/src/layouts/Base.astro
+  s_dff068cc0e37a0::t_d7b632270d57c3 13,18-19,196-207,265-318
+web/src/lib/ui.ts
+  s_dff068cc0e37a0::t_35e498fb17479b 82-90,152-159
+web/src/pages/llms.txt.ts
+  s_dff068cc0e37a0::t_1d005b3542813e 50-51
+web/src/pages/privacidad.astro
+  s_dff068cc0e37a0::t_83f80ba3ea6795 1-189
+web/src/pages/radar/[seccion].astro
+  s_dff068cc0e37a0::t_873ce2743b251b 5,19-22
+web/src/pages/terminos.astro
+  s_dff068cc0e37a0::t_3e3ef5ffa1d62a 1-192
+web/src/styles/global.css
+  s_dff068cc0e37a0::t_b631b8d0b5af74 511-582,1404-1414,2843-2844,2872-2874
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6f96fdf15adec0fd1e246d966f3668136212cebe",
+  "prompts": {},
+  "sessions": {
+    "s_dff068cc0e37a0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "90c53102-a272-49b5-a9ad-dadb1c6396dc",
+        "model": "claude-opus-5"
+      },
+      "human_author": "z0s3r77 <80277545+z0s3r77@users.noreply.github.com>"
+    }
+  }
+}
