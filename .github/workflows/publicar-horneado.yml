@@ -1,0 +1,61 @@
+# Despliega el sitio YA HORNEADO que empuja la pasada nocturna.
+#
+# Desde que el pipeline corre en un Action del repo privado, el sitio se compila
+# allí —en la misma máquina que la API, contra http://localhost:8000— y llega
+# aquí hecho, en la rama `sitio`. Aquí ya no se hornea nada: se coge el HTML y
+# se deposita en Pages.
+#
+# `deploy.yml` sigue existiendo y NO se toca: es la vía manual de emergencia,
+# la que hornea desde el código con el túnel de Cloudflare, para el día que la
+# pasada automática falle y haya que publicar a mano desde el portátil.
+#
+# Las dos escriben en Pages, así que comparten el mismo `concurrency: pages`
+# para no pisarse.
+name: Publicar el sitio horneado
+
+on:
+  push:
+    branches: [sitio]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sitio
+
+      # Último corte antes de Pages. El repo privado ya comprueba esto mismo
+      # antes de empujar, pero esta rama la puede escribir cualquiera con el
+      # PAT: es la única defensa que vive del lado del sitio publicado.
+      - name: Guardarraíl · no desplegar un sitio pelado
+        run: |
+          set -euo pipefail
+          paginas=$(find . -name '*.html' -not -path './.git/*' | wc -l | tr -d ' ')
+          echo "Páginas recibidas: $paginas"
+          if [ "$paginas" -lt 20 ]; then
+            echo "::error::Solo $paginas páginas. No se despliega encima de un sitio bueno."
+            exit 1
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: despliegue
+        uses: actions/deploy-pages@v4
