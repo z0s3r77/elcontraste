@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="es"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Resumen diario — La Doxa</title><meta name="description" content="Lo que ha pasado hoy en España y por qué te importa, en seis puntos. Se puede escuchar."><link rel="canonical" href="https://noticiasdoxa.es/resumen/"><!-- El icono se sirve desde public/. Con `urlEstatico` porque Astro no
+         reescribe los href escritos a mano y en GitHub Pages el sitio cuelga
+         de /<repo>/ (mismo motivo que el resto de helpers de ui.ts). --><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><!-- El color de la barra del navegador sigue al papel del tema: sin esto,
+         en móvil el sistema pinta una franja blanca sobre la portada nocturna.
+         Son los hex exactos de --color-paper (design.md § Theme).
+         Una sola etiqueta, sin `media`: desde que hay botón, el tema puede no
+         coincidir con el del sistema y el script de abajo la mantiene al día. --><meta name="theme-color" content="#f8f5ee"><!-- Tema elegido. `is:inline` y aquí arriba a propósito: tiene que correr
+         ANTES del primer pintado o se ve un fogonazo claro antes de aplicarse
+         el modo oscuro. Por eso no puede ser el script normal de Astro, que va
+         diferido. Es la única lógica del sitio que no puede esperar. --><script>
+      (function () {
+        // Marca de que hay JS. El revelado al hacer scroll solo esconde
+        // contenido si esta marca está puesta: sin script, la página se ve
+        // entera. Va aquí y no al final para que el CSS ya la encuentre.
+        document.documentElement.dataset.js = "";
+        try {
+          var elegido = localStorage.getItem("tema");
+          if (elegido === "dark" || elegido === "light") {
+            document.documentElement.dataset.theme = elegido;
+          }
+          var oscuro = elegido
+            ? elegido === "dark"
+            : matchMedia("(prefers-color-scheme: dark)").matches;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.content = oscuro ? "#130e09" : "#f8f5ee";
+        } catch (e) {
+          /* localStorage puede fallar (modo privado, cookies bloqueadas).
+             Sin preferencia guardada el sitio sigue el sistema y todo va. */
+        }
+      })();
+    </script><!-- Tarjeta al compartir. Sin esto un enlace pegado en WhatsApp o Mastodon
+         sale como una URL desnuda. --><meta property="og:type" content="website"><meta property="og:site_name" content="La Doxa"><meta property="og:locale" content="es_ES"><meta property="og:title" content="Resumen diario — La Doxa"><meta property="og:description" content="Lo que ha pasado hoy en España y por qué te importa, en seis puntos. Se puede escuchar."><meta property="og:url" content="https://noticiasdoxa.es/resumen/"><meta property="og:image" content="https://noticiasdoxa.es/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="La Doxa · agregador de prensa contrastada"><meta name="twitter:card" content="summary_large_image"><!-- Datos estructurados de la página, si los trae. Un motor de respuesta
+         (Google AI Overviews, ChatGPT, Perplexity…) lee esto antes que la
+         maquetación: le dice sin ambigüedad qué es la página, de cuándo es y
+         qué cita. Ver el escapado de jsonLdSeguro arriba. --><!-- Cloudflare Web Analytics: sin cookies, sin banner de consentimiento
+         (no hay dato personal persistente que consentir). El token NO es
+         secreto —viaja igual en el HTML de cada página—, así que llega como
+         variable de build normal (CF_BEACON_TOKEN), igual que SITE_URL.
+         Sin variable, no se pinta nada: el sitio funciona igual sin ella. --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&#34;token&#34;:&#34;986667ce23b345ccb0a0b4943b52cf5c&#34;}"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/_astro/_tema_.WgTCV2rH.css"></head> <body> <!-- `marco` en los tres: la cabecera se alinea con el contenido en vez de
+         sobresalir por los lados, que era el desajuste más visible en ancho. --> <header class="mast marco"> <p class="mast-line">Resumen del día · 2026-09-01</p> <a class="mast-name" href="/">La Doxa</a> <nav class="mast-nav" aria-label="Principal"> <ul> <li><a href="/" class>Portada</a></li> <li> <a href="/resumen/" class="activo">Escuchar</a> </li> <li> <a href="/seccion/economico/" class>
+Secciones
+</a> </li> <li> <a href="/focos/" class>Focos</a> </li>  <li> <a href="/tendencias/" class>
+Tendencias
+</a> </li> <li> <a href="/contacto/" class>Contacto</a> </li> <li><button class="tema" type="button" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar entre modo claro y oscuro"> <span class="tema-iconos"> <svg class="tema-luna" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"> <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path> </svg> <svg class="tema-sol" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"> <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"></circle> <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path> </svg> </span> <span class="tema-texto">Tema</span> </button></li> </ul> </nav> <hr class="rule-double" aria-hidden="true"> </header> <main class="contenido marco">  <article class="doc"> <div class="doc-cuerpo"> <header class="doc-cabecera"> <p class="doc-seccion">Resumen diario</p> <h1>Descuento del gasóleo sube a 20 céntimos mientras Ceuta sigue en crisis migratoria un mes después</h1> <p class="doc-meta">
+Lo inmediato y lo práctico primero · <span class="dato">2026-09-01</span> </p> </header>  <div class="voz-audio" data-voz-audio> <audio controls preload="metadata" src="/audio/resumen.mp3"></audio> <p class="voz-nota">
+Voz sintética castellana. Dice estos mismos puntos, escritos para el
+                  oído.
+</p> </div><div class="voz" hidden data-voz> <button type="button" class="voz-boton" data-voz-play> <span class="voz-icono" aria-hidden="true">▶</span> <span data-voz-texto>Escuchar el resumen</span> </button> <button type="button" class="voz-boton voz-parar" data-voz-stop hidden>
+Parar
+</button> <p class="voz-nota">
+Versión hablada de estos mismos puntos, con la voz del navegador. No se
+                descarga nada.
+</p> </div> <ol hidden data-guion> <li>Hoy el día viene marcado por dos cosas que pasan en la gasolinera y en casa: el gasóleo te sale más barato y las hipotecas más caras. Una buena noticia y otra menos, aunque no para todo el mundo a la vez.</li><li>Si repostas diésel esta semana, notarás que el Gobierno le ha dado otro empujón al descuento. Ahora baja 20 céntimos por litro: la gasolina solo baja 5.</li><li>Ceuta sigue siendo un problema. Un mes después de aquella entrada masiva de migrantes, la ciudad tiene miles de personas sin sitio donde dormir y cada vez hay más incidentes violentos. El Gobierno ha intentado duplicar las plazas de acogida, pero la inseguridad entre los ceutíes no deja de crecer.</li><li>Lo más grave es lo que los datos están mostrando: en el último mes se han registrado 23 agresiones sexuales, cinco de ellas violaciones. Nueve de las víctimas fueron menores. La mayoría de los agresores siguen sin identificar.</li><li>Si tienes una hipoteca variable, prepárate: el euríbor está en el nivel más alto en casi dos años. Eso significa que tu cuota mensual va a subir entre 68 y 70 euros. En un año son más de 840 euros extra en el recibo.</li><li>En otro orden de cosas, el Gobierno aprueba hoy el Estatuto Marco de la Sanidad. Después de tres años negociando, llegan los cambios: las guardias médicas bajan de 24 horas a un máximo de 17. Ahora va al Congreso, así que todavía se puede debatir.</li><li>En lo internacional, Apple cambia de mando: John Ternus releva a Tim Cook como consejero delegado tras 15 años en el cargo. Es un cambio en la cúpula de uno de los gigantes tecnológicos.</li><li>Pues eso, una jornada donde los euros del combustible bajan pero los del hipotecario suben, y donde Ceuta sigue pidiendo a gritos una solución que no llega.</li> </ol><p class="resumen-entradilla">El Gobierno incrementa automáticamente el descuento en el gasóleo a partir de hoy tras superar el umbral de inflación establecido. Mientras tanto, Ceuta permanece desbordada un mes después de la entrada masiva de migrantes, con miles de personas en las calles y un aumento preocupante de agresiones sexuales.</p><ol class="resumen-puntos"> <li class="resumen-punto"> <p class="resumen-linea"> <span class="banda-num">01</span> <span class="resumen-urgencia urg-ahora"> Ya está pasando </span> <span class="resumen-seccion">Economía</span> </p> <h2 class="resumen-titulo">El descuento del gasóleo sube a 20 céntimos por litro este mes</h2> <p class="resumen-porque">Si repostas diésel esta semana, vas a notar la bajada en el precio. La gasolina sigue con solo 5 céntimos de descuento.</p> <p class="resumen-pie"> <a class="enlace-accion" href="/cluster/1504/">
+Ver el contraste →
+</a> <span class="dato"> 4 medios · 6 versiones </span> </p> </li><li class="resumen-punto"> <p class="resumen-linea"> <span class="banda-num">02</span> <span class="resumen-urgencia urg-ahora"> Ya está pasando </span> <span class="resumen-seccion">Política</span> </p> <h2 class="resumen-titulo">Ceuta sigue en crisis un mes después de la entrada de decenas de miles de migrantes</h2> <p class="resumen-porque">La ciudad permanece desbordada con miles de personas en las calles. El Gobierno ha doblado las plazas de acogida, pero la inseguridad y el malestar social entre los ceutíes crece.</p> <p class="resumen-pie"> <a class="enlace-accion" href="/cluster/1497/">
+Ver el contraste →
+</a> <span class="dato"> 7 medios · 31 versiones </span> </p> </li><li class="resumen-punto"> <p class="resumen-linea"> <span class="banda-num">03</span> <span class="resumen-urgencia urg-ahora"> Ya está pasando </span> <span class="resumen-seccion">Social</span> </p> <h2 class="resumen-titulo">23 agresiones sexuales registradas en Ceuta en el último mes, cinco de ellas violaciones</h2> <p class="resumen-porque">El conflicto migratorio ha traído una escalada de violencia sexual: nueve víctimas fueron menores de entre 14 y 17 años, y más de una docena de agresores permanecen sin identificar.</p> <p class="resumen-pie"> <a class="enlace-accion" href="/cluster/1557/">
+Ver el contraste →
+</a> <span class="dato"> 3 medios · 4 versiones </span> </p> </li><li class="resumen-punto"> <p class="resumen-linea"> <span class="banda-num">04</span> <span class="resumen-urgencia urg-pronto"> Se decide estos días </span> <span class="resumen-seccion">Política</span> </p> <h2 class="resumen-titulo">El Gobierno aprueba el Estatuto Marco de Sanidad tras tres años de negociación</h2> <p class="resumen-porque">Reduce las guardias médicas de 24 horas a un máximo de 17 horas. Va ahora al Congreso para ser votado, así que todavía se puede discutir.</p> <p class="resumen-pie"> <a class="enlace-accion" href="/cluster/1560/">
+Ver el contraste →
+</a> <span class="dato"> 2 medios · 2 versiones </span> </p> </li><li class="resumen-punto"> <p class="resumen-linea"> <span class="banda-num">05</span> <span class="resumen-urgencia urg-ahora"> Ya está pasando </span> <span class="resumen-seccion">Economía</span> </p> <h2 class="resumen-titulo">Las hipotecas variables suben: el euríbor alcanza su nivel más alto en casi dos años</h2> <p class="resumen-porque">Si tienes una hipoteca variable, la cuota mensual te va a subir entre 68 y 70 euros al mes. En un año son más de 840 euros extra.</p> <p class="resumen-pie"> <a class="enlace-accion" href="/cluster/1532/">
+Ver el contraste →
+</a> <span class="dato"> 3 medios · 3 versiones </span> </p> </li><li class="resumen-punto"> <p class="resumen-linea"> <span class="banda-num">06</span> <span class="resumen-urgencia urg-fondo"> Asunto de fondo </span> <span class="resumen-seccion">Economía</span> </p> <h2 class="resumen-titulo">John Ternus asume como consejero delegado de Apple en sustitución de Tim Cook</h2> <p class="resumen-porque">Es un cambio en la cúpula de una de las mayores compañías tecnológicas del mundo, pero no te afecta a la economía de casa.</p> <p class="resumen-pie"> <a class="enlace-accion" href="/cluster/1552/">
+Ver el contraste →
+</a> <span class="dato"> 4 medios · 6 versiones </span> </p> </li><li class="resumen-punto"> <p class="resumen-linea"> <span class="banda-num">07</span> <span class="resumen-urgencia urg-fondo"> Asunto de fondo </span> <span class="resumen-seccion">Política</span> </p> <h2 class="resumen-titulo">El Gobierno aprueba un reglamento para mejorar la accesibilidad cognitiva en espacios y servicios</h2> <p class="resumen-porque">Obliga a que entornos, productos y servicios sean más comprensibles para personas con dificultades de comprensión. Es una norma que ya existía pero ahora se desarrolla reglamentariamente.</p> <p class="resumen-pie"> <a class="enlace-accion" href="/cluster/1569/">
+Ver el contraste →
+</a> <span class="dato"> 3 medios · 3 versiones </span> </p> </li> </ol> <p class="firma-ia">
+La selección y el orden los decide un modelo de lenguaje sobre las historias
+              contrastadas del día. No es todo lo que ha pasado: es lo que más cambia algo
+              hoy, según ese criterio. La portada lleva el digest completo.
+</p>  </div> <aside class="doc-aparato"> <h2 class="rotulo-doc">Qué es esta página</h2> <p class="aparato-texto">
+La portada ordena el día por secciones, como un periódico. Esto responde otra
+        pregunta: de todo lo de hoy, qué cambia algo ya y a quién le llega.
+</p> <h2 class="rotulo-doc">De dónde sale</h2> <p class="aparato-texto">
+De las historias que han pasado por el contraste hoy — no de todo lo rastreado. Una
+        noticia que solo cuenta un medio no llega hasta aquí.
+</p> <h2 class="rotulo-doc">La voz</h2> <p class="aparato-texto">
+Lo que se escucha no es este texto leído en alto, sino una versión escrita para el
+        oído: los mismos puntos, el mismo orden y los mismos datos, dichos como los diría
+        una persona. Sale de la misma llamada al modelo que el texto.
+</p>  <p class="aparato-texto"> La locución está grabada de antemano con una voz sintética en castellano. No es una persona: es un modelo de voz, y por eso se nota. Si el audio no carga, sale un botón que lee la página con la voz de tu navegador. </p> </aside> </article>  </main> <!-- Colofón denso (design.md § Nav y footer), pero repartido en columnas
+         de periódico: hasta el 2026-08-16 era UN párrafo de 72ch centrado, y
+         en escritorio quedaban 518 px de letra pequeña en medio de 1584 —una
+         maqueta de móvil estirada—. La densidad y los parámetros reales del
+         sistema no cambian: lo que cambia es que cada dato lleva su rótulo y
+         ocupa el ancho de la página. --> <footer class="colofon"> <div class="marco colofon-rejilla"> <section> <p class="colofon-rotulo">La Doxa</p> <p>
+Agregador personal de noticias contrastadas. Sin ánimo de lucro y sin
+            publicidad. Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
+</p> </section> <section> <p class="colofon-rotulo">Las síntesis</p> <p>
+Las redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de
+            los medios enlazados; pueden contener errores. Lee siempre el original.
+</p> </section> <section> <p class="colofon-rotulo">La agrupación</p> <p>
+Similitud coseno ≥ 0,75 sobre embeddings MiniLM multilingüe, ventana de
+            48 h y mínimo 2 medios por historia.
+</p> </section> <section> <p class="colofon-rotulo">Los medios</p> <p>
+No se republica el texto de los artículos ni se sortean muros de pago.
+</p> <p class="colofon-contacto"> <a href="mailto:contacto@noticiasdoxa.es">contacto@noticiasdoxa.es</a> </p> </section> </div> <!-- Apoyo (2026-08-26). Va ENTRE las cuatro columnas y el aviso legal a
+           propósito: el lector acaba de leer con qué reglas se hace esto, y es
+           justo ahí donde una petición de dinero se entiende en vez de
+           interrumpir. Arriba del todo sería lo contrario — una portada de
+           periódico que pide antes de dar.
+           🚫 Es un `href`, no el widget de Buy Me a Coffee: su botón oficial es
+           un script de terceros que carga con la página y rastrea mire quien
+           mire, exactamente lo que se rechazó en Compartir. Nada sale hacia
+           buymeacoffee.com salvo que el lector pulse.
+           ⚠️ Si esta línea cambia, cambian también /terminos/ («cómo se
+           sostiene») y /privacidad/ («si pulsas el enlace de apoyo»). Las tres
+           dicen lo mismo desde tres sitios y solo valen si coinciden. --> <div class="marco colofon-apoyo"> <p class="colofon-rotulo">Cómo se sostiene</p> <p>
+La Doxa no cobra ni cobrará por leerla y no lleva publicidad. Lo que cuesta
+          —el dominio y las llamadas al modelo que redacta las síntesis— sale del
+          bolsillo de una persona. Si te sirve y quieres que crezca, puedes echar una
+          mano; no hay nada detrás de ese enlace más que un café.
+</p> <p class="colofon-apoyo-accion"> <a class="enlace-accion" href="https://buymeacoffee.com/ipopdue24o" target="_blank" rel="noopener noreferrer">
+Invitar a un café ↗
+</a> </p> </div> <!-- Aviso legal: una FILA bajo las cuatro columnas, no una quinta
+           columna. § Nav y footer fija el colofón en cuatro columnas rotuladas
+           con los parámetros del sistema, y lo legal no es un parámetro del
+           sistema: es de otra clase. Un periódico lo pone igual, en una línea
+           al pie de todo. En móvil se apila solo, porque es un flex con wrap. --> <div class="marco colofon-legal"> <p class="colofon-declaracion">
+Proyecto personal sin ánimo de lucro: no hay publicidad, ni patrocinios, ni
+          afiliación, ni cuentas de usuario. Cada historia enlaza al artículo original,
+          que es de su medio.
+</p> <nav class="colofon-enlaces" aria-label="Legal"> <a href="/terminos/" class>
+Términos y condiciones
+</a> <a href="/privacidad/" class>
+Política de privacidad
+</a> <a href="/contacto/">Contacto</a> </nav> </div> </footer> <!-- Este SÍ puede ir diferido: nadie pulsa el botón antes de que cargue.
+         El estado "actual" se resuelve preguntando, no guardando una variable:
+         sin elección previa el tema lo manda el sistema, y leer el DOM es la
+         única forma de que el primer clic vaya en la dirección correcta. --> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.B5ft4Fqc.js"></script> </body> </html>

@@ -1,0 +1,35 @@
+# La Doxa
+
+> Agregador personal de prensa española: agrupa las versiones que dan distintos medios de la misma noticia y muestra en qué coinciden, en qué se contradicen y qué cuenta solo uno. Sin ánimo de lucro, sin publicidad, sin cuenta de usuario.
+
+Cada historia (`/cluster/<id>/`) lleva datos estructurados propios (schema.org NewsArticle) con relato, fecha y citas a los originales: es la fuente más fiable página a página. Este fichero es solo el mapa.
+
+## Secciones
+
+- [Política](https://noticiasdoxa.es/seccion/politica-nacional/)
+- [Social](https://noticiasdoxa.es/seccion/social/)
+- [Geopolítica](https://noticiasdoxa.es/seccion/geopolitica/)
+- [Economía](https://noticiasdoxa.es/seccion/economico/)
+- [Tecnología](https://noticiasdoxa.es/seccion/tecnologia/)
+- [Ciencia](https://noticiasdoxa.es/seccion/ciencia/)
+- [Deportes](https://noticiasdoxa.es/seccion/deportes/)
+- [Arte y cultura](https://noticiasdoxa.es/seccion/arte/)
+- [Gaming](https://noticiasdoxa.es/seccion/gaming/)
+- [Moda](https://noticiasdoxa.es/seccion/moda/)
+- [K-pop](https://noticiasdoxa.es/seccion/kpop/)
+
+## Páginas
+
+- [Portada](https://noticiasdoxa.es/) — la primera plana del día, ordenada por relevancia.
+- [Resumen diario](https://noticiasdoxa.es/resumen/) — 4-7 puntos con «por qué importa», con audio.
+- [Focos](https://noticiasdoxa.es/focos/) — qué cubre mucho la prensa y qué cubre poco, un día dado.
+- [Tendencias](https://noticiasdoxa.es/tendencias/) — qué asuntos llevan más tiempo abiertos.
+- [Contacto](https://noticiasdoxa.es/contacto/)
+- [Términos y condiciones](https://noticiasdoxa.es/terminos/) — sin ánimo de lucro, sin publicidad, y con qué reglas se cita a los medios.
+- [Política de privacidad](https://noticiasdoxa.es/privacidad/) — sin cuentas ni cookies propias; qué terceros intervienen.
+
+## Aviso
+
+No se republica el texto de los medios ni se sortean muros de pago: cada historia enlaza a los artículos originales, que son la fuente primaria. Las síntesis las escribe un modelo de lenguaje y pueden contener errores.
+
+Mapa completo: [sitemap](https://noticiasdoxa.es/sitemap-index.xml)
