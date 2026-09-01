@@ -14,6 +14,19 @@
 name: Publicar el sitio horneado
 
 on:
+  # El disparo bueno es este, no el `push`. Un workflow que reacciona a `push`
+  # se lee DESDE LA RAMA EMPUJADA, y `sitio` es solo el HTML horneado: no lleva
+  # `.github/` dentro, así que ahí no hay workflow que ejecutar. El 2026-09-01
+  # la pasada empujó `sitio` a las 08:56 y aquí no se movió nada, en silencio.
+  #
+  # `repository_dispatch` se lee siempre desde la rama por defecto, que es donde
+  # vive este fichero, y le basta el `Contents: write` que el PAGES_TOKEN ya
+  # tiene. Meter `.github/` en la rama `sitio` habría pedido además el permiso
+  # de Workflows en el token, y por eso se descartó.
+  repository_dispatch:
+    types: [sitio-actualizado]
+  # Se queda por si algún día `sitio` llega a llevar el workflow dentro, y
+  # porque no estorba.
   push:
     branches: [sitio]
   workflow_dispatch:
