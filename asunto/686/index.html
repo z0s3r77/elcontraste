@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="es"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Muere el actor Francesc Garrido a los 56 años — La Doxa</title><meta name="description" content="Muere el actor Francesc Garrido a los 56 años. Seguimiento día a día: 2 días, 4 piezas de 3 medios."><link rel="canonical" href="https://noticiasdoxa.es/asunto/686/"><!-- El icono se sirve desde public/. Con `urlEstatico` porque Astro no
+         reescribe los href escritos a mano y en GitHub Pages el sitio cuelga
+         de /<repo>/ (mismo motivo que el resto de helpers de ui.ts). --><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><!-- El color de la barra del navegador sigue al papel del tema: sin esto,
+         en móvil el sistema pinta una franja blanca sobre la portada nocturna.
+         Son los hex exactos de --color-paper (design.md § Theme).
+         Una sola etiqueta, sin `media`: desde que hay botón, el tema puede no
+         coincidir con el del sistema y el script de abajo la mantiene al día. --><meta name="theme-color" content="#f8f5ee"><!-- Tema elegido. `is:inline` y aquí arriba a propósito: tiene que correr
+         ANTES del primer pintado o se ve un fogonazo claro antes de aplicarse
+         el modo oscuro. Por eso no puede ser el script normal de Astro, que va
+         diferido. Es la única lógica del sitio que no puede esperar. --><script>
+      (function () {
+        // Marca de que hay JS. El revelado al hacer scroll solo esconde
+        // contenido si esta marca está puesta: sin script, la página se ve
+        // entera. Va aquí y no al final para que el CSS ya la encuentre.
+        document.documentElement.dataset.js = "";
+        try {
+          var elegido = localStorage.getItem("tema");
+          if (elegido === "dark" || elegido === "light") {
+            document.documentElement.dataset.theme = elegido;
+          }
+          var oscuro = elegido
+            ? elegido === "dark"
+            : matchMedia("(prefers-color-scheme: dark)").matches;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.content = oscuro ? "#130e09" : "#f8f5ee";
+        } catch (e) {
+          /* localStorage puede fallar (modo privado, cookies bloqueadas).
+             Sin preferencia guardada el sitio sigue el sistema y todo va. */
+        }
+      })();
+    </script><!-- Tarjeta al compartir. Sin esto un enlace pegado en WhatsApp o Mastodon
+         sale como una URL desnuda. --><meta property="og:type" content="website"><meta property="og:site_name" content="La Doxa"><meta property="og:locale" content="es_ES"><meta property="og:title" content="Muere el actor Francesc Garrido a los 56 años — La Doxa"><meta property="og:description" content="Muere el actor Francesc Garrido a los 56 años. Seguimiento día a día: 2 días, 4 piezas de 3 medios."><meta property="og:url" content="https://noticiasdoxa.es/asunto/686/"><meta property="og:image" content="https://noticiasdoxa.es/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="La Doxa · agregador de prensa contrastada"><meta name="twitter:card" content="summary_large_image"><!-- Datos estructurados de la página, si los trae. Un motor de respuesta
+         (Google AI Overviews, ChatGPT, Perplexity…) lee esto antes que la
+         maquetación: le dice sin ambigüedad qué es la página, de cuándo es y
+         qué cita. Ver el escapado de jsonLdSeguro arriba. --><!-- Cloudflare Web Analytics: sin cookies, sin banner de consentimiento
+         (no hay dato personal persistente que consentir). El token NO es
+         secreto —viaja igual en el HTML de cada página—, así que llega como
+         variable de build normal (CF_BEACON_TOKEN), igual que SITE_URL.
+         Sin variable, no se pinta nada: el sitio funciona igual sin ella. --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&#34;token&#34;:&#34;986667ce23b345ccb0a0b4943b52cf5c&#34;}"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/_astro/_tema_.WgTCV2rH.css"></head> <body> <!-- `marco` en los tres: la cabecera se alinea con el contenido en vez de
+         sobresalir por los lados, que era el desajuste más visible en ancho. --> <header class="mast marco"> <p class="mast-line">Asunto · 2026-09-01 → 2026-09-02</p> <a class="mast-name" href="/">La Doxa</a> <nav class="mast-nav" aria-label="Principal"> <ul> <li><a href="/" class="activo">Portada</a></li> <li> <a href="/resumen/" class>Escuchar</a> </li> <li> <a href="/seccion/economico/" class>
+Secciones
+</a> </li> <li> <a href="/focos/" class>Focos</a> </li>  <li> <a href="/tendencias/" class>
+Tendencias
+</a> </li> <li> <a href="/contacto/" class>Contacto</a> </li> <li><button class="tema" type="button" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar entre modo claro y oscuro"> <span class="tema-iconos"> <svg class="tema-luna" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"> <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path> </svg> <svg class="tema-sol" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"> <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"></circle> <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path> </svg> </span> <span class="tema-texto">Tema</span> </button></li> </ul> </nav> <hr class="rule-double" aria-hidden="true"> </header> <main class="contenido marco">  <article class="doc"> <div class="doc-cuerpo"> <header class="doc-cabecera"> <p class="doc-seccion"> <a href="/seccion/arte/">Arte y cultura</a> </p> <h1>Muere el actor Francesc Garrido a los 56 años</h1> <p class="doc-meta"> <span class="dato">2 días · 4 piezas · 3 medios</span>  · <span class="asunto-sello sello-apagado">2 días y dejó de contarse</span> </p> </header> <h2 class="rotulo-doc">Cómo ha ido, día a día</h2> <ol class="cronologia"> <li class="crono-dia"> <p class="crono-fecha">  <span class="dato crono-n">Día 1</span> <span class="dato muted">2026-09-01</span> <span class="dato crono-entran">3 piezas nuevas</span> </p>  <ul class="crono-nuevas"> <li> <a href="https://www.20minutos.es/cinemania/noticias/francesc-garrido-actor-muere-56-anos-mar-adentro-smoking-room_7031185_0.html" rel="nofollow noopener" target="_blank"> Muere Francesc Garrido, actor de &#39;La novia gitana&#39;, &#39;Mar adentro&#39; y &#39;Smoking Room&#39;, a los 56 años </a> <span class="dato crono-medio">20minutos</span> </li><li> <a href="https://www.lavanguardia.com/cultura/20260831/11624014/muere-francesc-garrido-actor-sobrio-magnetico.html" rel="nofollow noopener" target="_blank"> Muere Francesc Garrido, actor sobrio y magnético, a los 56 años </a> <span class="dato crono-medio">La Vanguardia</span> </li><li> <a href="https://elpais.com/television/2026-08-31/muere-a-los-56-anos-francesc-garrido-actor-devlas-series-se-quien-eres-y-la-novia-gitana-y-peliculas-como-smoking-room.html" rel="nofollow noopener" target="_blank"> Muere a los 56 años Francesc Garrido, actor de las series ‘Sé quién eres’ y ‘La novia gitana’ y películas como ‘Smoking Room’ </a> <span class="dato crono-medio">El País</span> </li> </ul>   <p class="crono-pie"> <a href="/cluster/1562/">Cómo se contaba el 2026-09-01</a> <span class="dato">3 medios · 3 versiones</span>    </p> </li><li class="crono-dia crono-ultimo"> <p class="crono-fecha">  <span class="dato crono-n">Día 2</span> <span class="dato muted">2026-09-02</span> <span class="dato crono-entran">1 pieza nueva</span> </p>  <ul class="crono-nuevas"> <li> <a href="https://www.lavanguardia.com/cultura/cine/20260901/11624378/cine-espanol-despide-conmocionado-francesc-garrido-que-tristeza-que-buen-actor-que-buen-companero.html" rel="nofollow noopener" target="_blank"> El cine español despide conmocionado a Francesc Garrido: “Qué tristeza, qué buen actor y qué buen compañero” </a> <span class="dato crono-medio">La Vanguardia</span> </li> </ul>   <p class="crono-pie"> <a href="/cluster/1618/">Cómo se contaba el 2026-09-02</a> <span class="dato">3 medios · 4 versiones</span>   <span class="ficha-prestamo">síntesis del 2026-09-01</span> </p> </li> </ol> <p class="firma-ia">
+Cada día lista las piezas que ENTRAN ese día, no todas las del asunto: la agrupación mira
+        48 horas hacia atrás, así que un mismo artículo aparece en varios días y contarlo cada vez
+        haría parecer que la noticia avanza cuando se está repitiendo. Los días sin piezas nuevas
+        se dicen y no se numeran. Las historias se agrupan comparando los artículos que tienen en
+        común, no por criterio editorial; los titulares neutros los redacta un modelo de lenguaje
+        a partir de todas las versiones.
+</p> <section class="compartir" data-compartir-caja data-url="https://noticiasdoxa.es/asunto/686/" data-titulo="Muere el actor Francesc Garrido a los 56 años"> <p class="compartir-rotulo">Compartir</p> <ul class="compartir-lista"> <li> <button type="button" class="compartir-accion" data-compartir="nativo" hidden>
+Enviar…
+</button> </li> <li> <button type="button" class="compartir-accion" data-compartir="copiar" hidden>
+Copiar enlace
+</button> </li> <li> <a class="compartir-accion" href="https://wa.me/?text=Muere%20el%20actor%20Francesc%20Garrido%20a%20los%2056%20a%C3%B1os%20https%3A%2F%2Fnoticiasdoxa.es%2Fasunto%2F686%2F" target="_blank" rel="noopener noreferrer"> WhatsApp </a> </li><li> <a class="compartir-accion" href="https://t.me/share/url?url=https%3A%2F%2Fnoticiasdoxa.es%2Fasunto%2F686%2F&text=Muere%20el%20actor%20Francesc%20Garrido%20a%20los%2056%20a%C3%B1os" target="_blank" rel="noopener noreferrer"> Telegram </a> </li><li> <a class="compartir-accion" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnoticiasdoxa.es%2Fasunto%2F686%2F" target="_blank" rel="noopener noreferrer"> Facebook </a> </li><li> <a class="compartir-accion" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fnoticiasdoxa.es%2Fasunto%2F686%2F&text=Muere%20el%20actor%20Francesc%20Garrido%20a%20los%2056%20a%C3%B1os" target="_blank" rel="noopener noreferrer"> X </a> </li> </ul>  <p class="compartir-estado" data-compartir="estado" role="status" aria-live="polite"></p> </section> <script type="module">document.querySelectorAll("[data-compartir-caja]").forEach(t=>{const r=t.dataset.url||location.href,n=t.dataset.titulo||document.title,e=t.querySelector('[data-compartir="estado"]'),a=t.querySelector('[data-compartir="copiar"]'),o=t.querySelector('[data-compartir="nativo"]');let i;const c=s=>{e&&(e.textContent=s,e.classList.add("visible"),clearTimeout(i),i=setTimeout(()=>{e.classList.remove("visible"),e.textContent=""},4e3))};navigator.clipboard&&window.isSecureContext&&a&&(a.hidden=!1,a.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(r),c("Enlace copiado.")}catch{c("No se pudo copiar. El enlace está en la barra del navegador.")}})),typeof navigator.share=="function"&&o&&(o.hidden=!1,o.addEventListener("click",async()=>{try{await navigator.share({title:n,url:r})}catch{}}))});</script> </div> <aside class="doc-aparato"> <h2 class="rotulo-doc">Quién lo cuenta</h2> <ul class="aparato-medios"> <li>20minutos</li><li>El País</li><li>La Vanguardia</li> </ul>  <h2 class="rotulo-doc">No lo han contado</h2> <ul class="aparato-medios aparato-ausentes"> <li>ABC</li><li>El Mundo</li><li>eldiario.es</li> </ul> <p class="aparato-texto aparato-descargo">
+Quiere decir que no ha aparecido en lo que este sitio ha podido leer de ellos. Los
+              feeds solo exponen sus últimas piezas y algunos medios bloquean la lectura del texto,
+              así que una ausencia aquí no prueba una decisión editorial.
+</p>   </aside> </article>  </main> <!-- Colofón denso (design.md § Nav y footer), pero repartido en columnas
+         de periódico: hasta el 2026-08-16 era UN párrafo de 72ch centrado, y
+         en escritorio quedaban 518 px de letra pequeña en medio de 1584 —una
+         maqueta de móvil estirada—. La densidad y los parámetros reales del
+         sistema no cambian: lo que cambia es que cada dato lleva su rótulo y
+         ocupa el ancho de la página. --> <footer class="colofon"> <div class="marco colofon-rejilla"> <section> <p class="colofon-rotulo">La Doxa</p> <p>
+Agregador personal de noticias contrastadas. Sin ánimo de lucro y sin
+            publicidad. Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
+</p> </section> <section> <p class="colofon-rotulo">Las síntesis</p> <p>
+Las redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de
+            los medios enlazados; pueden contener errores. Lee siempre el original.
+</p> </section> <section> <p class="colofon-rotulo">La agrupación</p> <p>
+Similitud coseno ≥ 0,75 sobre embeddings MiniLM multilingüe, ventana de
+            48 h y mínimo 2 medios por historia.
+</p> </section> <section> <p class="colofon-rotulo">Los medios</p> <p>
+No se republica el texto de los artículos ni se sortean muros de pago.
+</p> <p class="colofon-contacto"> <a href="mailto:contacto@noticiasdoxa.es">contacto@noticiasdoxa.es</a> </p> </section> </div> <!-- Apoyo (2026-08-26). Va ENTRE las cuatro columnas y el aviso legal a
+           propósito: el lector acaba de leer con qué reglas se hace esto, y es
+           justo ahí donde una petición de dinero se entiende en vez de
+           interrumpir. Arriba del todo sería lo contrario — una portada de
+           periódico que pide antes de dar.
+           🚫 Es un `href`, no el widget de Buy Me a Coffee: su botón oficial es
+           un script de terceros que carga con la página y rastrea mire quien
+           mire, exactamente lo que se rechazó en Compartir. Nada sale hacia
+           buymeacoffee.com salvo que el lector pulse.
+           ⚠️ Si esta línea cambia, cambian también /terminos/ («cómo se
+           sostiene») y /privacidad/ («si pulsas el enlace de apoyo»). Las tres
+           dicen lo mismo desde tres sitios y solo valen si coinciden. --> <div class="marco colofon-apoyo"> <p class="colofon-rotulo">Cómo se sostiene</p> <p>
+La Doxa no cobra ni cobrará por leerla y no lleva publicidad. Lo que cuesta
+          —el dominio y las llamadas al modelo que redacta las síntesis— sale del
+          bolsillo de una persona. Si te sirve y quieres que crezca, puedes echar una
+          mano; no hay nada detrás de ese enlace más que un café.
+</p> <p class="colofon-apoyo-accion"> <a class="enlace-accion" href="https://buymeacoffee.com/ipopdue24o" target="_blank" rel="noopener noreferrer">
+Invitar a un café ↗
+</a> </p> </div> <!-- Aviso legal: una FILA bajo las cuatro columnas, no una quinta
+           columna. § Nav y footer fija el colofón en cuatro columnas rotuladas
+           con los parámetros del sistema, y lo legal no es un parámetro del
+           sistema: es de otra clase. Un periódico lo pone igual, en una línea
+           al pie de todo. En móvil se apila solo, porque es un flex con wrap. --> <div class="marco colofon-legal"> <p class="colofon-declaracion">
+Proyecto personal sin ánimo de lucro: no hay publicidad, ni patrocinios, ni
+          afiliación, ni cuentas de usuario. Cada historia enlaza al artículo original,
+          que es de su medio.
+</p> <nav class="colofon-enlaces" aria-label="Legal"> <a href="/terminos/" class>
+Términos y condiciones
+</a> <a href="/privacidad/" class>
+Política de privacidad
+</a> <a href="/contacto/">Contacto</a> </nav> </div> </footer> <!-- Este SÍ puede ir diferido: nadie pulsa el botón antes de que cargue.
+         El estado "actual" se resuelve preguntando, no guardando una variable:
+         sin elección previa el tema lo manda el sistema, y leer el DOM es la
+         única forma de que el primer clic vaya en la dirección correcta. --> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.B5ft4Fqc.js"></script> </body> </html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="es"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Los gobiernos necesitan crecimiento económico y mercados alcistas para manejar niveles récord de deuda pública — La Doxa</title><meta name="description" content="La deuda pública mundial alcanza el 94% del PIB y llegará al 100% en 2029 según el Fondo Monetario Internacional, nivel no registrado desde la Segunda Guerra Mundial. Los gobiernos buscan reducir la…"><link rel="canonical" href="https://noticiasdoxa.es/cluster/2436/"><!-- El icono se sirve desde public/. Con `urlEstatico` porque Astro no
+         reescribe los href escritos a mano y en GitHub Pages el sitio cuelga
+         de /<repo>/ (mismo motivo que el resto de helpers de ui.ts). --><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><!-- El color de la barra del navegador sigue al papel del tema: sin esto,
+         en móvil el sistema pinta una franja blanca sobre la portada nocturna.
+         Son los hex exactos de --color-paper (design.md § Theme).
+         Una sola etiqueta, sin `media`: desde que hay botón, el tema puede no
+         coincidir con el del sistema y el script de abajo la mantiene al día. --><meta name="theme-color" content="#f8f5ee"><!-- Tema elegido. `is:inline` y aquí arriba a propósito: tiene que correr
+         ANTES del primer pintado o se ve un fogonazo claro antes de aplicarse
+         el modo oscuro. Por eso no puede ser el script normal de Astro, que va
+         diferido. Es la única lógica del sitio que no puede esperar. --><script>
+      (function () {
+        // Marca de que hay JS. El revelado al hacer scroll solo esconde
+        // contenido si esta marca está puesta: sin script, la página se ve
+        // entera. Va aquí y no al final para que el CSS ya la encuentre.
+        document.documentElement.dataset.js = "";
+        try {
+          var elegido = localStorage.getItem("tema");
+          if (elegido === "dark" || elegido === "light") {
+            document.documentElement.dataset.theme = elegido;
+          }
+          var oscuro = elegido
+            ? elegido === "dark"
+            : matchMedia("(prefers-color-scheme: dark)").matches;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.content = oscuro ? "#130e09" : "#f8f5ee";
+        } catch (e) {
+          /* localStorage puede fallar (modo privado, cookies bloqueadas).
+             Sin preferencia guardada el sitio sigue el sistema y todo va. */
+        }
+      })();
+    </script><!-- Tarjeta al compartir. Sin esto un enlace pegado en WhatsApp o Mastodon
+         sale como una URL desnuda. --><meta property="og:type" content="website"><meta property="og:site_name" content="La Doxa"><meta property="og:locale" content="es_ES"><meta property="og:title" content="Los gobiernos necesitan crecimiento económico y mercados alcistas para manejar niveles récord de deuda pública — La Doxa"><meta property="og:description" content="La deuda pública mundial alcanza el 94% del PIB y llegará al 100% en 2029 según el Fondo Monetario Internacional, nivel no registrado desde la Segunda Guerra Mundial. Los gobiernos buscan reducir la…"><meta property="og:url" content="https://noticiasdoxa.es/cluster/2436/"><meta property="og:image" content="https://noticiasdoxa.es/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="La Doxa · agregador de prensa contrastada"><meta name="twitter:card" content="summary_large_image"><!-- Datos estructurados de la página, si los trae. Un motor de respuesta
+         (Google AI Overviews, ChatGPT, Perplexity…) lee esto antes que la
+         maquetación: le dice sin ambigüedad qué es la página, de cuándo es y
+         qué cita. Ver el escapado de jsonLdSeguro arriba. --><script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsArticle","headline":"Los gobiernos necesitan crecimiento económico y mercados alcistas para manejar niveles récord de deuda pública","description":"La deuda pública mundial alcanza el 94% del PIB y llegará al 100% en 2029 según el Fondo Monetario Internacional, nivel no registrado desde la Segunda Guerra Mundial. Los gobiernos buscan reducir la…","inLanguage":"es","datePublished":"2026-09-14T00:00:00Z","dateModified":"2026-09-14T00:00:00Z","image":["https://noticiasdoxa.es/og.png"],"articleSection":"Economía","keywords":"mercados, banca","articleBody":"La deuda pública mundial alcanza el 94% del PIB y llegará al 100% en 2029 según el Fondo Monetario Internacional, nivel no registrado desde la Segunda Guerra Mundial. Los gobiernos buscan reducir la ratio de deuda no solo recortando el gasto, sino consiguiendo que la economía crezca lo suficientemente rápido. Con necesidades de gasto cada vez mayores y ajustes fiscales políticamente difíciles, lograr más crecimiento se ha convertido en pieza fundamental. Los países de la OCDE necesitarán captar alrededor de 18 billones de dólares este año para refinanciarse, frente a 17 billones en 2025. Cuando suben las acciones, los hogares se sienten más ricos y gastan más, generando el llamado efecto riqueza.","author":{"@type":"Organization","name":"La Doxa","url":"https://noticiasdoxa.es/"},"publisher":{"@type":"Organization","name":"La Doxa","logo":{"@type":"ImageObject","url":"https://noticiasdoxa.es/og.png"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://noticiasdoxa.es/cluster/2436/"},"citation":[{"@type":"NewsArticle","headline":"¿Necesitan los gobiernos que suba la bolsa para poder pagar sus deudas?","url":"https://www.20minutos.es/lainformacion/economia-y-finanzas/necesitan-los-gobiernos-que-suba-bolsa-para-poder-pagar-sus-deudas_7035798_0.html"},{"@type":"NewsArticle","headline":"Las 7 joyas de inversión que no hay que dejar escapar","url":"https://www.expansion.com/inversion/2026/09/14/6aa3c257e5fdeab5728b456f.html"}]}</script><!-- Cloudflare Web Analytics: sin cookies, sin banner de consentimiento
+         (no hay dato personal persistente que consentir). El token NO es
+         secreto —viaja igual en el HTML de cada página—, así que llega como
+         variable de build normal (CF_BEACON_TOKEN), igual que SITE_URL.
+         Sin variable, no se pinta nada: el sitio funciona igual sin ella. --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&#34;token&#34;:&#34;986667ce23b345ccb0a0b4943b52cf5c&#34;}"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/_astro/_tema_.WgTCV2rH.css"></head> <body> <!-- `marco` en los tres: la cabecera se alinea con el contenido en vez de
+         sobresalir por los lados, que era el desajuste más visible en ancho. --> <header class="mast marco"> <p class="mast-line">Economía · 2026-09-14</p> <a class="mast-name" href="/">La Doxa</a> <nav class="mast-nav" aria-label="Principal"> <ul> <li><a href="/" class>Portada</a></li> <li> <a href="/resumen/" class>Escuchar</a> </li> <li> <a href="/seccion/economico/" class>
+Secciones
+</a> </li> <li> <a href="/focos/" class>Focos</a> </li>  <li> <a href="/tendencias/" class>
+Tendencias
+</a> </li> <li> <a href="/contacto/" class>Contacto</a> </li> <li><button class="tema" type="button" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar entre modo claro y oscuro"> <span class="tema-iconos"> <svg class="tema-luna" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"> <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path> </svg> <svg class="tema-sol" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"> <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"></circle> <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path> </svg> </span> <span class="tema-texto">Tema</span> </button></li> </ul> </nav> <hr class="rule-double" aria-hidden="true"> </header> <main class="contenido marco">  <article class="doc"> <div class="doc-cuerpo"> <header class="doc-cabecera"> <p class="doc-seccion"> <a href="/seccion/economico/">Economía</a> <span class="tema">mercados</span><span class="tema">banca</span> </p> <h1> Los gobiernos necesitan crecimiento económico y mercados alcistas para manejar niveles récord de deuda pública </h1>  <p class="doc-meta">
+Contrastada entre <span class="dato">2</span> medios sobre
+<span class="dato">2</span> versiones ·
+<span class="dato">2026-09-14</span> </p> </header>  <div class="relato"> <p>La <span class="termino-caja"> <button type="button" class="termino" aria-describedby="gl-deuda-p-blica">deuda pública</button> <span class="termino-globo" id="gl-deuda-p-blica" role="tooltip"> <span class="termino-palabra">deuda pública</span> <span class="termino-def">Todo lo que el Estado debe a quien le ha prestado dinero. Cada año hay que pagar sus intereses antes que nada, y ese dinero ya no está para otra cosa.</span>  </span> </span> mundial alcanza el 94% del <span class="termino-caja"> <button type="button" class="termino" aria-describedby="gl-pib">PIB</button> <span class="termino-globo" id="gl-pib" role="tooltip"> <span class="termino-palabra">PIB</span> <span class="termino-def">Todo lo que produce y vende un país en un periodo. Cuando crece suele haber más empleo; cuando cae dos trimestres seguidos se habla de recesión.</span>  </span> </span> y llegará al 100% en 2029 según el <strong>Fondo Monetario Internacional</strong>, nivel no registrado desde la Segunda Guerra Mundial. Los gobiernos buscan reducir la ratio de deuda no solo recortando el gasto, sino consiguiendo que la economía crezca lo suficientemente rápido. Con necesidades de gasto cada vez mayores y ajustes fiscales políticamente difíciles, lograr más crecimiento se ha convertido en pieza fundamental. Los países de la <strong>OCDE</strong> necesitarán captar alrededor de 18 billones de dólares este año para refinanciarse, frente a 17 billones en 2025. Cuando suben las acciones, los hogares se sienten más ricos y gastan más, generando el llamado efecto riqueza.</p> </div><p class="firma-ia"> Resumen redactado por un modelo de lenguaje a partir de los textos enlazados al margen. Esta historia la cuentan pocos medios, así que no hay contraste de versiones que medir. Puede contener errores: los originales mandan. </p>  <h2 class="rotulo-doc">En qué coinciden todos</h2> <ul class="hechos"> <li>La deuda pública mundial roza el 94% del PIB</li><li>Según el FMI, alcanzará el 100% en 2029</li><li>Un mercado de acciones al alza puede ayudar a reducir la ratio de deuda mediante el crecimiento económico</li> </ul>  <section class="compartir" data-compartir-caja data-url="https://noticiasdoxa.es/cluster/2436/" data-titulo="Los gobiernos necesitan crecimiento económico y mercados alcistas para manejar niveles récord de deuda pública"> <p class="compartir-rotulo">Compartir</p> <ul class="compartir-lista"> <li> <button type="button" class="compartir-accion" data-compartir="nativo" hidden>
+Enviar…
+</button> </li> <li> <button type="button" class="compartir-accion" data-compartir="copiar" hidden>
+Copiar enlace
+</button> </li> <li> <a class="compartir-accion" href="https://wa.me/?text=Los%20gobiernos%20necesitan%20crecimiento%20econ%C3%B3mico%20y%20mercados%20alcistas%20para%20manejar%20niveles%20r%C3%A9cord%20de%20deuda%20p%C3%BAblica%20https%3A%2F%2Fnoticiasdoxa.es%2Fcluster%2F2436%2F" target="_blank" rel="noopener noreferrer"> WhatsApp </a> </li><li> <a class="compartir-accion" href="https://t.me/share/url?url=https%3A%2F%2Fnoticiasdoxa.es%2Fcluster%2F2436%2F&text=Los%20gobiernos%20necesitan%20crecimiento%20econ%C3%B3mico%20y%20mercados%20alcistas%20para%20manejar%20niveles%20r%C3%A9cord%20de%20deuda%20p%C3%BAblica" target="_blank" rel="noopener noreferrer"> Telegram </a> </li><li> <a class="compartir-accion" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnoticiasdoxa.es%2Fcluster%2F2436%2F" target="_blank" rel="noopener noreferrer"> Facebook </a> </li><li> <a class="compartir-accion" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fnoticiasdoxa.es%2Fcluster%2F2436%2F&text=Los%20gobiernos%20necesitan%20crecimiento%20econ%C3%B3mico%20y%20mercados%20alcistas%20para%20manejar%20niveles%20r%C3%A9cord%20de%20deuda%20p%C3%BAblica" target="_blank" rel="noopener noreferrer"> X </a> </li> </ul>  <p class="compartir-estado" data-compartir="estado" role="status" aria-live="polite"></p> </section> <script type="module">document.querySelectorAll("[data-compartir-caja]").forEach(t=>{const r=t.dataset.url||location.href,n=t.dataset.titulo||document.title,e=t.querySelector('[data-compartir="estado"]'),a=t.querySelector('[data-compartir="copiar"]'),o=t.querySelector('[data-compartir="nativo"]');let i;const c=s=>{e&&(e.textContent=s,e.classList.add("visible"),clearTimeout(i),i=setTimeout(()=>{e.classList.remove("visible"),e.textContent=""},4e3))};navigator.clipboard&&window.isSecureContext&&a&&(a.hidden=!1,a.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(r),c("Enlace copiado.")}catch{c("No se pudo copiar. El enlace está en la barra del navegador.")}})),typeof navigator.share=="function"&&o&&(o.hidden=!1,o.addEventListener("click",async()=>{try{await navigator.share({title:n,url:r})}catch{}}))});</script> </div>  <aside class="doc-aparato">  <details class="pliegue" open> <summary class="rotulo-doc">
+Las versiones originales
+<span class="pliegue-cuenta">2</span> </summary> <div class="fuentes"> <section class="fuente-grupo"> <h3 class="fuente-medio">20minutos</h3> <ul> <li> <a href="https://www.20minutos.es/lainformacion/economia-y-finanzas/necesitan-los-gobiernos-que-suba-bolsa-para-poder-pagar-sus-deudas_7035798_0.html" target="_blank" rel="noopener noreferrer"> ¿Necesitan los gobiernos que suba la bolsa para poder pagar sus deudas? </a> </li> </ul> </section><section class="fuente-grupo"> <h3 class="fuente-medio">Expansión</h3> <ul> <li> <a href="https://www.expansion.com/inversion/2026/09/14/6aa3c257e5fdeab5728b456f.html" target="_blank" rel="noopener noreferrer"> Las 7 joyas de inversión que no hay que dejar escapar </a> </li> </ul> </section> </div>  </details> <section class="impacto"> <h2 class="rotulo-doc">En qué te afecta a ti</h2> <p class="impacto-alcance alcance-general">Le afecta a casi todo el mundo</p> <dl class="impacto-filas">  <dt>Qué ha pasado</dt> <dd>Los alquileres han subido de media un 8,6% en un año, pero bajan en ciudades grandes como Barcelona y Madrid. En pueblos y regiones baratas suben mucho más.</dd>  <dt>Quién lo causa</dt> <dd>La escasez de vivienda nueva: se construyeron 150.000 hogares menos de los que hacían falta entre 2021 y 2025.</dd>  <dt>El efecto directo</dt> <dd>Quien busca piso paga más en casi toda España. Quien ya alquila ve subir su recibo. En grandes ciudades es al revés: baja la demanda y bajan los precios.</dd>  <dt>Cómo te llega</dt> <dd>Si te mudas o te vence el contrato, tu alquiler sube. Si eres de Barcelona o Madrid, puede bajar. Muchos españoles siguen sin encontrar vivienda asequible.</dd>  </dl> <p class="firma-ia">
+Explicación en lenguaje llano escrita por un modelo a partir de la síntesis. Los hechos
+    y las cifras salen de los medios enlazados; el resto de la página los detalla.
+</p> </section> <section class="contrastar"><h2 class="rotulo-doc">Para contrastarlo</h2><ul class="contrastar-lista"><li><a href="https://www.bde.es/webbe/es/estadisticas/" target="_blank" rel="noopener noreferrer">Banco de España · Estadísticas</a><span class="contrastar-aporta">Tipos, euríbor, crédito y deuda, con las series que usan los propios bancos.</span></li><li><a href="https://www.ine.es/" target="_blank" rel="noopener noreferrer">INE · Instituto Nacional de Estadística</a><span class="contrastar-aporta">La estadística oficial española: población, vivienda, renta, sanidad, educación.</span></li></ul><p class="firma-ia">
+Fuentes primarias escogidas de un registro escrito a mano. Llevan al organismo que
+        publica el dato, no al documento concreto de esta noticia.
+</p></section> </aside> </article>  </main> <!-- Colofón denso (design.md § Nav y footer), pero repartido en columnas
+         de periódico: hasta el 2026-08-16 era UN párrafo de 72ch centrado, y
+         en escritorio quedaban 518 px de letra pequeña en medio de 1584 —una
+         maqueta de móvil estirada—. La densidad y los parámetros reales del
+         sistema no cambian: lo que cambia es que cada dato lleva su rótulo y
+         ocupa el ancho de la página. --> <footer class="colofon"> <div class="marco colofon-rejilla"> <section> <p class="colofon-rotulo">La Doxa</p> <p>
+Agregador personal de noticias contrastadas. Sin ánimo de lucro y sin
+            publicidad. Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
+</p> </section> <section> <p class="colofon-rotulo">Las síntesis</p> <p>
+Las redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de
+            los medios enlazados; pueden contener errores. Lee siempre el original.
+</p> </section> <section> <p class="colofon-rotulo">La agrupación</p> <p>
+Similitud coseno ≥ 0,75 sobre embeddings MiniLM multilingüe, ventana de
+            48 h y mínimo 2 medios por historia.
+</p> </section> <section> <p class="colofon-rotulo">Los medios</p> <p>
+No se republica el texto de los artículos ni se sortean muros de pago.
+</p> <p class="colofon-contacto"> <a href="mailto:contacto@noticiasdoxa.es">contacto@noticiasdoxa.es</a> </p> </section> </div> <!-- Apoyo (2026-08-26). Va ENTRE las cuatro columnas y el aviso legal a
+           propósito: el lector acaba de leer con qué reglas se hace esto, y es
+           justo ahí donde una petición de dinero se entiende en vez de
+           interrumpir. Arriba del todo sería lo contrario — una portada de
+           periódico que pide antes de dar.
+           🚫 Es un `href`, no el widget de Buy Me a Coffee: su botón oficial es
+           un script de terceros que carga con la página y rastrea mire quien
+           mire, exactamente lo que se rechazó en Compartir. Nada sale hacia
+           buymeacoffee.com salvo que el lector pulse.
+           ⚠️ Si esta línea cambia, cambian también /terminos/ («cómo se
+           sostiene») y /privacidad/ («si pulsas el enlace de apoyo»). Las tres
+           dicen lo mismo desde tres sitios y solo valen si coinciden. --> <div class="marco colofon-apoyo"> <p class="colofon-rotulo">Cómo se sostiene</p> <p>
+La Doxa no cobra ni cobrará por leerla y no lleva publicidad. Lo que cuesta
+          —el dominio y las llamadas al modelo que redacta las síntesis— sale del
+          bolsillo de una persona. Si te sirve y quieres que crezca, puedes echar una
+          mano; no hay nada detrás de ese enlace más que un café.
+</p> <p class="colofon-apoyo-accion"> <a class="enlace-accion" href="https://buymeacoffee.com/ipopdue24o" target="_blank" rel="noopener noreferrer">
+Invitar a un café ↗
+</a> </p> </div> <!-- Aviso legal: una FILA bajo las cuatro columnas, no una quinta
+           columna. § Nav y footer fija el colofón en cuatro columnas rotuladas
+           con los parámetros del sistema, y lo legal no es un parámetro del
+           sistema: es de otra clase. Un periódico lo pone igual, en una línea
+           al pie de todo. En móvil se apila solo, porque es un flex con wrap. --> <div class="marco colofon-legal"> <p class="colofon-declaracion">
+Proyecto personal sin ánimo de lucro: no hay publicidad, ni patrocinios, ni
+          afiliación, ni cuentas de usuario. Cada historia enlaza al artículo original,
+          que es de su medio.
+</p> <nav class="colofon-enlaces" aria-label="Legal"> <a href="/terminos/" class>
+Términos y condiciones
+</a> <a href="/privacidad/" class>
+Política de privacidad
+</a> <a href="/contacto/">Contacto</a> </nav> </div> </footer> <!-- Este SÍ puede ir diferido: nadie pulsa el botón antes de que cargue.
+         El estado "actual" se resuelve preguntando, no guardando una variable:
+         sin elección previa el tema lo manda el sistema, y leer el DOM es la
+         única forma de que el primer clic vaya en la dirección correcta. --> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.B5ft4Fqc.js"></script> </body> </html>
