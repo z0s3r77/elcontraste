@@ -1,0 +1,105 @@
+<!DOCTYPE html><html lang="es"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Un informe de la Policía conecta grabaciones de Villarejo con sus agendas personales en conversaciones con Cospedal — La Doxa</title><meta name="description" content="La Unidad de Asuntos Internos de la Policía Nacional ha conectado las agendas personales del comisario José Manuel Villarejo con audios que este grabó secretamente de conversaciones con María Dolores…"><link rel="canonical" href="https://noticiasdoxa.es/cluster/2950/"><!-- El icono se sirve desde public/. Con `urlEstatico` porque Astro no
+         reescribe los href escritos a mano y en GitHub Pages el sitio cuelga
+         de /<repo>/ (mismo motivo que el resto de helpers de ui.ts). --><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><!-- El color de la barra del navegador sigue al papel del tema: sin esto,
+         en móvil el sistema pinta una franja blanca sobre la portada nocturna.
+         Son los hex exactos de --color-paper (design.md § Theme).
+         Una sola etiqueta, sin `media`: desde que hay botón, el tema puede no
+         coincidir con el del sistema y el script de abajo la mantiene al día. --><meta name="theme-color" content="#f8f5ee"><!-- Tema elegido. `is:inline` y aquí arriba a propósito: tiene que correr
+         ANTES del primer pintado o se ve un fogonazo claro antes de aplicarse
+         el modo oscuro. Por eso no puede ser el script normal de Astro, que va
+         diferido. Es la única lógica del sitio que no puede esperar. --><script>
+      (function () {
+        // Marca de que hay JS. El revelado al hacer scroll solo esconde
+        // contenido si esta marca está puesta: sin script, la página se ve
+        // entera. Va aquí y no al final para que el CSS ya la encuentre.
+        document.documentElement.dataset.js = "";
+        try {
+          var elegido = localStorage.getItem("tema");
+          if (elegido === "dark" || elegido === "light") {
+            document.documentElement.dataset.theme = elegido;
+          }
+          var oscuro = elegido
+            ? elegido === "dark"
+            : matchMedia("(prefers-color-scheme: dark)").matches;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.content = oscuro ? "#130e09" : "#f8f5ee";
+        } catch (e) {
+          /* localStorage puede fallar (modo privado, cookies bloqueadas).
+             Sin preferencia guardada el sitio sigue el sistema y todo va. */
+        }
+      })();
+    </script><!-- Tarjeta al compartir. Sin esto un enlace pegado en WhatsApp o Mastodon
+         sale como una URL desnuda. --><meta property="og:type" content="website"><meta property="og:site_name" content="La Doxa"><meta property="og:locale" content="es_ES"><meta property="og:title" content="Un informe de la Policía conecta grabaciones de Villarejo con sus agendas personales en conversaciones con Cospedal — La Doxa"><meta property="og:description" content="La Unidad de Asuntos Internos de la Policía Nacional ha conectado las agendas personales del comisario José Manuel Villarejo con audios que este grabó secretamente de conversaciones con María Dolores…"><meta property="og:url" content="https://noticiasdoxa.es/cluster/2950/"><meta property="og:image" content="https://noticiasdoxa.es/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="La Doxa · agregador de prensa contrastada"><meta name="twitter:card" content="summary_large_image"><!-- Datos estructurados de la página, si los trae. Un motor de respuesta
+         (Google AI Overviews, ChatGPT, Perplexity…) lee esto antes que la
+         maquetación: le dice sin ambigüedad qué es la página, de cuándo es y
+         qué cita. Ver el escapado de jsonLdSeguro arriba. --><script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsArticle","headline":"Un informe de la Policía conecta grabaciones de Villarejo con sus agendas personales en conversaciones con Cospedal","description":"La Unidad de Asuntos Internos de la Policía Nacional ha conectado las agendas personales del comisario José Manuel Villarejo con audios que este grabó secretamente de conversaciones con María Dolores…","inLanguage":"es","datePublished":"2026-09-18T00:00:00Z","dateModified":"2026-09-18T00:00:00Z","image":["https://noticiasdoxa.es/og.png"],"articleSection":"Política","keywords":"corrupcion-y-casos","articleBody":"La Unidad de Asuntos Internos de la Policía Nacional ha conectado las agendas personales del comisario José Manuel Villarejo con audios que este grabó secretamente de conversaciones con María Dolores de Cospedal, exsecretaria general del PP. En un informe enviado al juez Antonio Piña, los investigadores comunicaron que las fechas coinciden. En una de las grabaciones, Villarejo le cuenta a Cospedal su idea de que el Ministerio del Interior haga policía al chófer de Luis Bárcenas. En la misma conversación del 15 de septiembre de 2014, Cospedal asegura a Villarejo que el presidente del Gobierno sabe que le han «limpiado» toda la documentación comprometida del PP sobre financiación ilegal.","author":{"@type":"Organization","name":"La Doxa","url":"https://noticiasdoxa.es/"},"publisher":{"@type":"Organization","name":"La Doxa","logo":{"@type":"ImageObject","url":"https://noticiasdoxa.es/og.png"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://noticiasdoxa.es/cluster/2950/"},"citation":[{"@type":"NewsArticle","headline":"Un nuevo informe de la Policía conecta los audios de Cospedal con los diarios de Villarejo","url":"https://elpais.com/espana/2026-09-16/un-nuevo-informe-de-la-policia-conecta-los-audios-de-cospedal-con-los-diarios-de-villarejo.html"},{"@type":"NewsArticle","headline":"Villarejo, a Cospedal: \"Hacéis policía nacional al chófer de Bárcenas y ya no puede hablar\"","url":"https://www.eldiario.es/politica/villarejo-cospedal-policia-nacional-chofer-barcenas-no-hablar_1_13516438.html"},{"@type":"NewsArticle","headline":"Las pruebas de cómo el PP de Rajoy intentó eliminar los papeles de Bárcenas vuelven a la mesa del juez","url":"https://www.eldiario.es/politica/pruebas-pp-rajoy-eliminar-papeles-barcenas-vuelven-mesa-juez_1_13516640.html"}]}</script><!-- Cloudflare Web Analytics: sin cookies, sin banner de consentimiento
+         (no hay dato personal persistente que consentir). El token NO es
+         secreto —viaja igual en el HTML de cada página—, así que llega como
+         variable de build normal (CF_BEACON_TOKEN), igual que SITE_URL.
+         Sin variable, no se pinta nada: el sitio funciona igual sin ella. --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon="{&#34;token&#34;:&#34;986667ce23b345ccb0a0b4943b52cf5c&#34;}"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="stylesheet" href="/_astro/_tema_.WgTCV2rH.css"></head> <body> <!-- `marco` en los tres: la cabecera se alinea con el contenido en vez de
+         sobresalir por los lados, que era el desajuste más visible en ancho. --> <header class="mast marco"> <p class="mast-line">Política · 2026-09-18</p> <a class="mast-name" href="/">La Doxa</a> <nav class="mast-nav" aria-label="Principal"> <ul> <li><a href="/" class>Portada</a></li> <li> <a href="/resumen/" class>Escuchar</a> </li> <li> <a href="/seccion/economico/" class>
+Secciones
+</a> </li> <li> <a href="/focos/" class>Focos</a> </li>  <li> <a href="/tendencias/" class>
+Tendencias
+</a> </li> <li> <a href="/contacto/" class>Contacto</a> </li> <li><button class="tema" type="button" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar entre modo claro y oscuro"> <span class="tema-iconos"> <svg class="tema-luna" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"> <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path> </svg> <svg class="tema-sol" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"> <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"></circle> <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path> </svg> </span> <span class="tema-texto">Tema</span> </button></li> </ul> </nav> <hr class="rule-double" aria-hidden="true"> </header> <main class="contenido marco">  <article class="doc"> <div class="doc-cuerpo"> <header class="doc-cabecera"> <p class="doc-seccion"> <a href="/seccion/politica-nacional/">Política</a> <span class="tema">corrupcion-y-casos</span> </p> <h1> Un informe de la Policía conecta grabaciones de Villarejo con sus agendas personales en conversaciones con Cospedal </h1>  <p class="doc-meta">
+Contrastada entre <span class="dato">2</span> medios sobre
+<span class="dato">3</span> versiones ·
+<span class="dato">2026-09-18</span> </p> </header>  <div class="relato"> <p>La Unidad de Asuntos Internos de la Policía Nacional ha conectado las agendas personales del comisario <strong>José Manuel Villarejo</strong> con audios que este grabó secretamente de conversaciones con <strong>María Dolores de Cospedal</strong>, exsecretaria general del PP. En un informe enviado al juez <strong>Antonio Piña</strong>, los investigadores comunicaron que las fechas coinciden. En una de las grabaciones, Villarejo le cuenta a Cospedal su idea de que el Ministerio del Interior haga policía al chófer de <strong>Luis Bárcenas</strong>. En la misma conversación del 15 de septiembre de 2014, Cospedal asegura a Villarejo que el presidente del Gobierno sabe que le han <em>«limpiado»</em> toda la documentación comprometida del PP sobre financiación ilegal.</p> </div><p class="firma-ia"> Resumen redactado por un modelo de lenguaje a partir de los textos enlazados al margen. Esta historia la cuentan pocos medios, así que no hay contraste de versiones que medir. Puede contener errores: los originales mandan. </p>  <h2 class="rotulo-doc">En qué coinciden todos</h2> <ul class="hechos"> <li>La Unidad de Asuntos Internos de la Policía Nacional ha validado grabaciones del comisario Villarejo</li><li>Las grabaciones comprometen a Dolores de Cospedal en el conocimiento de operaciones policiales ilegales</li><li>El informe compara fechas de grabaciones con anotaciones en la agenda personal de Villarejo</li> </ul>  <section class="compartir" data-compartir-caja data-url="https://noticiasdoxa.es/cluster/2950/" data-titulo="Un informe de la Policía conecta grabaciones de Villarejo con sus agendas personales en conversaciones con Cospedal"> <p class="compartir-rotulo">Compartir</p> <ul class="compartir-lista"> <li> <button type="button" class="compartir-accion" data-compartir="nativo" hidden>
+Enviar…
+</button> </li> <li> <button type="button" class="compartir-accion" data-compartir="copiar" hidden>
+Copiar enlace
+</button> </li> <li> <a class="compartir-accion" href="https://wa.me/?text=Un%20informe%20de%20la%20Polic%C3%ADa%20conecta%20grabaciones%20de%20Villarejo%20con%20sus%20agendas%20personales%20en%20conversaciones%20con%20Cospedal%20https%3A%2F%2Fnoticiasdoxa.es%2Fcluster%2F2950%2F" target="_blank" rel="noopener noreferrer"> WhatsApp </a> </li><li> <a class="compartir-accion" href="https://t.me/share/url?url=https%3A%2F%2Fnoticiasdoxa.es%2Fcluster%2F2950%2F&text=Un%20informe%20de%20la%20Polic%C3%ADa%20conecta%20grabaciones%20de%20Villarejo%20con%20sus%20agendas%20personales%20en%20conversaciones%20con%20Cospedal" target="_blank" rel="noopener noreferrer"> Telegram </a> </li><li> <a class="compartir-accion" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnoticiasdoxa.es%2Fcluster%2F2950%2F" target="_blank" rel="noopener noreferrer"> Facebook </a> </li><li> <a class="compartir-accion" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fnoticiasdoxa.es%2Fcluster%2F2950%2F&text=Un%20informe%20de%20la%20Polic%C3%ADa%20conecta%20grabaciones%20de%20Villarejo%20con%20sus%20agendas%20personales%20en%20conversaciones%20con%20Cospedal" target="_blank" rel="noopener noreferrer"> X </a> </li> </ul>  <p class="compartir-estado" data-compartir="estado" role="status" aria-live="polite"></p> </section> <script type="module">document.querySelectorAll("[data-compartir-caja]").forEach(t=>{const r=t.dataset.url||location.href,n=t.dataset.titulo||document.title,e=t.querySelector('[data-compartir="estado"]'),a=t.querySelector('[data-compartir="copiar"]'),o=t.querySelector('[data-compartir="nativo"]');let i;const c=s=>{e&&(e.textContent=s,e.classList.add("visible"),clearTimeout(i),i=setTimeout(()=>{e.classList.remove("visible"),e.textContent=""},4e3))};navigator.clipboard&&window.isSecureContext&&a&&(a.hidden=!1,a.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(r),c("Enlace copiado.")}catch{c("No se pudo copiar. El enlace está en la barra del navegador.")}})),typeof navigator.share=="function"&&o&&(o.hidden=!1,o.addEventListener("click",async()=>{try{await navigator.share({title:n,url:r})}catch{}}))});</script> </div>  <aside class="doc-aparato">  <details class="pliegue" open> <summary class="rotulo-doc">
+Las versiones originales
+<span class="pliegue-cuenta">3</span> </summary> <div class="fuentes"> <section class="fuente-grupo"> <h3 class="fuente-medio">El País</h3> <ul> <li> <a href="https://elpais.com/espana/2026-09-16/un-nuevo-informe-de-la-policia-conecta-los-audios-de-cospedal-con-los-diarios-de-villarejo.html" target="_blank" rel="noopener noreferrer"> Un nuevo informe de la Policía conecta los audios de Cospedal con los diarios de Villarejo </a> </li> </ul> </section><section class="fuente-grupo"> <h3 class="fuente-medio">eldiario.es</h3> <ul> <li> <a href="https://www.eldiario.es/politica/villarejo-cospedal-policia-nacional-chofer-barcenas-no-hablar_1_13516438.html" target="_blank" rel="noopener noreferrer"> Villarejo, a Cospedal: &quot;Hacéis policía nacional al chófer de Bárcenas y ya no puede hablar&quot; </a> </li><li> <a href="https://www.eldiario.es/politica/pruebas-pp-rajoy-eliminar-papeles-barcenas-vuelven-mesa-juez_1_13516640.html" target="_blank" rel="noopener noreferrer"> Las pruebas de cómo el PP de Rajoy intentó eliminar los papeles de Bárcenas vuelven a la mesa del juez </a> </li> </ul> </section> </div>  </details>  <section class="contrastar"><h2 class="rotulo-doc">Para contrastarlo</h2><ul class="contrastar-lista"><li><a href="https://www.poderjudicial.es/cgpj/es/Poder-Judicial" target="_blank" rel="noopener noreferrer">Poder Judicial · Resoluciones y notas</a><span class="contrastar-aporta">Las sentencias y comunicados oficiales de los tribunales españoles.</span></li></ul><p class="firma-ia">
+Fuentes primarias escogidas de un registro escrito a mano. Llevan al organismo que
+        publica el dato, no al documento concreto de esta noticia.
+</p></section> </aside> </article>  </main> <!-- Colofón denso (design.md § Nav y footer), pero repartido en columnas
+         de periódico: hasta el 2026-08-16 era UN párrafo de 72ch centrado, y
+         en escritorio quedaban 518 px de letra pequeña en medio de 1584 —una
+         maqueta de móvil estirada—. La densidad y los parámetros reales del
+         sistema no cambian: lo que cambia es que cada dato lleva su rótulo y
+         ocupa el ancho de la página. --> <footer class="colofon"> <div class="marco colofon-rejilla"> <section> <p class="colofon-rotulo">La Doxa</p> <p>
+Agregador personal de noticias contrastadas. Sin ánimo de lucro y sin
+            publicidad. Compuesto con Libre Caslon Display, Spectral e IBM Plex Mono.
+</p> </section> <section> <p class="colofon-rotulo">Las síntesis</p> <p>
+Las redacta un modelo de lenguaje (Haiku 4.5) a partir de los textos de
+            los medios enlazados; pueden contener errores. Lee siempre el original.
+</p> </section> <section> <p class="colofon-rotulo">La agrupación</p> <p>
+Similitud coseno ≥ 0,75 sobre embeddings MiniLM multilingüe, ventana de
+            48 h y mínimo 2 medios por historia.
+</p> </section> <section> <p class="colofon-rotulo">Los medios</p> <p>
+No se republica el texto de los artículos ni se sortean muros de pago.
+</p> <p class="colofon-contacto"> <a href="mailto:contacto@noticiasdoxa.es">contacto@noticiasdoxa.es</a> </p> </section> </div> <!-- Apoyo (2026-08-26). Va ENTRE las cuatro columnas y el aviso legal a
+           propósito: el lector acaba de leer con qué reglas se hace esto, y es
+           justo ahí donde una petición de dinero se entiende en vez de
+           interrumpir. Arriba del todo sería lo contrario — una portada de
+           periódico que pide antes de dar.
+           🚫 Es un `href`, no el widget de Buy Me a Coffee: su botón oficial es
+           un script de terceros que carga con la página y rastrea mire quien
+           mire, exactamente lo que se rechazó en Compartir. Nada sale hacia
+           buymeacoffee.com salvo que el lector pulse.
+           ⚠️ Si esta línea cambia, cambian también /terminos/ («cómo se
+           sostiene») y /privacidad/ («si pulsas el enlace de apoyo»). Las tres
+           dicen lo mismo desde tres sitios y solo valen si coinciden. --> <div class="marco colofon-apoyo"> <p class="colofon-rotulo">Cómo se sostiene</p> <p>
+La Doxa no cobra ni cobrará por leerla y no lleva publicidad. Lo que cuesta
+          —el dominio y las llamadas al modelo que redacta las síntesis— sale del
+          bolsillo de una persona. Si te sirve y quieres que crezca, puedes echar una
+          mano; no hay nada detrás de ese enlace más que un café.
+</p> <p class="colofon-apoyo-accion"> <a class="enlace-accion" href="https://buymeacoffee.com/ipopdue24o" target="_blank" rel="noopener noreferrer">
+Invitar a un café ↗
+</a> </p> </div> <!-- Aviso legal: una FILA bajo las cuatro columnas, no una quinta
+           columna. § Nav y footer fija el colofón en cuatro columnas rotuladas
+           con los parámetros del sistema, y lo legal no es un parámetro del
+           sistema: es de otra clase. Un periódico lo pone igual, en una línea
+           al pie de todo. En móvil se apila solo, porque es un flex con wrap. --> <div class="marco colofon-legal"> <p class="colofon-declaracion">
+Proyecto personal sin ánimo de lucro: no hay publicidad, ni patrocinios, ni
+          afiliación, ni cuentas de usuario. Cada historia enlaza al artículo original,
+          que es de su medio.
+</p> <nav class="colofon-enlaces" aria-label="Legal"> <a href="/terminos/" class>
+Términos y condiciones
+</a> <a href="/privacidad/" class>
+Política de privacidad
+</a> <a href="/contacto/">Contacto</a> </nav> </div> </footer> <!-- Este SÍ puede ir diferido: nadie pulsa el botón antes de que cargue.
+         El estado "actual" se resuelve preguntando, no guardando una variable:
+         sin elección previa el tema lo manda el sistema, y leer el DOM es la
+         única forma de que el primer clic vaya en la dirección correcta. --> <script type="module" src="/_astro/Base.astro_astro_type_script_index_0_lang.B5ft4Fqc.js"></script> </body> </html>
